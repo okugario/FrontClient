@@ -14,6 +14,10 @@ const ComponentList = [
     Keys: ['Firms'],
   },
   {
+    Component: React.lazy(() => import('./IntervalComponent')),
+    Keys: ['IntervalComponent'],
+  },
+  {
     Component: React.lazy(() => import('./TransportModelComponent')),
     Keys: ['VehicleModels'],
   },
@@ -58,7 +62,10 @@ const ComponentList = [
     Component: React.lazy(() => import('./AdministrationMenuComponent')),
     Keys: ['AdministrationMenu'],
   },
-
+  {
+    Component: React.lazy(() => import('./TransportTreeComponent')),
+    Keys: ['TreeComponent'],
+  },
   {
     Component: React.lazy(() => import('./StatisticComponent')),
     Keys: ['statistic'],

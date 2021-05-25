@@ -31,7 +31,7 @@ export default class TransportTreeComponent extends React.Component {
         onCheck={(CheckedKeys) => {
           this.TransportChech(CheckedKeys);
         }}
-        height={700}
+        height={400}
         treeData={this.props.ProviderStore.TransportTree}
         defaultCheckedKeys={
           this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys

@@ -99,8 +99,22 @@ export class Tab {
         break;
       case 'reports':
         this.Options = {
+          CheckedTransportKeys: [],
           CurrentMenuItem: TabObject.items[0],
-          LeftMenu: ['AdministrationMenu'],
+          StartDate:
+            Moment().hours() < 20
+              ? Moment('08:00:00', 'HH:mm:ss')
+              : Moment('20:00:00', 'HH:mm:ss'),
+
+          EndDate:
+            Moment().hours() < 20
+              ? Moment('20:00:00', 'HH:mm:ss')
+              : Moment('08:00:00', 'HH:mm:ss').add(1, 'day'),
+          LeftMenu: [
+            'IntervalComponent',
+            'TreeComponent',
+            'AdministrationMenu',
+          ],
         };
         break;
       case 'equipment':

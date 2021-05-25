@@ -3,7 +3,7 @@ import { observer, inject } from 'mobx-react';
 import { Table } from 'antd';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import 'chartjs-adapter-moment';
-import { GenerateTableData } from '../Helpers/Helpers';
+import { ApiFetch, GenerateTableData } from '../Helpers/Helpers';
 
 import {
   Chart,
@@ -26,6 +26,16 @@ export default class TripsReportComponent extends React.Component {
     this.ChartRef = React.createRef();
     this.state = {};
     this.Chart = null;
+  }
+  RequestTransportTree() {
+    ApiFetch(
+      `reports/VehicleTree?ts=${this.props.ProviderStore.CurrentTab.Options.StartDate.unix()}`,
+      'GET',
+      undefined,
+      (Response) => {
+        this.props.ProviderStore.SetNewTransportTree(Response.data);
+      }
+    );
   }
   InitCharts() {
     this.ChartRef.current.getContext('2d');
@@ -105,6 +115,7 @@ export default class TripsReportComponent extends React.Component {
 
   componentDidMount() {
     this.InitCharts();
+    this.RequestTransportTree();
   }
   render() {
     return (

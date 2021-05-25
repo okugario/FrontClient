@@ -157,16 +157,13 @@ class Store {
     this.CurrentTab.Options.StartDate = NewStartDate;
     this.CurrentTab.Options.EndDate = NewEndDate;
   }
-  SetNewTransportTree(GroupsData, TransportData) {
-    this.TransportTree = GroupsData.map((Group) => {
+  SetNewTransportTree(TransportData) {
+    this.TransportTree = TransportData.map((Group) => {
       return {
-        title: Group.name,
-        key: Group.id,
-        children: Group.vehs.map((TransportID) => {
-          const Transport = TransportData.find((Transport) => {
-            return Transport.id == TransportID;
-          });
-          return { title: Transport.caption, key: Transport.id };
+        title: Group.Caption,
+        key: Group.Id,
+        children: Group.Vehicles.map((Transport) => {
+          return { title: Transport.Caption, key: Transport.Id };
         }),
       };
     });
