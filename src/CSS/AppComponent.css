@@ -1,0 +1,8 @@
+html,
+body,
+#App,
+.ant-tabs-content,
+.FullExtend {
+  height: 100%;
+  width: 100%;
+}

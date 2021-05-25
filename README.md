@@ -1,2 +1,2 @@
 # FrontClient
-Frontend часть админки TradeInfo
+Фронтенд администрирования для SibOmnicomm.
