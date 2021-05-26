@@ -40,8 +40,8 @@ export default class RetranslationObjectTableComponent extends React.Component {
                   style={{ width: '170px' }}
                   showTime={true}
                   onOk={(Value) => {
-                    this.props.ProfileHandler(
-                      'EditObject',
+                    this.props.RetranslationHandler(
+                      'ChangeObjectTime',
                       Value.unix(),
                       this.state.SelectedKey[0]
                     );
@@ -53,10 +53,9 @@ export default class RetranslationObjectTableComponent extends React.Component {
                 {Record.ObjectId == '0' ? (
                   <Button
                     onClick={() => {
-                      this.props.ProfileHandler(
-                        'SaveNewObjectId',
-                        this.NewIdInputRef.current.value,
-                        Index
+                      this.props.RetranslationHandler(
+                        'SaveObject',
+                        this.NewIdInputRef.current.value
                       );
                     }}
                     size="small"
@@ -94,7 +93,7 @@ export default class RetranslationObjectTableComponent extends React.Component {
             this.ModalHandler(false);
           }}
           onOk={() => {
-            this.props.ProfileHandler(
+            this.props.RetranslationHandler(
               'DeleteObject',
               undefined,
               this.state.SelectedKey[0]
@@ -116,7 +115,7 @@ export default class RetranslationObjectTableComponent extends React.Component {
             size="small"
             type="primary"
             onClick={() => {
-              this.props.ProfileHandler('AddObject');
+              this.props.RetranslationHandler('AddObject');
             }}
           >
             Добавить

@@ -38,6 +38,9 @@ export default function RetranslationProfile(props) {
           </div>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <Input
+              onChange={(Event) => {
+                props.RetranslationHandler('ChangeCaption', Event.target.value);
+              }}
               size="small"
               style={{ width: '100px' }}
               value={props.Profile.Caption}
@@ -54,7 +57,15 @@ export default function RetranslationProfile(props) {
         >
           <div style={{ display: 'flex', alignItems: 'center' }}>Включен:</div>
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            <Checkbox checked={props.Profile.Active} />
+            <Checkbox
+              checked={props.Profile.Active}
+              onChange={(Event) => {
+                props.RetranslationHandler(
+                  'ChangeActive',
+                  Event.target.checked
+                );
+              }}
+            />
           </div>
         </div>
         <div
@@ -70,6 +81,9 @@ export default function RetranslationProfile(props) {
               size="small"
               style={{ width: '100px' }}
               value={props.Profile.Options.Url}
+              onChange={(Event) => {
+                props.RetranslationHandler('ChangeUrl', Event.target.value);
+              }}
             />
           </div>
         </div>
@@ -101,6 +115,9 @@ export default function RetranslationProfile(props) {
           <div style={{ display: 'flex', alignItems: 'center' }}>Название:</div>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <Select
+              onChange={(Value) => {
+                props.RetranslationHandler('ChangeProtocolName', Value);
+              }}
               value={props.Profile.Options.Protocol.Name}
               style={{ width: '100px' }}
               size="small"
@@ -124,6 +141,9 @@ export default function RetranslationProfile(props) {
           <div style={{ display: 'flex', alignItems: 'center' }}>Версия:</div>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <Select
+              onChange={(Value) => {
+                props.RetranslationHandler('ChangeProtocolVersion', Value);
+              }}
               value={props.Profile.Options.Protocol.Ver}
               style={{ width: '50px' }}
               size="small"
@@ -157,6 +177,12 @@ export default function RetranslationProfile(props) {
           </div>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <Input
+              onChange={(Event) => {
+                props.RetranslationHandler(
+                  'ChangeProtocolLimit',
+                  Event.target.value
+                );
+              }}
               size="small"
               style={{ width: '100px' }}
               value={props.Profile.Options.Protocol.Limit}
@@ -173,6 +199,12 @@ export default function RetranslationProfile(props) {
           <div style={{ display: 'flex', alignItems: 'center' }}>Пауза:</div>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <Input
+              onChange={(Event) => {
+                props.RetranslationHandler(
+                  'ChangeProtocolPause',
+                  Event.target.value
+                );
+              }}
               size="small"
               style={{ width: '100px' }}
               value={props.Profile.Options.Protocol.Pause}
@@ -198,7 +230,10 @@ export default function RetranslationProfile(props) {
           <div style={{ display: 'flex', alignItems: 'center' }}></div>
         </div>
       </div>
-      <RetranslationObjectTable Objects={props.Profile.Objects} />
+      <RetranslationObjectTable
+        Objects={props.Profile.Objects}
+        RetranslationHandler={props.RetranslationHandler}
+      />
     </>
   );
 }

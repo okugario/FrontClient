@@ -1,12 +1,14 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { Table, Modal, Button } from 'antd';
+import { Table, Modal, Button, message } from 'antd';
 import { TableSorter, ApiFetch } from '../Helpers/Helpers';
 import RetranslationProfile from './RetranslationProfile';
+import Moment from 'moment';
 export default function RetranslationComponent() {
   const [RetranslationTable, SetNewTable] = useState(null);
   const [SelectedKey, SetNewSelectedKey] = useState(null);
   const [ShowProfile, SetNewShowProfile] = useState(false);
+  const [ShowDeleteModal, SetNewShowDeleteModal] = useState(false);
   const [Profile, SetNewProfile] = useState(null);
   const RequestProfile = () => {
     ApiFetch(
@@ -19,7 +21,9 @@ export default function RetranslationComponent() {
       }
     );
   };
-  const RetranslationHandler = (Operation, Data) => {
+  const RetranslationHandler = (Operation, Data, ObjectKey) => {
+    let NewObjects = Profile != null ? [...Profile.Objects] : [];
+    let NewProfile = Profile != null ? { ...Profile } : null;
     switch (Operation) {
       case 'AddRetranslation':
         SetNewProfile({
@@ -33,10 +37,126 @@ export default function RetranslationComponent() {
         });
         SetNewShowProfile(true);
         break;
+      case 'ChangeCaption':
+        NewProfile.Caption = Data;
+        SetNewProfile(NewProfile);
+        break;
+      case 'ChangeActive':
+        NewProfile.Active = Data;
+        SetNewProfile(NewProfile);
+        break;
+      case 'ChangeUrl':
+        NewProfile.Options.Url = Data;
+        SetNewProfile(NewProfile);
+        break;
+      case 'ChangeProtocolName':
+        NewProfile.Options.Protocol.Name = Data;
+        SetNewProfile(NewProfile);
+        break;
+      case 'ChangeProtocolVersion':
+        NewProfile.Options.Protocol.Ver = Data;
+        SetNewProfile(NewProfile);
+        break;
+      case 'ChangeProtocolLimit':
+        NewProfile.Options.Protocol.Limit = Data;
+        SetNewProfile(NewProfile);
+        break;
+      case 'ChangeProtocolPause':
+        NewProfile.Options.Protocol.Pause = Data;
+        SetNewProfile(NewProfile);
+        break;
+      case 'AddObject':
+        if (NewObjects[0] == undefined || NewObjects[0].ObjectId != '0') {
+          NewObjects.unshift({ ObjectId: '0', LastTs: Moment().unix() });
+          NewProfile.Objects = NewObjects;
+          SetNewProfile(NewProfile);
+        } else {
+          message.error('Сохраните объект');
+        }
+
+        break;
+      case 'SaveObject':
+        if (
+          Data != '0' &&
+          NewObjects.every((Objects) => {
+            return Objects.ObjectId != Data;
+          })
+        ) {
+          NewObjects[0].ObjectId = Data;
+          NewProfile.Objects = NewObjects;
+          SetNewProfile(NewProfile);
+        } else {
+          message.error('Укажите корректный ID');
+        }
+
+        break;
+      case 'ChangeObjectTime':
+        NewObjects.find((Object) => {
+          return Object.ObjectId == ObjectKey;
+        }).LastTs = Data;
+        NewProfile.Objects = NewObjects;
+        SetNewProfile(NewProfile);
+
+        break;
+      case 'DeleteObject':
+        NewObjects.splice(
+          NewObjects.findIndex((Object) => {
+            return Object.ObjectId == ObjectKey;
+          }),
+          1
+        );
+        NewProfile.Objects = NewObjects;
+        SetNewProfile(NewProfile);
+        break;
+      case 'DeleteRetranslation':
+        if (SelectedKey != null) {
+          let NewRetranslationTable = [...RetranslationTable];
+          NewRetranslationTable.splice(
+            RetranslationTable.findIndex((Retranslation) => {
+              return Retranslation.Id == SelectedKey;
+            }),
+            1
+          );
+          SetNewSelectedKey(null);
+          ApiFetch(
+            `model/RetransTargets/${SelectedKey}`,
+            'DELETE',
+            undefined,
+            () => {
+              SetNewTable(NewRetranslationTable);
+              SetNewShowDeleteModal(false);
+            }
+          );
+        }
+
+        break;
+      case 'SaveProfile':
+        if (
+          Profile.Caption.length != 0 &&
+          Profile.Options.Url.length != 0 &&
+          Profile.Options.Protocol.Limit != 0 &&
+          Profile.Options.Protocol.Pause != 0
+        ) {
+          ApiFetch(
+            'Id' in Profile
+              ? `model/RetransTargets/${SelectedKey}`
+              : `model/RetransTargets`,
+            'Id' in Profile ? 'PATCH' : 'POST',
+            Profile,
+            (Response) => {
+              RequestTable().then(() => {
+                SetNewShowProfile(false);
+              });
+            }
+          );
+        } else {
+          message.error('Полностью заполните профиль');
+        }
+        break;
     }
   };
   const RequestTable = () => {
-    ApiFetch('model/RetransTargets', 'GET', undefined, (Response) => {
+    return ApiFetch('model/RetransTargets', 'GET', undefined, (Response) => {
       SetNewTable(Response.data);
     });
   };
@@ -44,7 +164,22 @@ export default function RetranslationComponent() {
   return (
     <div className="FullExtend">
       <Modal
-        width="400px"
+        visible={ShowDeleteModal}
+        onCancel={() => {
+          SetNewShowDeleteModal(false);
+        }}
+        title="Подтвердите действие"
+        okButtonProps={{ size: 'small' }}
+        cancelButtonProps={{ size: 'small' }}
+        onOk={() => {
+          RetranslationHandler('DeleteRetranslation');
+        }}
+      >
+        Вы действительно хотите удалить ретранслятор?
+      </Modal>
+      <Modal
+        okText="Сохранить"
+        width="450px"
         title="Профиль ретранслятора"
         visible={ShowProfile}
         onCancel={() => {
@@ -52,8 +187,14 @@ export default function RetranslationComponent() {
         }}
         okButtonProps={{ size: 'small' }}
         cancelButtonProps={{ size: 'small' }}
+        onOk={() => {
+          RetranslationHandler('SaveProfile');
+        }}
       >
-        <RetranslationProfile Profile={Profile} />
+        <RetranslationProfile
+          Profile={Profile}
+          RetranslationHandler={RetranslationHandler}
+        />
       </Modal>
       <div
         style={{
@@ -72,7 +213,16 @@ export default function RetranslationComponent() {
         >
           Добавить
         </Button>
-        <Button size="small" danger type="primary">
+        <Button
+          size="small"
+          danger
+          type="primary"
+          onClick={() => {
+            if (SelectedKey != null) {
+              SetNewShowDeleteModal(true);
+            }
+          }}
+        >
           Удалить
         </Button>
       </div>
