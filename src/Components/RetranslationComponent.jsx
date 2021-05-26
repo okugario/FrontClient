@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { Table, Modal } from 'antd';
+import { Table, Modal, Button } from 'antd';
 import { TableSorter, ApiFetch } from '../Helpers/Helpers';
 import RetranslationProfile from './RetranslationProfile';
 export default function RetranslationComponent() {
@@ -19,6 +19,22 @@ export default function RetranslationComponent() {
       }
     );
   };
+  const RetranslationHandler = (Operation, Data) => {
+    switch (Operation) {
+      case 'AddRetranslation':
+        SetNewProfile({
+          Caption: '',
+          Active: false,
+          Options: {
+            Protocol: { Limit: 50, Name: 'WialonIPS', Pause: 30, Ver: 1 },
+            Url: '',
+          },
+          Objects: [],
+        });
+        SetNewShowProfile(true);
+        break;
+    }
+  };
   const RequestTable = () => {
     ApiFetch('model/RetransTargets', 'GET', undefined, (Response) => {
       SetNewTable(Response.data);
@@ -28,13 +44,38 @@ export default function RetranslationComponent() {
   return (
     <div className="FullExtend">
       <Modal
+        width="400px"
+        title="Профиль ретранслятора"
         visible={ShowProfile}
         onCancel={() => {
           SetNewShowProfile(false);
         }}
+        okButtonProps={{ size: 'small' }}
+        cancelButtonProps={{ size: 'small' }}
       >
-        {<RetranslationProfile Profile={Profile} />}
+        <RetranslationProfile Profile={Profile} />
       </Modal>
+      <div
+        style={{
+          width: '200px',
+          display: 'flex',
+          justifyContent: 'space-evenly',
+          marginBottom: '5px',
+        }}
+      >
+        <Button
+          size="small"
+          type="primary"
+          onClick={() => {
+            RetranslationHandler('AddRetranslation');
+          }}
+        >
+          Добавить
+        </Button>
+        <Button size="small" danger type="primary">
+          Удалить
+        </Button>
+      </div>
       <Table
         scroll={{ scrollToFirstRowOnChange: true, y: 700 }}
         rowKey="Id"
