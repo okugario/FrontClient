@@ -49,86 +49,50 @@ export default class TyrespressReportComponent extends React.Component {
           {
             pointRadius: 0,
             type: 'line',
-            label: 'ПЛ',
+            label: TyrpressReportData.skt.values[0].caption,
             borderColor: '#7cb5ec',
             backgroundColor: '#7cb5ec',
-            data: TyrpressReportData.skt.values
-              .find((Data) => {
-                return Data.caption == 'ПЛ';
-              })
-              .pts.map((Point) => {
-                return Point[1];
-              }),
+            data: TyrpressReportData.skt.values[0].pts,
           },
           {
             borderColor: '#434348',
             backgroundColor: '#434348',
             pointRadius: 0,
             type: 'line',
-            label: 'ПП',
-            data: TyrpressReportData.skt.values
-              .find((Data) => {
-                return Data.caption == 'ПП';
-              })
-              .pts.map((Point) => {
-                return Point[1];
-              }),
+            label: TyrpressReportData.skt.values[1].caption,
+            data: TyrpressReportData.skt.values[1].pts,
           },
           {
             borderColor: '#90ed7d',
             backgroundColor: '#90ed7d',
             pointRadius: 0,
             type: 'line',
-            label: 'ЗЛН',
-            data: TyrpressReportData.skt.values
-              .find((Data) => {
-                return Data.caption == 'ЗЛН';
-              })
-              .pts.map((Point) => {
-                return Point[1];
-              }),
+            label: TyrpressReportData.skt.values[2].caption,
+            data: TyrpressReportData.skt.values[2].pts,
           },
           {
             pointRadius: 0,
             backgroundColor: '#f7a35c',
             borderColor: '#f7a35c',
             type: 'line',
-            label: 'ЗЛВ',
-            data: TyrpressReportData.skt.values
-              .find((Data) => {
-                return Data.caption == 'ЗЛВ';
-              })
-              .pts.map((Point) => {
-                return Point[1];
-              }),
+            label: TyrpressReportData.skt.values[3].caption,
+            data: TyrpressReportData.skt.values[3].pts,
           },
           {
             pointRadius: 0,
             backgroundColor: '#8085e9',
             borderColor: '#8085e9',
             type: 'line',
-            label: 'ЗПВ',
-            data: TyrpressReportData.skt.values
-              .find((Data) => {
-                return Data.caption == 'ЗПВ';
-              })
-              .pts.map((Point) => {
-                return Point[1];
-              }),
+            label: TyrpressReportData.skt.values[4].caption,
+            data: TyrpressReportData.skt.values[4].pts,
           },
           {
             pointRadius: 0,
             backgroundColor: '#f15c80',
             borderColor: '#f15c80',
             type: 'line',
-            label: 'ЗПН',
-            data: TyrpressReportData.skt.values
-              .find((Data) => {
-                return Data.caption == 'ЗПН';
-              })
-              .pts.map((Point) => {
-                return Point[1];
-              }),
+            label: TyrpressReportData.skt.values[5].caption,
+            data: TyrpressReportData.skt.values[5].pts,
           },
         ],
       },
@@ -136,7 +100,7 @@ export default class TyrespressReportComponent extends React.Component {
         plugins: {
           legend: { display: true, position: 'bottom' },
           zoom: {
-            zoom: { enabled: true, mode: 'x' },
+            zoom: { wheel: { enabled: true }, mode: 'x' },
             pan: {
               enabled: true,
               mode: 'x',

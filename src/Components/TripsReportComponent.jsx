@@ -73,10 +73,7 @@ export default class TripsReportComponent extends React.Component {
             borderWidth: 1.6,
             borderColor: '#802080',
             backgroundColor: '#802080',
-            data: TripsReportTestData.tpts.map((Point) => {
-              return Point[1];
-            }),
-
+            data: TripsReportTestData.tpts,
             borderWidth: 1,
           },
           {
@@ -95,7 +92,7 @@ export default class TripsReportComponent extends React.Component {
         plugins: {
           legend: { display: true, position: 'bottom' },
           zoom: {
-            zoom: { enabled: true, mode: 'x' },
+            zoom: { wheel: { enabled: true }, mode: 'x' },
             pan: {
               enabled: true,
               mode: 'x',
