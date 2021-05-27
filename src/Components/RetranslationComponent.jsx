@@ -67,7 +67,11 @@ export default function RetranslationComponent() {
         break;
       case 'AddObject':
         if (NewObjects[0] == undefined || NewObjects[0].ObjectId != '0') {
-          NewObjects.unshift({ ObjectId: '0', LastTs: Moment().unix() });
+          NewObjects.unshift({
+            TargetId: NewProfile.Id,
+            ObjectId: '0',
+            LastTs: Moment().unix(),
+          });
           NewProfile.Objects = NewObjects;
           SetNewProfile(NewProfile);
         } else {
