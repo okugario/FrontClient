@@ -50,7 +50,6 @@ export default class IntervalComponent extends React.Component {
           this.state.StartDate,
           this.state.EndDate
         );
-        this.props.ProviderStore.UpdateTracks();
         this.ModalHandler(false);
         break;
       case 'Cancel':

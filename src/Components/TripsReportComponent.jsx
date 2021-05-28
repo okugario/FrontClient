@@ -151,6 +151,7 @@ export default class TripsReportComponent extends React.Component {
               pagination={false}
             />
             <Table
+              showHeader={false}
               pagination={false}
               size="small"
               dataSource={GenerateTableData(

@@ -9,18 +9,7 @@ export default class TransportTreeComponent extends React.Component {
     this.state = {};
   }
   TransportChech = (CheckedKey) => {
-    let CheckedKeysArray = [];
-    CheckedKey.forEach((Key) => {
-      this.props.ProviderStore.TransportTree.forEach((TreeItem) => {
-        TreeItem.children.forEach((TransportItem) => {
-          if (TransportItem.key == Key) {
-            CheckedKeysArray.push(TransportItem.key);
-          }
-        });
-      });
-    });
-
-    this.props.ProviderStore.SetNewCheckedTransportKeys(CheckedKeysArray);
+    this.props.ProviderStore.SetNewCheckedTransportKeys(CheckedKey);
   };
   render() {
     return (
@@ -28,16 +17,15 @@ export default class TransportTreeComponent extends React.Component {
         defaultExpandedKeys={
           this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys
         }
-        onCheck={(CheckedKeys) => {
+        onSelect={(CheckedKeys) => {
           this.TransportChech(CheckedKeys);
         }}
         height={400}
         treeData={this.props.ProviderStore.TransportTree}
-        defaultCheckedKeys={
+        selectedKeys={
           this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys
         }
-        checkable={true}
-        selectable={false}
+        selectable={true}
       />
     );
   }

@@ -108,45 +108,7 @@ class Store {
       );
     }
   }
-  UpdateTracks() {
-    this.CurrentTab.Options.CheckedTransportKeys.forEach((Key) => {
-      this.DeleteTrack(Key);
-      this.AddTrack(Key);
-    });
-    if (this.CurrentTab.GetVectorLayerSource().getFeatures() > 0) {
-      this.CurrentTab.Options.MapObject.getView().fit(
-        this.CurrentTab.GetVectorLayerSource().getExtent()
-      );
-    }
-  }
   SetNewCheckedTransportKeys(NewTransportKeys) {
-    let PromiseArray = [];
-
-    if (
-      NewTransportKeys.length >
-      this.CurrentTab.Options.CheckedTransportKeys.length
-    ) {
-      NewTransportKeys.forEach((Key) => {
-        if (!this.CurrentTab.Options.CheckedTransportKeys.includes(Key)) {
-          PromiseArray.push(this.AddTrack(Key));
-        }
-      });
-
-      Promise.all(PromiseArray).then(() => {
-        if (this.CurrentTab.GetVectorLayerSource().getFeatures().length > 0) {
-          this.CurrentTab.Options.MapObject.getView().fit(
-            this.CurrentTab.GetVectorLayerSource().getExtent()
-          );
-        }
-      });
-    } else {
-      this.CurrentTab.Options.CheckedTransportKeys.forEach((Key) => {
-        if (!NewTransportKeys.includes(Key)) {
-          this.DeleteTrack(Key);
-        }
-      });
-    }
-
     this.CurrentTab.Options.CheckedTransportKeys = NewTransportKeys;
   }
   SetNewCurrentTimeTrackPlayer(NewTime) {
@@ -160,6 +122,7 @@ class Store {
   SetNewTransportTree(TransportData) {
     this.TransportTree = TransportData.map((Group) => {
       return {
+        selectable: false,
         title: Group.Caption,
         key: Group.Id,
         children: Group.Vehicles.map((Transport) => {
