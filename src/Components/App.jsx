@@ -101,6 +101,7 @@ export default class App extends React.Component {
   componentDidMount() {
     GlobalStore.AddTab({
       id: 'settings',
+      type: 'setting',
       caption: 'Администрирование',
       items: [
         { id: 'RetransTargets', caption: 'Ретрансляторы' },
@@ -117,13 +118,24 @@ export default class App extends React.Component {
     });
     GlobalStore.AddTab({
       id: 'reports',
+      type: 'report',
       caption: 'Отчеты',
       items: [
         { id: 'tripsReport', caption: 'Отчет по рейсам' },
-        { id: 'loadsReport', caption: 'Погрузки экскаваторов' },
-        { id: 'tyrespressReport', caption: 'Давление в шинах' },
-        { id: 'exhaustTemperature', caption: 'Температура выхлопа' },
+        {
+          id: 'loadsReport',
+          caption: 'Погрузки экскаваторов',
+        },
+        {
+          id: 'tyrespressReport',
+          caption: 'Давление в шинах',
+        },
+        {
+          id: 'exhaustTemperature',
+          caption: 'Температура выхлопа',
+        },
         { id: 'journal', caption: 'Журнал' },
+        { id: 'map', caption: 'Карта' },
       ],
     });
   }

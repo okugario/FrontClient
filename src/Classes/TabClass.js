@@ -18,12 +18,12 @@ export class Tab {
     if ('items' in TabObject) {
       this.Items = TabObject.items;
     }
-    switch (TabObject.id) {
-      case 'map':
+    switch (TabObject.type) {
+      case 'report':
         this.Options = {
           CurrentMenuItem: TabObject.items[0],
           CheckedTransportKeys: [],
-          LeftMenu: ['Interval', 'TransportTree'],
+          LeftMenu: ['Interval', 'TransportTree', 'AdministrationMenu'],
           StartDate:
             Moment().hours() < 20
               ? Moment('08:00:00', 'HH:mm:ss')
@@ -41,7 +41,6 @@ export class Tab {
           MapObject: new MapObject({
             interactions: defaults({ doubleClickZoom: false }),
             controls: [],
-
             layers: [
               new TileLayer({
                 preload: Infinity,
@@ -90,38 +89,12 @@ export class Tab {
           return this.Options.MapObject.getLayers().array_[1].getSource();
         };
         break;
-      case 'settings':
+      case 'setting':
         this.Options = {
           CurrentMenuItem: TabObject.items[0],
           LeftMenu: ['AdministrationMenu'],
         };
 
-        break;
-      case 'reports':
-        this.Options = {
-          CheckedTransportKeys: [],
-          CurrentMenuItem: TabObject.items[0],
-          StartDate:
-            Moment().hours() < 20
-              ? Moment('08:00:00', 'HH:mm:ss')
-              : Moment('20:00:00', 'HH:mm:ss'),
-
-          EndDate:
-            Moment().hours() < 20
-              ? Moment('20:00:00', 'HH:mm:ss')
-              : Moment('08:00:00', 'HH:mm:ss').add(1, 'day'),
-          LeftMenu: [
-            'IntervalComponent',
-            'TreeComponent',
-            'AdministrationMenu',
-          ],
-        };
-        break;
-      case 'equipment':
-        break;
-      case 'exports':
-        break;
-      case 'actions':
         break;
     }
     makeAutoObservable(this);
