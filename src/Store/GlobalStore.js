@@ -103,16 +103,15 @@ class Store {
     }
   }
   SetNewCheckedTransportKeys(NewTransportKeys) {
-    if (this.CurrentTab.Options.CheckedTransportKeys.length > 0) {
-      this.DeleteTrack(this.CurrentTab.Options.CheckedTransportKeys[0]);
-    }
-    this.CurrentTab.Options.CheckedTransportKeys = NewTransportKeys;
     switch (this.CurrentTab.Options.CurrentMenuItem.id) {
       case 'map':
+        if (this.CurrentTab.Options.CheckedTransportKeys.length > 0) {
+          this.DeleteTrack(this.CurrentTab.Options.CheckedTransportKeys[0]);
+        }
         this.AddTrack(NewTransportKeys[0]);
-
         break;
     }
+    this.CurrentTab.Options.CheckedTransportKeys = NewTransportKeys;
   }
   SetNewCurrentTimeTrackPlayer(NewTime) {
     this.CurrentTab.Options.CurrentTrackPlayerTime = Moment.unix(NewTime);
@@ -121,6 +120,20 @@ class Store {
     this.CurrentTab.Options.CurrentTrackPlayerTime = NewStartDate;
     this.CurrentTab.Options.StartDate = NewStartDate;
     this.CurrentTab.Options.EndDate = NewEndDate;
+    switch (this.CurrentTab.Options.CurrentMenuItem.id) {
+      case 'map':
+        if (this.CurrentTab.Options.CheckedTransportKeys.length > 0) {
+          this.DeleteTrack(this.CurrentTab.Options.CheckedTransportKeys[0]);
+          this.AddTrack(this.CurrentTab.Options.CheckedTransportKeys[0]);
+        }
+        if (this.CurrentTab.GetTrackFeaturies().length > 0) {
+          this.CurrentTab.Options.MapObject.getView().fit(
+            this.CurrentTab.GetVectorLayerSource().getExtent()
+          );
+        }
+
+        break;
+    }
   }
   SetNewTransportTree(TransportData) {
     this.TransportTree = TransportData.map((Group) => {
