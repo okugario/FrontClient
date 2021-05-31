@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Slider, Button, Input } from 'antd';
+import { Slider, Button, Input, Select } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import { observer, inject } from 'mobx-react';
 
@@ -11,6 +11,7 @@ export default class TrackPlayerComponent extends React.Component {
     this.PlayerDataMap = null;
     this.CurrentTraks = null;
     this.state = {
+      Speed: 10,
       PlayerInterval: null,
     };
   }
@@ -47,7 +48,7 @@ export default class TrackPlayerComponent extends React.Component {
               ) {
                 this.props.ProviderStore.SetNewCurrentTimeTrackPlayer(
                   this.props.ProviderStore.CurrentTab.Options.CurrentTrackPlayerTime.unix() +
-                    1
+                    (1 * this.state.Speed) / 10
                 );
               }
               if (
@@ -60,7 +61,7 @@ export default class TrackPlayerComponent extends React.Component {
                 );
                 Data.Mark.getGeometry().setCoordinates(Data.Coordinates);
               }
-            }, 10),
+            }, this.state.Speed),
           });
         }
 
@@ -70,6 +71,9 @@ export default class TrackPlayerComponent extends React.Component {
         this.setState({ PlayerInterval: null });
         break;
     }
+  }
+  componentWillUnmount() {
+    clearInterval(this.state.PlayerInterval);
   }
   ChangeTransportMarkPosition(NewTime) {
     if (this.PlayerDataMap != null) {
@@ -166,6 +170,20 @@ export default class TrackPlayerComponent extends React.Component {
           value={this.props.ProviderStore.CurrentTab.Options.CurrentTrackPlayerTime.format(
             'HH:mm:ss'
           )}
+        />
+        <Select
+          size="small"
+          onChange={(NewSpeed) => {
+            this.setState({ Speed: NewSpeed });
+          }}
+          value={this.state.Speed}
+          options={[
+            { value: 10, label: '1' },
+            { value: 20, label: '2' },
+            { value: 50, label: '5' },
+            { value: 100, label: '10' },
+            { value: 300, label: '30' },
+          ]}
         />
         <CloseOutlined
           style={{ cursor: 'pointer', color: 'red' }}

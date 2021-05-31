@@ -106,37 +106,13 @@ export default class App extends React.Component {
       items: [
         { id: 'RetransTargets', caption: 'Ретрансляторы' },
         { id: 'statistic', caption: 'Статистика' },
-        { id: 'Vehicles', caption: 'Транспорт' },
-        { id: 'Users', caption: 'Пользователи' },
-        { id: 'Manufacturers', caption: 'Производители' },
-        { id: 'VehicleTypes', caption: 'Типы ТС' },
-        { id: 'VehicleModels', caption: 'Модели ТС' },
-        { id: 'Regions', caption: 'Участки' },
-        { id: 'AccessRoles', caption: 'Роли' },
-        { id: 'Firms', caption: 'Организации' },
       ],
     });
     GlobalStore.AddTab({
       id: 'reports',
       type: 'report',
       caption: 'Отчеты',
-      items: [
-        { id: 'tripsReport', caption: 'Отчет по рейсам' },
-        {
-          id: 'loadsReport',
-          caption: 'Погрузки экскаваторов',
-        },
-        {
-          id: 'tyrespressReport',
-          caption: 'Давление в шинах',
-        },
-        {
-          id: 'exhaustTemperature',
-          caption: 'Температура выхлопа',
-        },
-        { id: 'journal', caption: 'Журнал' },
-        { id: 'map', caption: 'Карта' },
-      ],
+      items: [{ id: 'map', caption: 'Карта' }],
     });
   }
   GetComponent(ComponentID) {

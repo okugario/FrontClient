@@ -27,38 +27,37 @@ export default class MapButtonBarComponent extends React.Component {
   TrackPlayer = () => {
     if (
       this.props.ProviderStore.CurrentTab.Options.MapObject.getControls().array_
-        .length == 1
+        .length == 1 &&
+      this.props.ProviderStore.CurrentTab.GetTrackFeaturies().length == 1
     ) {
       this.props.ProviderStore.CurrentTab.Options.MapObject.addControl(
         new Control({
           element: this.TrackPlayerElement,
         })
       );
-      this.props.ProviderStore.CurrentTab.GetVectorLayerSource().forEachFeature(
+      this.props.ProviderStore.CurrentTab.GetTrackFeaturies().forEach(
         (Track) => {
-          if (/Track/.test(Track.getId())) {
-            const Feature = new GeoJSON().readFeature({
-              type: 'Feature',
-              id: `Mark${Track.getId()}`,
-              geometry: {
-                type: 'Point',
-                coordinates: Track.getGeometry().getCoordinateAt(0),
-              },
-            });
+          const Feature = new GeoJSON().readFeature({
+            type: 'Feature',
+            id: `Mark${Track.getId()}`,
+            geometry: {
+              type: 'Point',
+              coordinates: Track.getGeometry().getCoordinateAt(0),
+            },
+          });
 
-            Feature.setStyle(
-              new Style({
-                image: new Icon({
-                  anchor: [0.5, 1],
-                  src: TruckSVG,
-                  scale: [0.25, 0.25],
-                }),
-              })
-            );
-            this.props.ProviderStore.CurrentTab.GetVectorLayerSource().addFeature(
-              Feature
-            );
-          }
+          Feature.setStyle(
+            new Style({
+              image: new Icon({
+                anchor: [0.5, 1],
+                src: TruckSVG,
+                scale: [0.25, 0.25],
+              }),
+            })
+          );
+          this.props.ProviderStore.CurrentTab.GetVectorLayerSource().addFeature(
+            Feature
+          );
         }
       );
     }

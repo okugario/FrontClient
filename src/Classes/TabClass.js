@@ -80,7 +80,7 @@ export class Tab {
             .array_[1].getSource()
             .getFeatures()
             .filter((Feature) => {
-              if (/^Track\d{1,}/.test(Feature.getId())) {
+              if (/^Track\w{1,}/.test(Feature.getId())) {
                 return true;
               }
             });
