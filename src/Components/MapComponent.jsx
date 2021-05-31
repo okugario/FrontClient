@@ -19,9 +19,23 @@ export default class MapComponent extends React.Component {
     this.props.ProviderStore.CurrentTab.Options.MapObject.setTarget(
       this.MapRef.current
     );
-    this.props.ProviderStore.CurrentTab.Options.MapObject.addControl(
-      new Control({ element: this.ButtonBar })
-    );
+
+    if (
+      this.props.ProviderStore.CurrentTab.Options.MapObject.getControls().array_
+        .length == 0
+    ) {
+      this.props.ProviderStore.CurrentTab.Options.MapObject.addControl(
+        new Control({ element: this.ButtonBar })
+      );
+    } else {
+      this.props.ProviderStore.CurrentTab.Options.MapObject.removeControl(
+        this.props.ProviderStore.CurrentTab.Options.MapObject.getControls()
+          .array_[0]
+      );
+      this.props.ProviderStore.CurrentTab.Options.MapObject.addControl(
+        new Control({ element: this.ButtonBar })
+      );
+    }
   };
   componentDidMount() {
     this.InitMap();

@@ -27,11 +27,9 @@ class Store {
   AddTrack = (TransportId) => {
     return new Promise((resolve, reject) => {
       ApiFetch(
-        `/trackGeoJSON?oid=${TransportId}&sts=${
-          this.CurrentTab.Options.StartDate.unix() - 1230768000
-        }&fts=${this.CurrentTab.Options.EndDate.unix() - 1230768000}`,
-        'get',
-        null,
+        `reports/Track?id=${TransportId}&sts=${this.CurrentTab.Options.StartDate.unix()}&fts=${this.CurrentTab.Options.EndDate.unix()}`,
+        'GET',
+        undefined,
         (Response) => {
           if (Response.geometry.coordinates.length > 0) {
             let NewFeature = new GeoJSON().readFeature(Response, {
@@ -48,31 +46,27 @@ class Store {
               })
             );
             this.CurrentTab.GetVectorLayerSource().addFeature(NewFeature);
-
-            if (
-              this.CurrentTab.Options.MapObject.getControls().array_.length == 2
-            ) {
-              const MarkTrackFeature = new GeoJSON().readFeature({
-                type: 'Feature',
-                id: `MarkTrack${TransportId}`,
-                geometry: {
-                  type: 'Point',
-                  coordinates: NewFeature.getGeometry().getCoordinateAt(0),
-                },
-              });
-              MarkTrackFeature.setStyle(
-                new Style({
-                  image: new Icon({
-                    anchor: [0.5, 1],
-                    src: TruckSVG,
-                    scale: [0.25, 0.25],
-                  }),
-                })
-              );
-              this.CurrentTab.GetVectorLayerSource().addFeature(
-                MarkTrackFeature
-              );
-            }
+            const MarkTrackFeature = new GeoJSON().readFeature({
+              type: 'Feature',
+              id: `MarkTrack${TransportId}`,
+              geometry: {
+                type: 'Point',
+                coordinates: NewFeature.getGeometry().getCoordinateAt(0),
+              },
+            });
+            MarkTrackFeature.setStyle(
+              new Style({
+                image: new Icon({
+                  anchor: [0.5, 1],
+                  src: TruckSVG,
+                  scale: [0.25, 0.25],
+                }),
+              })
+            );
+            this.CurrentTab.GetVectorLayerSource().addFeature(MarkTrackFeature);
+            this.CurrentTab.Options.MapObject.getView().fit(
+              this.CurrentTab.GetVectorLayerSource().getExtent()
+            );
           }
           resolve();
         }
@@ -109,7 +103,16 @@ class Store {
     }
   }
   SetNewCheckedTransportKeys(NewTransportKeys) {
+    if (this.CurrentTab.Options.CheckedTransportKeys.length > 0) {
+      this.DeleteTrack(this.CurrentTab.Options.CheckedTransportKeys[0]);
+    }
     this.CurrentTab.Options.CheckedTransportKeys = NewTransportKeys;
+    switch (this.CurrentTab.Options.CurrentMenuItem.id) {
+      case 'map':
+        this.AddTrack(NewTransportKeys[0]);
+
+        break;
+    }
   }
   SetNewCurrentTimeTrackPlayer(NewTime) {
     this.CurrentTab.Options.CurrentTrackPlayerTime = Moment.unix(NewTime);
