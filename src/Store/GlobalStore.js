@@ -1,11 +1,15 @@
 import { makeAutoObservable } from 'mobx';
 import { Tab } from '../Classes/TabClass';
 import { ApiFetch } from '../Helpers/Helpers';
-import GeoJSON from 'ol/format/GeoJSON';
+
 import { RandomColor } from '../Helpers/Helpers';
-import Style from 'ol/style/Style';
+
 import Stroke from 'ol/style/Stroke';
 import * as Moment from 'moment';
+
+import { Icon, Style, Text } from 'ol/style';
+import GeoJSON from 'ol/format/GeoJSON';
+import TruckSVG from '../Svg/Truck.svg';
 
 class Store {
   TransportTree = [];
@@ -43,6 +47,36 @@ class Store {
                 }),
               })
             );
+            if (
+              this.CurrentTab.Options.MapObject.getControls().array_.length == 2
+            ) {
+              const Feature = new GeoJSON().readFeature({
+                type: 'Feature',
+                id: `Mark${NewFeature.getId()}`,
+                geometry: {
+                  type: 'Point',
+                  coordinates: NewFeature.getGeometry().getCoordinateAt(0),
+                },
+              });
+
+              Feature.setStyle(
+                new Style({
+                  text: new Text({
+                    font: 'bold 10px sans-serif',
+                    text: NewFeature.values_.caption,
+                    offsetX: 30,
+                    offsetY: -10,
+                  }),
+                  image: new Icon({
+                    anchor: [0.5, 1],
+                    src: TruckSVG,
+                    scale: [0.2, 0.2],
+                  }),
+                })
+              );
+              this.CurrentTab.GetVectorLayerSource().addFeature(Feature);
+            }
+
             this.CurrentTab.GetVectorLayerSource().addFeature(NewFeature);
             this.CurrentTab.Options.MapObject.getView().fit(
               this.CurrentTab.GetVectorLayerSource().getExtent()
