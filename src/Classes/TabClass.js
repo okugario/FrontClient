@@ -1,5 +1,6 @@
 import MapObject from 'ol/Map';
 import OSM from 'ol/source/OSM';
+import * as React from 'react';
 import Stroke from 'ol/style/Stroke';
 import * as Moment from 'moment';
 import Style from 'ol/style/Style';
@@ -9,6 +10,9 @@ import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import View from 'ol/View';
 import { makeAutoObservable } from 'mobx';
+import MapComponent from '../Components/MapComponent';
+import RetranslationComponent from '../Components/RetranslationComponent';
+import StatisticComponent from '../Components/StatisticComponent';
 
 export class Tab {
   constructor(TabObject, OpenTabs) {
@@ -16,7 +20,20 @@ export class Tab {
     this.Caption = TabObject.caption;
     this.Key = this.GenerateTabKey(TabObject.id, OpenTabs);
     if ('items' in TabObject) {
-      this.Items = TabObject.items;
+      this.Items = TabObject.items.map((Item) => {
+        switch (Item.id) {
+          case 'map':
+            Item.Component = <MapComponent />;
+            break;
+          case 'RetransTargets':
+            Item.Component = <RetranslationComponent />;
+            break;
+          case 'statistic':
+            Item.Component = <StatisticComponent />;
+            break;
+        }
+        return Item;
+      });
     }
     switch (TabObject.type) {
       case 'report':
@@ -97,6 +114,7 @@ export class Tab {
 
         break;
     }
+
     makeAutoObservable(this);
   }
   GenerateTabKey(TabID, OpenTabs) {

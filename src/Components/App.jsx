@@ -67,10 +67,6 @@ const ComponentList = [
     Keys: ['TreeComponent'],
   },
   {
-    Component: React.lazy(() => import('./StatisticComponent')),
-    Keys: ['statistic'],
-  },
-  {
     Component: React.lazy(() => import('./TripsReportComponent')),
     Keys: ['tripsReport'],
   },
@@ -85,10 +81,6 @@ const ComponentList = [
   {
     Component: React.lazy(() => import('./ExhaustTemperatureComponent')),
     Keys: ['exhaustTemperature'],
-  },
-  {
-    Component: React.lazy(() => import('./RetranslationComponent')),
-    Keys: ['RetransTargets'],
   },
 ];
 @observer
@@ -152,7 +144,8 @@ export default class App extends React.Component {
               </Sider>
               <Content>
                 <Tabs
-                  style={{ height: 'calc(100% - 4%)', with: '100%' }}
+                  size="small"
+                  style={{ height: '100%', with: '100%' }}
                   hideAdd={true}
                   type="card"
                   onChange={(TabKey) => {
@@ -171,15 +164,9 @@ export default class App extends React.Component {
                         key={Tab.Key}
                         className="FullExtend"
                       >
-                        <React.Suspense
-                          fallback={
-                            <Spin tip="Загрузка компонента" size="large" />
-                          }
-                        >
-                          {this.GetComponent(
-                            GlobalStore.CurrentTab.Options.CurrentMenuItem.id
-                          )}
-                        </React.Suspense>
+                        {GlobalStore.CurrentTab != null
+                          ? Tab.Options.CurrentMenuItem.Component
+                          : null}
                       </TabPane>
                     );
                   })}

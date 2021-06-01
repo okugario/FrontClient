@@ -49,7 +49,9 @@ export default class MapComponent extends React.Component {
     return (
       <React.Fragment>
         <div ref={this.MapRef} className="FullExtend" />
-        {ReactDOM.createPortal(<MapButtonBarComponent />, this.ButtonBar)}
+        {this.props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id == 'map'
+          ? ReactDOM.createPortal(<MapButtonBarComponent />, this.ButtonBar)
+          : null}
       </React.Fragment>
     );
   }
