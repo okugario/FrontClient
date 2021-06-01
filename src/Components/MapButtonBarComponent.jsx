@@ -8,7 +8,7 @@ import OverlayPositioning from 'ol/OverlayPositioning';
 import Draw from 'ol/interaction/Draw';
 import GeometryType from 'ol/geom/GeometryType';
 import Stroke from 'ol/style/Stroke';
-import { Icon, Style } from 'ol/style';
+import { Icon, Style, Text } from 'ol/style';
 import Overlay from 'ol/Overlay';
 import LineString from 'ol/geom/LineString';
 import TrackPlayerComponent from './TrackPlayerComponent';
@@ -48,10 +48,16 @@ export default class MapButtonBarComponent extends React.Component {
 
           Feature.setStyle(
             new Style({
+              text: new Text({
+                font: 'bold 10px sans-serif',
+                text: Track.values_.caption,
+                offsetX: 30,
+                offsetY: -10,
+              }),
               image: new Icon({
                 anchor: [0.5, 1],
                 src: TruckSVG,
-                scale: [0.25, 0.25],
+                scale: [0.2, 0.2],
               }),
             })
           );

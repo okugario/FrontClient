@@ -125,7 +125,7 @@ export default class TrackPlayerComponent extends React.Component {
     return (
       <div
         style={{
-          marginTop: '39%',
+          marginTop: '42%',
           marginLeft: '30%',
           width: '600px',
           height: '30px',

@@ -6,8 +6,6 @@ import { RandomColor } from '../Helpers/Helpers';
 import Style from 'ol/style/Style';
 import Stroke from 'ol/style/Stroke';
 import * as Moment from 'moment';
-import { Icon } from 'ol/style';
-import TruckSVG from '../Svg/Truck.svg';
 
 class Store {
   TransportTree = [];
@@ -46,24 +44,6 @@ class Store {
               })
             );
             this.CurrentTab.GetVectorLayerSource().addFeature(NewFeature);
-            const MarkTrackFeature = new GeoJSON().readFeature({
-              type: 'Feature',
-              id: `MarkTrack${TransportId}`,
-              geometry: {
-                type: 'Point',
-                coordinates: NewFeature.getGeometry().getCoordinateAt(0),
-              },
-            });
-            MarkTrackFeature.setStyle(
-              new Style({
-                image: new Icon({
-                  anchor: [0.5, 1],
-                  src: TruckSVG,
-                  scale: [0.25, 0.25],
-                }),
-              })
-            );
-            this.CurrentTab.GetVectorLayerSource().addFeature(MarkTrackFeature);
             this.CurrentTab.Options.MapObject.getView().fit(
               this.CurrentTab.GetVectorLayerSource().getExtent()
             );

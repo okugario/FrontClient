@@ -26,10 +26,6 @@ export default class MapComponent extends React.Component {
     );
   }
   InitMap = () => {
-    console.log(
-      this.props.ProviderStore.CurrentTab.Options.MapObject.getControls().array_
-        .length
-    );
     this.ButtonBar.className = 'MatteGlass';
     this.props.ProviderStore.CurrentTab.Options.MapObject.setTarget(
       this.MapRef.current
