@@ -13,6 +13,8 @@ import { makeAutoObservable } from 'mobx';
 import MapComponent from '../Components/MapComponent';
 import RetranslationComponent from '../Components/RetranslationComponent';
 import StatisticComponent from '../Components/StatisticComponent';
+import TransportComponent from '../Components/TransportComponent';
+import RegionsComponent from '../Components/RegionsComponent';
 
 export class Tab {
   constructor(TabObject, OpenTabs) {
@@ -30,6 +32,12 @@ export class Tab {
             break;
           case 'statistic':
             Item.Component = <StatisticComponent />;
+            break;
+          case 'Vehicles':
+            Item.Component = <TransportComponent />;
+            break;
+          case 'Regions':
+            Item.Component = <RegionsComponent />;
             break;
         }
         return Item;

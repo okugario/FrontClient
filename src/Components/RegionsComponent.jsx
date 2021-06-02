@@ -1,35 +1,33 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import RegionProfile from './RegionProfile';
-import { Table, Modal } from 'antd';
+import { Table, Button } from 'antd';
 import { ApiFetch } from '../Helpers/Helpers';
 export default function RegionsComponent() {
   const [SelectedKey, SetNewSelectedKey] = useState(null);
-  const [ShowProfile, SetNewShowProfile] = useState(false);
   const [RegionsTable, SetNewRegionsTable] = useState(null);
-  const [Profile, SetNewProfile] = useState(null);
   const RequestTable = () => {
     ApiFetch('model/Regions', 'GET', undefined, (Response) => {
       SetNewRegionsTable(Response.data);
     });
   };
-  const RequestProfile = () => {
-    ApiFetch(`model/Regions/${SelectedKey}`, 'GET', undefined, (Response) => {
-      SetNewProfile(Response.data);
-      SetNewShowProfile(true);
-    });
-  };
   useEffect(RequestTable, []);
   return (
     <div className="FullExtend">
-      <Modal
-        visible={ShowProfile}
-        onCancel={() => {
-          SetNewShowProfile(false);
+      <div
+        style={{
+          width: '200px',
+          display: 'flex',
+          justifyContent: 'space-evenly',
+          marginBottom: '5px',
         }}
       >
-        <RegionProfile />
-      </Modal>
+        <Button size="small" type="primary" onClick={() => {}}>
+          Добавить
+        </Button>
+        <Button size="small" danger type="primary" onClick={() => {}}>
+          Удалить
+        </Button>
+      </div>
       <Table
         scroll={{ scrollToFirstRowOnChange: true, y: 700 }}
         pagination={false}
@@ -46,9 +44,7 @@ export default function RegionsComponent() {
             onClick: () => {
               SetNewSelectedKey(Record['Id']);
             },
-            onDoubleClick: () => {
-              RequestProfile();
-            },
+            onDoubleClick: () => {},
           };
         }}
         dataSource={RegionsTable}

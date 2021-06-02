@@ -26,10 +26,6 @@ const ComponentList = [
     Keys: ['AccessRoles'],
   },
   {
-    Component: React.lazy(() => import('./RegionsComponent')),
-    Keys: ['Regions'],
-  },
-  {
     Component: React.lazy(() => import('./TransportTypeComponent')),
     Keys: ['VehicleTypes'],
   },
@@ -42,10 +38,6 @@ const ComponentList = [
     Keys: ['Manufacturers'],
   },
   { Component: React.lazy(() => import('./UsersComponent')), Keys: ['Users'] },
-  {
-    Component: React.lazy(() => import('./TransportComponent')),
-    Keys: ['Vehicles'],
-  },
   {
     Component: React.lazy(() => import('./TyrespressReportComponent')),
     Keys: ['tyrespressReport'],
@@ -98,6 +90,8 @@ export default class App extends React.Component {
       items: [
         { id: 'RetransTargets', caption: 'Ретрансляторы' },
         { id: 'statistic', caption: 'Статистика' },
+        { id: 'Vehicles', caption: 'Транспорт' },
+        { id: 'Regions', caption: 'Участки' },
       ],
     });
     GlobalStore.AddTab({

@@ -9,14 +9,42 @@ export default function TransportComponent() {
   const [ShowProfile, SetNewShowProfile] = useState(false);
   const [SelectedKey, SetNewSelectedKey] = useState(null);
   const [Profile, SetNewProfile] = useState(null);
+
   const RequestTransportTable = () => {
     ApiFetch('model/Vehicles', 'GET', undefined, (Response) => {
       SetNewTransportTable(Response.data);
     });
   };
   const RequestProfile = () => {
-    ApiFetch(`model/Vehicles/${SelectedKey}`, 'GET', undefined, (Response) => {
-      SetNewProfile(Response.data);
+    let NewProfile = {};
+    let PromiseArray = [];
+    PromiseArray.push(
+      ApiFetch('model/VehicleModels', 'GET', undefined, (Response) => {
+        NewProfile.AllModels = Response.data;
+      })
+    );
+    PromiseArray.push(
+      ApiFetch('model/VehicleTypes', 'GET', undefined, (Response) => {
+        NewProfile.AllTypes = Response.data;
+      })
+    );
+    PromiseArray.push(
+      ApiFetch('model/Firms', 'GET', undefined, (Response) => {
+        NewProfile.AllFirms = Response.data;
+      })
+    );
+    PromiseArray.push(
+      ApiFetch(
+        `model/Vehicles/${SelectedKey}`,
+        'GET',
+        undefined,
+        (Response) => {
+          NewProfile.Profile = Response.data;
+        }
+      )
+    );
+    Promise.all(PromiseArray).then(() => {
+      SetNewProfile(NewProfile);
       SetNewShowProfile(true);
     });
   };
@@ -24,12 +52,17 @@ export default function TransportComponent() {
   return (
     <div className="FullExtend">
       <Modal
+        title="Профиль транспорта"
+        width="450px"
+        okText="Сохранить"
+        okButtonProps={{ size: 'small' }}
+        cancelButtonProps={{ size: 'small' }}
         visible={ShowProfile}
         onCancel={() => {
           SetNewShowProfile(false);
         }}
       >
-        {<TransportProfile />}
+        <TransportProfile Profile={Profile} />
       </Modal>
       <Table
         scroll={{ scrollToFirstRowOnChange: true, y: 700 }}
