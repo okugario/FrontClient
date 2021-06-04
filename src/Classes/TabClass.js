@@ -10,6 +10,7 @@ import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import View from 'ol/View';
 import { makeAutoObservable } from 'mobx';
+import TripsReportComponent from '../Components/TripsReportComponent';
 import MapComponent from '../Components/MapComponent';
 import RetranslationComponent from '../Components/RetranslationComponent';
 import StatisticComponent from '../Components/StatisticComponent';
@@ -38,6 +39,9 @@ export class Tab {
             break;
           case 'Regions':
             Item.Component = <RegionsComponent />;
+            break;
+          case 'tripsReport':
+            Item.Component = <TripsReportComponent />;
             break;
         }
         return Item;

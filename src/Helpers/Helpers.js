@@ -1,5 +1,4 @@
 import Moment from 'moment';
-import * as React from 'react';
 
 export const ApiFetch = (Adress, Method, Body, Callback) => {
   return new Promise((resolve, reject) => {

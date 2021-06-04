@@ -24,7 +24,14 @@ export default class TripsReportComponent extends React.Component {
   constructor(props) {
     super(props);
     this.ChartRef = React.createRef();
-    this.state = {};
+    this.state = {
+      InfoTableRows: [],
+      TripsTableRows: [],
+      TripsTableColumns: [],
+      GroupsTableRows: [],
+      GroupsTableColumns: [],
+      InfoTableColumns: [],
+    };
     this.Chart = null;
   }
   RequestTransportTree() {
@@ -36,6 +43,37 @@ export default class TripsReportComponent extends React.Component {
         this.props.ProviderStore.SetNewTransportTree(Response.data);
       }
     );
+  }
+  RequestReport() {
+    if (
+      this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys.length !=
+      0
+    ) {
+      ApiFetch(
+        `reports/TripsReport?id=${
+          this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys[0]
+        }&sts=${this.props.ProviderStore.CurrentTab.Options.StartDate.unix()}&fts=${this.props.ProviderStore.CurrentTab.Options.EndDate.unix()}`,
+        'GET',
+        undefined,
+        (Response) => {
+          this.setState({
+            GroupsTableColumns: GenerateTableData(
+              'Columns',
+              Response.groupsTable.columns
+            ),
+            GroupsTableRows: GenerateTableData(
+              'Rows',
+              Response.groupsTable.rows
+            ),
+            TripsTableRows: GenerateTableData('Rows', Response.tripsTable.rows),
+            TripsTableColumns: GenerateTableData(
+              'Columns',
+              Response.tripsTable.columns
+            ),
+          });
+        }
+      );
+    }
   }
   InitCharts() {
     this.ChartRef.current.getContext('2d');
@@ -112,6 +150,7 @@ export default class TripsReportComponent extends React.Component {
 
   componentDidMount() {
     this.InitCharts();
+    this.RequestReport();
     this.RequestTransportTree();
   }
   render() {
@@ -139,14 +178,8 @@ export default class TripsReportComponent extends React.Component {
           >
             <Table
               size="small"
-              columns={GenerateTableData(
-                'Columns',
-                TripsReportTestData.groups.columns
-              )}
-              dataSource={GenerateTableData(
-                'Rows',
-                TripsReportTestData.groups.rows
-              )}
+              columns={this.state.GroupsTableColumns}
+              dataSource={this.state.GroupsTableRows}
               scroll={{ y: 200 }}
               pagination={false}
             />
@@ -154,14 +187,8 @@ export default class TripsReportComponent extends React.Component {
               showHeader={false}
               pagination={false}
               size="small"
-              dataSource={GenerateTableData(
-                'Rows',
-                TripsReportTestData.info.rows
-              )}
-              columns={GenerateTableData(
-                'Columns',
-                TripsReportTestData.info.columns
-              )}
+              dataSource={this.state.InfoTableRows}
+              columns={this.state.InfoTableColumns}
             />
           </div>
         </div>
@@ -170,14 +197,8 @@ export default class TripsReportComponent extends React.Component {
             pagination={false}
             size="small"
             scroll={{ y: 150 }}
-            columns={GenerateTableData(
-              'Columns',
-              TripsReportTestData.trips.columns
-            )}
-            dataSource={GenerateTableData(
-              'Rows',
-              TripsReportTestData.trips.rows
-            )}
+            columns={this.state.TripsTableColumns}
+            dataSource={this.state.TripsTableRows}
           />
         </div>
       </div>

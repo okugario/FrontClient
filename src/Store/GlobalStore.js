@@ -29,7 +29,7 @@ class Store {
   AddTrack = (TransportId) => {
     return new Promise((resolve, reject) => {
       ApiFetch(
-        `reports/Track?id=${TransportId}&sts=${this.CurrentTab.Options.StartDate.unix()}&fts=${this.CurrentTab.Options.EndDate.unix()}`,
+        `reports/VehicleTrack?id=${TransportId}&sts=${this.CurrentTab.Options.StartDate.unix()}&fts=${this.CurrentTab.Options.EndDate.unix()}`,
         'GET',
         undefined,
         (Response) => {
