@@ -43,6 +43,15 @@ export function GenerateTableData(Mode, Data) {
         };
       });
       break;
+    case 'NoColumns':
+      FormatData = Data.map((Column, Index) => {
+        return {
+          dataIndex: `${Index}`,
+          title: '',
+          key: `${Index}`,
+        };
+      });
+      break;
   }
   return FormatData;
 }

@@ -17,7 +17,6 @@ import {
   BarElement,
   Legend,
 } from 'chart.js';
-import TripsReportTestData from '../TestData/TripsReportData.json';
 @inject('ProviderStore')
 @observer
 export default class TripsReportComponent extends React.Component {
@@ -25,6 +24,9 @@ export default class TripsReportComponent extends React.Component {
     super(props);
     this.ChartRef = React.createRef();
     this.state = {
+      TripsChartData: [],
+      LoadingChartData: [],
+      LoadingCanChartData: [],
       InfoTableRows: [],
       TripsTableRows: [],
       TripsTableColumns: [],
@@ -49,7 +51,7 @@ export default class TripsReportComponent extends React.Component {
       this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys.length !=
       0
     ) {
-      ApiFetch(
+      return ApiFetch(
         `reports/TripsReport?id=${
           this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys[0]
         }&sts=${this.props.ProviderStore.CurrentTab.Options.StartDate.unix()}&fts=${this.props.ProviderStore.CurrentTab.Options.EndDate.unix()}`,
@@ -57,6 +59,9 @@ export default class TripsReportComponent extends React.Component {
         undefined,
         (Response) => {
           this.setState({
+            TripsChartData: Response.tripsPoints,
+            LoadingChartData: Response.weightPoints,
+            LoadingCanChartData: Response.weightCANPoints,
             GroupsTableColumns: GenerateTableData(
               'Columns',
               Response.groupsTable.columns
@@ -70,6 +75,11 @@ export default class TripsReportComponent extends React.Component {
               'Columns',
               Response.tripsTable.columns
             ),
+            InfoTableColumns: GenerateTableData(
+              'NoColumns',
+              Response.infoTable.rows
+            ),
+            InfoTableRows: GenerateTableData('Rows', Response.infoTable.rows),
           });
         }
       );
@@ -91,7 +101,7 @@ export default class TripsReportComponent extends React.Component {
     );
     this.Chart = new Chart(this.ChartRef.current, {
       data: {
-        labels: TripsReportTestData.tpts.map((Time) => {
+        labels: this.state.TripsChartData.map((Time) => {
           return Time[0];
         }),
         datasets: [
@@ -102,7 +112,7 @@ export default class TripsReportComponent extends React.Component {
             backgroundColor: '#000000',
             pointRadius: 0,
             borderWidth: 0.8,
-            data: TripsReportTestData.wpts,
+            data: this.state.LoadingChartData,
           },
           {
             pointRadius: 0,
@@ -111,7 +121,7 @@ export default class TripsReportComponent extends React.Component {
             borderWidth: 1.6,
             borderColor: '#802080',
             backgroundColor: '#802080',
-            data: TripsReportTestData.tpts,
+            data: this.state.TripsChartData,
             borderWidth: 1,
           },
           {
@@ -121,7 +131,7 @@ export default class TripsReportComponent extends React.Component {
             borderWidth: 0.4,
             borderColor: '#206070',
             backgroundColor: '#206070',
-            data: TripsReportTestData.wcpts,
+            data: this.state.LoadingCanChartData,
           },
         ],
       },
@@ -134,7 +144,6 @@ export default class TripsReportComponent extends React.Component {
             pan: {
               enabled: true,
               mode: 'x',
-              rangeMin: { x: TripsReportTestData.tpts[0][0] },
             },
           },
         },
@@ -147,10 +156,24 @@ export default class TripsReportComponent extends React.Component {
       },
     });
   }
-
+  GetReportTitle() {
+    let Result = null;
+    this.props.ProviderStore.TransportTree.forEach((TreeNode) => {
+      TreeNode.children.forEach((Transport) => {
+        if (
+          Transport.key ==
+          this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys[0]
+        ) {
+          Result = Transport.title;
+        }
+      });
+    });
+    return Result;
+  }
   componentDidMount() {
-    this.InitCharts();
-    this.RequestReport();
+    this.RequestReport().then(() => {
+      this.InitCharts();
+    });
     this.RequestTransportTree();
   }
   render() {
@@ -159,8 +182,14 @@ export default class TripsReportComponent extends React.Component {
         style={{ display: 'grid', gridTemplateRows: '1fr 1fr' }}
         className="FullExtend"
       >
-        <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '3fr 1fr',
+          }}
+        >
           <div>
+            <strong>{this.GetReportTitle()}</strong>
             <canvas
               onDoubleClick={() => {
                 this.Chart.resetZoom();
