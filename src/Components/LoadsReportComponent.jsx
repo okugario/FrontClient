@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { observer, inject } from 'mobx-react';
+import { reaction } from 'mobx';
 import { Table } from 'antd';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import { ApiFetch } from '../Helpers/Helpers';
@@ -35,6 +36,7 @@ export default class LoadsReportComponent extends React.Component {
     this.ChartRef = React.createRef();
     this.Chart = null;
   }
+
   InitChart = () => {
     this.ChartRef.current.getContext('2d');
     Chart.register(
@@ -79,7 +81,7 @@ export default class LoadsReportComponent extends React.Component {
             type: 'time',
             time: {
               unit: 'hour',
-              displayFormats: { hour: 'DD MMM HH:MM:SS' },
+              displayFormats: { hour: 'HH:MM:SS' },
             },
           },
         },
@@ -116,12 +118,65 @@ export default class LoadsReportComponent extends React.Component {
     }
   }
   componentDidMount() {
-    this.RequestReport().then(() => {
-      this.InitChart();
-    });
+    if (
+      this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys.length >
+      0
+    ) {
+      this.RequestReport().then(() => {
+        this.InitChart();
+      });
+    }
+
+    reaction(
+      () => this.props.ProviderStore.CurrentTab.Options.StartDate,
+      () => {
+        if (this.Chart != null) {
+          this.RequestReport().then(() => {
+            this.Chart.data.labels = this.state.LoadsChartData.map((Data) => {
+              return Data[0];
+            });
+            this.Chart.data.datasets[0].data = this.state.LoadsChartData.map(
+              (Data) => {
+                return Data[1];
+              }
+            );
+            this.Chart.update();
+          });
+        } else {
+          this.RequestReport().then(() => {
+            this.InitChart();
+          });
+        }
+      }
+    );
+    reaction(
+      () => this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys,
+      () => {
+        if (
+          this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys
+            .length > 0
+        ) {
+          if (this.Chart != null) {
+            this.RequestReport().then(() => {
+              this.Chart.data.datasets[0].data = this.state.LoadsChartData.map(
+                (Data) => {
+                  return Data[1];
+                }
+              );
+              this.Chart.update();
+            });
+          } else {
+            this.RequestReport().then(() => {
+              this.InitChart();
+            });
+          }
+        }
+      }
+    );
   }
   render() {
-    return (
+    return this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys
+      .length > 0 ? (
       <div
         className="FullExtend"
         style={{ display: 'grid', gridTemplateRows: '1fr 1fr' }}
@@ -148,6 +203,8 @@ export default class LoadsReportComponent extends React.Component {
           />
         </div>
       </div>
+    ) : (
+      <span>Отчет не может быть построен</span>
     );
   }
 }
