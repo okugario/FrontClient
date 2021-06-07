@@ -2,8 +2,9 @@ import * as React from 'react';
 import { observer, inject } from 'mobx-react';
 import { Table } from 'antd';
 import zoomPlugin from 'chartjs-plugin-zoom';
+import { ApiFetch } from '../Helpers/Helpers';
 import 'chartjs-adapter-moment';
-import LoadTestData from '../TestData/LoadReportData.json';
+
 import { GenerateTableData } from '../Helpers/Helpers';
 import {
   Chart,
@@ -24,7 +25,13 @@ import {
 export default class LoadsReportComponent extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      InfoTableRows: [],
+      InfoTableColumns: [],
+      LoadsTableRows: [],
+      LoadsTableColumns: [],
+      LoadsChartData: [],
+    };
     this.ChartRef = React.createRef();
     this.Chart = null;
   }
@@ -45,7 +52,7 @@ export default class LoadsReportComponent extends React.Component {
     );
     this.Chart = new Chart(this.ChartRef.current, {
       data: {
-        labels: LoadTestData.lpts.map((Data) => {
+        labels: this.state.LoadsChartData.map((Data) => {
           return Data[0];
         }),
         datasets: [
@@ -56,7 +63,7 @@ export default class LoadsReportComponent extends React.Component {
 
             fill: true,
 
-            data: LoadTestData.lpts.map((Data) => {
+            data: this.state.LoadsChartData.map((Data) => {
               return Data[1];
             }),
           },
@@ -79,8 +86,39 @@ export default class LoadsReportComponent extends React.Component {
       },
     });
   };
+  RequestReport() {
+    if (
+      this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys.length !=
+      0
+    ) {
+      return ApiFetch(
+        `reports/LoadsReport?id=${
+          this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys[0]
+        }&sts=${this.props.ProviderStore.CurrentTab.Options.StartDate.unix()}&fts=${this.props.ProviderStore.CurrentTab.Options.EndDate.unix()}`,
+        'GET',
+        undefined,
+        (Response) => {
+          this.setState({
+            LoadsChartData: Response.loadsPoints,
+            InfoTableRows: GenerateTableData('Rows', Response.infoTable.rows),
+            InfoTableColumns: GenerateTableData(
+              'NoColumns',
+              Response.infoTable.rows
+            ),
+            LoadsTableRows: GenerateTableData('Rows', Response.loadsTable.rows),
+            LoadsTableColumns: GenerateTableData(
+              'Columns',
+              Response.loadsTable.columns
+            ),
+          });
+        }
+      );
+    }
+  }
   componentDidMount() {
-    this.InitChart();
+    this.RequestReport().then(() => {
+      this.InitChart();
+    });
   }
   render() {
     return (
@@ -97,14 +135,15 @@ export default class LoadsReportComponent extends React.Component {
         <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr' }}>
           <Table
             size="small"
-            columns={GenerateTableData('Columns', LoadTestData.loads.columns)}
-            dataSource={GenerateTableData('Rows', LoadTestData.loads.rows)}
+            columns={this.state.LoadsTableColumns}
+            dataSource={this.state.LoadsTableRows}
             pagination={false}
           />
           <Table
             size="small"
-            columns={GenerateTableData('Columns', LoadTestData.info.columns)}
-            dataSource={GenerateTableData('Rows', LoadTestData.info.rows)}
+            showHeader={false}
+            columns={this.state.InfoTableColumns}
+            dataSource={this.state.InfoTableRows}
             pagination={false}
           />
         </div>

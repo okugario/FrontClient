@@ -16,6 +16,7 @@ import RetranslationComponent from '../Components/RetranslationComponent';
 import StatisticComponent from '../Components/StatisticComponent';
 import TransportComponent from '../Components/TransportComponent';
 import RegionsComponent from '../Components/RegionsComponent';
+import LoadsReportComponent from '../Components/LoadsReportComponent';
 
 export class Tab {
   constructor(TabObject, OpenTabs) {
@@ -42,6 +43,9 @@ export class Tab {
             break;
           case 'tripsReport':
             Item.Component = <TripsReportComponent />;
+            break;
+          case 'loadsReport':
+            Item.Component = <LoadsReportComponent />;
             break;
         }
         return Item;

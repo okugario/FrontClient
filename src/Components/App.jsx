@@ -59,10 +59,6 @@ const ComponentList = [
     Keys: ['TreeComponent'],
   },
   {
-    Component: React.lazy(() => import('./LoadsReportComponent')),
-    Keys: ['loadsReport'],
-  },
-  {
     Component: React.lazy(() => import('./JornalComponent')),
     Keys: ['journal'],
   },
@@ -97,6 +93,7 @@ export default class App extends React.Component {
       items: [
         { id: 'map', caption: 'Карта' },
         { id: 'tripsReport', caption: 'Отчет по рейсам' },
+        { id: 'loadsReport', caption: 'Отчет по погрузкам' },
       ],
     });
   }
