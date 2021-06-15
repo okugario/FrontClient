@@ -124,12 +124,15 @@ class Store {
           this.DeleteTrack(this.CurrentTab.Options.CheckedTransportKeys[0]);
         }
         this.CurrentTab.Options.CheckedTransportKeys = NewTransportKeys;
-        this.AddTrack(this.CurrentTab.Options.CheckedTransportKeys[0]);
-        if (this.CurrentTab.GetTrackFeaturies().length > 0) {
-          this.CurrentTab.Options.MapObject.getView().fit(
-            this.CurrentTab.GetVectorLayerSource().getExtent()
-          );
+        if (this.CurrentTab.Options.CheckedTransportKeys.length > 0) {
+          this.AddTrack(this.CurrentTab.Options.CheckedTransportKeys[0]);
+          if (this.CurrentTab.GetTrackFeaturies().length > 0) {
+            this.CurrentTab.Options.MapObject.getView().fit(
+              this.CurrentTab.GetVectorLayerSource().getExtent()
+            );
+          }
         }
+
         break;
     }
   }

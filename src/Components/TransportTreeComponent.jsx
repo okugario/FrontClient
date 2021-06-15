@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { observer, inject } from 'mobx-react';
+import { ApiFetch } from '../Helpers/Helpers';
 import { Tree } from 'antd';
 @inject('ProviderStore')
 @observer
@@ -8,22 +9,35 @@ export default class TransportTreeComponent extends React.Component {
     super(props);
     this.state = {};
   }
-
+  RequestTransportTree() {
+    ApiFetch(
+      `reports/VehicleTree?ts=${this.props.ProviderStore.CurrentTab.Options.StartDate.unix()}`,
+      'GET',
+      undefined,
+      (Response) => {
+        this.props.ProviderStore.SetNewTransportTree(Response.data);
+      }
+    );
+  }
+  componentDidMount() {
+    this.RequestTransportTree();
+  }
   render() {
     return (
       <Tree
+        checkable={true}
         defaultExpandedKeys={
           this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys
         }
-        onSelect={(CheckedKeys) => {
+        onCheck={(CheckedKeys) => {
           this.props.ProviderStore.UpdateCurrentData(CheckedKeys);
         }}
         height={400}
         treeData={this.props.ProviderStore.TransportTree}
-        selectedKeys={
+        checkedKeys={
           this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys
         }
-        selectable={true}
+        selectable={false}
       />
     );
   }

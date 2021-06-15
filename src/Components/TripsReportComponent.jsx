@@ -36,16 +36,7 @@ export default class TripsReportComponent extends React.Component {
     };
     this.Chart = null;
   }
-  RequestTransportTree() {
-    ApiFetch(
-      `reports/VehicleTree?ts=${this.props.ProviderStore.CurrentTab.Options.StartDate.unix()}`,
-      'GET',
-      undefined,
-      (Response) => {
-        this.props.ProviderStore.SetNewTransportTree(Response.data);
-      }
-    );
-  }
+
   RequestReport() {
     if (
       this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys.length !=
@@ -174,7 +165,6 @@ export default class TripsReportComponent extends React.Component {
     this.RequestReport().then(() => {
       this.InitCharts();
     });
-    this.RequestTransportTree();
   }
   render() {
     return (
