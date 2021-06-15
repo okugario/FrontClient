@@ -75,9 +75,6 @@ class Store {
             }
 
             this.CurrentTab.GetVectorLayerSource().addFeature(NewFeature);
-            this.CurrentTab.Options.MapObject.getView().fit(
-              this.CurrentTab.GetVectorLayerSource().getExtent()
-            );
           }
           resolve();
         }
@@ -120,17 +117,42 @@ class Store {
   UpdateCurrentData(NewTransportKeys) {
     switch (this.CurrentTab.Options.CurrentMenuItem.id) {
       case 'map':
-        if (this.CurrentTab.Options.CheckedTransportKeys.length > 0) {
-          this.DeleteTrack(this.CurrentTab.Options.CheckedTransportKeys[0]);
-        }
-        this.CurrentTab.Options.CheckedTransportKeys = NewTransportKeys;
-        if (this.CurrentTab.Options.CheckedTransportKeys.length > 0) {
-          this.AddTrack(this.CurrentTab.Options.CheckedTransportKeys[0]);
-          if (this.CurrentTab.GetTrackFeaturies().length > 0) {
+        let PromiseArray = [];
+        const NewFilteredTransportKeys = NewTransportKeys.filter((Key) => {
+          return this.TransportTree.reduce(
+            (CheckedTransportArray, CurrentGroup, Index, GroupArray) => {
+              return CheckedTransportArray.concat(
+                CurrentGroup.children.map((Children) => {
+                  return Children.key;
+                })
+              );
+            },
+            []
+          ).includes(Key);
+        });
+        NewFilteredTransportKeys.forEach((NewTransportKey) => {
+          if (
+            !this.CurrentTab.Options.CheckedTransportKeys.includes(
+              NewFilteredTransportKeys
+            )
+          ) {
+            PromiseArray.push(this.AddTrack(NewTransportKey));
+          }
+        });
+        this.CurrentTab.Options.CheckedTransportKeys.forEach(
+          (OldTransportKey) => {
+            if (!NewFilteredTransportKeys.includes(OldTransportKey)) {
+              this.DeleteTrack(OldTransportKey);
+            }
+          }
+        );
+        this.CurrentTab.Options.CheckedTransportKeys = NewFilteredTransportKeys;
+        if (PromiseArray.length != 0) {
+          Promise.all(PromiseArray).then(() => {
             this.CurrentTab.Options.MapObject.getView().fit(
               this.CurrentTab.GetVectorLayerSource().getExtent()
             );
-          }
+          });
         }
 
         break;
