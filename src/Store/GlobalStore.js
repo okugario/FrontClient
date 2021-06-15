@@ -1,12 +1,9 @@
 import { makeAutoObservable } from 'mobx';
 import { Tab } from '../Classes/TabClass';
 import { ApiFetch } from '../Helpers/Helpers';
-
 import { RandomColor } from '../Helpers/Helpers';
-
 import Stroke from 'ol/style/Stroke';
 import * as Moment from 'moment';
-
 import { Icon, Style, Text } from 'ol/style';
 import GeoJSON from 'ol/format/GeoJSON';
 import TruckSVG from '../Svg/Truck.svg';
@@ -116,38 +113,31 @@ class Store {
       );
     }
   }
-  SetNewCheckedTransportKeys(NewTransportKeys) {
-    switch (this.CurrentTab.Options.CurrentMenuItem.id) {
-      case 'map':
-        if (this.CurrentTab.Options.CheckedTransportKeys.length > 0) {
-          this.DeleteTrack(this.CurrentTab.Options.CheckedTransportKeys[0]);
-        }
-        this.AddTrack(NewTransportKeys[0]);
-        break;
-    }
-    this.CurrentTab.Options.CheckedTransportKeys = NewTransportKeys;
-  }
+
   SetNewCurrentTimeTrackPlayer(NewTime) {
     this.CurrentTab.Options.CurrentTrackPlayerTime = Moment.unix(NewTime);
   }
-  SetNewDateTimeInterval(NewStartDate, NewEndDate) {
-    this.CurrentTab.Options.CurrentTrackPlayerTime = NewStartDate;
-    this.CurrentTab.Options.StartDate = NewStartDate;
-    this.CurrentTab.Options.EndDate = NewEndDate;
+  UpdateCurrentData(NewTransportKeys) {
     switch (this.CurrentTab.Options.CurrentMenuItem.id) {
       case 'map':
         if (this.CurrentTab.Options.CheckedTransportKeys.length > 0) {
           this.DeleteTrack(this.CurrentTab.Options.CheckedTransportKeys[0]);
-          this.AddTrack(this.CurrentTab.Options.CheckedTransportKeys[0]);
         }
+        this.CurrentTab.Options.CheckedTransportKeys = NewTransportKeys;
+        this.AddTrack(this.CurrentTab.Options.CheckedTransportKeys[0]);
         if (this.CurrentTab.GetTrackFeaturies().length > 0) {
           this.CurrentTab.Options.MapObject.getView().fit(
             this.CurrentTab.GetVectorLayerSource().getExtent()
           );
         }
-
         break;
     }
+  }
+  SetNewDateTimeInterval(NewStartDate, NewEndDate) {
+    this.CurrentTab.Options.CurrentTrackPlayerTime = NewStartDate;
+    this.CurrentTab.Options.StartDate = NewStartDate;
+    this.CurrentTab.Options.EndDate = NewEndDate;
+    this.UpdateCurrentData(this.CurrentTab.Options.CheckedTransportKeys);
   }
   SetNewTransportTree(TransportData) {
     this.TransportTree = TransportData.map((Group) => {

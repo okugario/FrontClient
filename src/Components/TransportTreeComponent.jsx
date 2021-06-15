@@ -8,9 +8,7 @@ export default class TransportTreeComponent extends React.Component {
     super(props);
     this.state = {};
   }
-  TransportChech = (CheckedKey) => {
-    this.props.ProviderStore.SetNewCheckedTransportKeys(CheckedKey);
-  };
+
   render() {
     return (
       <Tree
@@ -18,7 +16,7 @@ export default class TransportTreeComponent extends React.Component {
           this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys
         }
         onSelect={(CheckedKeys) => {
-          this.TransportChech(CheckedKeys);
+          this.props.ProviderStore.UpdateCurrentData(CheckedKeys);
         }}
         height={400}
         treeData={this.props.ProviderStore.TransportTree}
