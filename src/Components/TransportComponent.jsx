@@ -22,6 +22,15 @@ export default function TransportComponent() {
         });
         SetNewProfile(NewProfile);
         break;
+      case 'DeleteFirm':
+        NewProfile.Profile.Owners.splice(
+          NewProfile.Profile.Owners.findIndex((Firm) => {
+            return Firm.Key == SelectedKey;
+          }),
+          1
+        );
+        SetNewProfile(NewProfile);
+        break;
     }
   };
   const RequestTransportTable = () => {
@@ -87,7 +96,7 @@ export default function TransportComponent() {
         onRow={(Record) => {
           return {
             onClick: () => {
-              SetNewSelectedKey(Record['Id']);
+              SetNewSelectedKey(Record.Id);
             },
             onDoubleClick: () => {
               RequestProfile();

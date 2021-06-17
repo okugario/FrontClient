@@ -89,9 +89,11 @@ export default function TransportPrfoile(props) {
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Input
             value={
-              props.Profile.AllFirms.find((Firm) => {
-                return Firm.Id == props.Profile.Profile.Owners[0].FirmId;
-              }).Caption
+              props.Profile.Profile.Owners.length > 0
+                ? props.Profile.AllFirms.find((Firm) => {
+                    return Firm.Id == props.Profile.Profile.Owners[0].FirmId;
+                  }).Caption
+                : 'Не указано'
             }
             size="small"
             style={{ width: '135px' }}
@@ -118,7 +120,31 @@ export default function TransportPrfoile(props) {
           >
             Добавить
           </Button>
-          <Button size="small" danger type="primary" style={{ margin: '5px' }}>
+          <Button
+            size="small"
+            danger
+            type="primary"
+            style={{ margin: '5px' }}
+            onClick={() => {
+              if (SelectedKey != null) {
+                Modal.confirm({
+                  onOk: () => {
+                    props.ProfileHandler('DeleteFirm');
+                  },
+                  title: 'Подтвердите действие',
+                  content: 'Вы действительно хотите удалить данную запись?',
+                  okText: 'Удалить',
+                  cancelText: 'Отмена',
+                  okButtonProps: {
+                    type: 'primary',
+                    danger: true,
+                    size: 'small',
+                  },
+                  cancelButtonProps: { size: 'small' },
+                });
+              }
+            }}
+          >
             Удалить
           </Button>
 
