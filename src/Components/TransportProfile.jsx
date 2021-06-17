@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { Input, Select, Button, Table, DatePicker } from 'antd';
+import { Input, Select, Button, Table, DatePicker, Modal } from 'antd';
 import { CaretDownOutlined, CaretUpOutlined } from '@ant-design/icons';
 import Moment from 'moment';
 export default function TransportPrfoile(props) {
   console.log(props);
   const [ShowFirmHistory, SetShowFirmHistory] = useState(false);
   return (
-    <div>
+    <>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           Наименование:
@@ -106,47 +106,78 @@ export default function TransportPrfoile(props) {
         </div>
       </div>
       {ShowFirmHistory ? (
-        <Table
-          pagination={false}
-          dataSource={props.Profile.Profile.Owners.map((Owner, Index) => {
-            return { key: Index, TS: Owner.TS, FirmId: Owner.FirmId };
-          })}
-          size="small"
-          columns={[
-            {
-              title: 'Дата',
-              dataIndex: 'TS',
-              key: 'TS',
-              render: (Text, Record, Index) => {
-                return (
-                  <DatePicker
-                    size="small"
-                    value={Moment(Text)}
-                    format="DD.MM.YYYY hh:mm:ss"
-                  />
-                );
+        <>
+          <Button size="small" type="primary" style={{ margin: '5px' }}>
+            Добавить
+          </Button>
+          <Button size="small" danger type="primary" style={{ margin: '5px' }}>
+            Удалить
+          </Button>
+
+          <Table
+            pagination={false}
+            dataSource={props.Profile.Profile.Owners.map((Owner, Index) => {
+              return { key: Index, TS: Owner.TS, FirmId: Owner.FirmId };
+            })}
+            size="small"
+            columns={[
+              {
+                title: 'Дата',
+                dataIndex: 'TS',
+                key: 'TS',
+                render: (Text, Record, Index) => {
+                  return (
+                    <DatePicker
+                      showTime={true}
+                      onOk={() => {
+                        Modal.confirm({
+                          title: 'Подтвердите изменение',
+                          content: 'Вы действительно хотите изменить дату?',
+                          okText: 'Да',
+                          okButtonProps: { size: 'small' },
+                          cancelButtonProps: { size: 'small' },
+                          cancelText: 'Нет',
+                        });
+                      }}
+                      size="small"
+                      value={Moment(Text)}
+                      format="DD.MM.YYYY hh:mm:ss"
+                    />
+                  );
+                },
               },
-            },
-            {
-              title: 'Наименование',
-              dataIndex: 'FirmId',
-              key: 'FirmId',
-              render: (Text, Record, Index) => {
-                return (
-                  <Select
-                    style={{ width: '160px' }}
-                    value={Text}
-                    size="small"
-                    options={props.Profile.AllFirms.map((Type) => {
-                      return { value: Type.Id, label: Type.Caption };
-                    })}
-                  />
-                );
+              {
+                title: 'Наименование',
+                dataIndex: 'FirmId',
+                key: 'FirmId',
+                render: (Text, Record, Index) => {
+                  return (
+                    <Select
+                      onSelect={() => {
+                        Modal.confirm({
+                          title: 'Подтвердите изменение',
+                          content:
+                            'Вы действительно хотите изменить организацию?',
+                          okText: 'Да',
+                          okButtonProps: { size: 'small' },
+                          cancelButtonProps: { size: 'small' },
+                          cancelText: 'Нет',
+                        });
+                      }}
+                      style={{ width: '160px' }}
+                      value={Text}
+                      size="small"
+                      options={props.Profile.AllFirms.map((Type) => {
+                        return { value: Type.Id, label: Type.Caption };
+                      })}
+                    />
+                  );
+                },
               },
-            },
-          ]}
-        />
+            ]}
+          />
+        </>
       ) : null}
-    </div>
+    </>
   );
 }
