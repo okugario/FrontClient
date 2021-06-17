@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import TransportProfile from './TransportProfile';
 import { Table, Modal } from 'antd';
 import { ApiFetch } from '../Helpers/Helpers';
+import Moment from 'moment';
 
 export default function TransportComponent() {
   const [TransportTable, SetNewTransportTable] = useState(null);
@@ -10,6 +11,19 @@ export default function TransportComponent() {
   const [SelectedKey, SetNewSelectedKey] = useState(null);
   const [Profile, SetNewProfile] = useState(null);
 
+  const TransportProfileHandler = (Action, Data) => {
+    let NewProfile = { ...Profile };
+    switch (Action) {
+      case 'AddFirm':
+        NewProfile.Profile.Owners.push({
+          TS: Moment().format(),
+          VehicleId: Profile.Profile.Id,
+          FirmId: Profile.AllFirms[0].Id,
+        });
+        SetNewProfile(NewProfile);
+        break;
+    }
+  };
   const RequestTransportTable = () => {
     ApiFetch('model/Vehicles', 'GET', undefined, (Response) => {
       SetNewTransportTable(Response.data);
@@ -52,6 +66,7 @@ export default function TransportComponent() {
   return (
     <div className="FullExtend">
       <Modal
+        destroyOnClose={true}
         title="Профиль транспорта"
         width="450px"
         okText="Сохранить"
@@ -62,7 +77,10 @@ export default function TransportComponent() {
           SetNewShowProfile(false);
         }}
       >
-        <TransportProfile Profile={Profile} />
+        <TransportProfile
+          Profile={Profile}
+          ProfileHandler={TransportProfileHandler}
+        />
       </Modal>
       <Table
         scroll={{ scrollToFirstRowOnChange: true, y: 700 }}
