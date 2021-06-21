@@ -31,6 +31,28 @@ export default function TransportComponent() {
         );
         SetNewProfile(NewProfile);
         break;
+      case 'ChangeCaption':
+        NewProfile.Profile.caption = Data;
+        SetNewProfile(NewProfile);
+        break;
+      case 'ChangeTransportType':
+        NewProfile.Profile.Model.TypeId = Data;
+        SetNewProfile(NewProfile);
+        break;
+      case 'ChangeModel':
+        NewProfile.Profile.ModelId = Data;
+        SetNewProfile(NewProfile);
+        break;
+      case 'SaveProfile':
+        ApiFetch(
+          `model/Vehicles/${NewProfile.Profile.Id}`,
+          'PATCH',
+          NewProfile.Profile,
+          (Response) => {
+            SetNewShowProfile(false);
+          }
+        );
+        break;
     }
   };
   const RequestTransportTable = () => {
@@ -75,6 +97,9 @@ export default function TransportComponent() {
   return (
     <div className="FullExtend">
       <Modal
+        onOk={() => {
+          TransportProfileHandler('SaveProfile');
+        }}
         destroyOnClose={true}
         title="Профиль транспорта"
         width="450px"

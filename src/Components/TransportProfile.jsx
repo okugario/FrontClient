@@ -15,6 +15,9 @@ export default function TransportPrfoile(props) {
         </div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Input
+            onChange={(Event) => {
+              props.ProfileHandler('ChangeCaption', Event.target.value);
+            }}
             size="small"
             style={{ width: '160px' }}
             value={props.Profile.Profile.caption}
@@ -48,6 +51,9 @@ export default function TransportPrfoile(props) {
         <div style={{ display: 'flex', alignItems: 'center' }}>Тип ТС:</div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Select
+            onChange={(TypeId) => {
+              props.ProfileHandler('ChangeTransportType', TypeId);
+            }}
             size="small"
             value={props.Profile.Profile.Model.TypeId}
             style={{ width: '160px' }}
@@ -67,8 +73,11 @@ export default function TransportPrfoile(props) {
         <div style={{ display: 'flex', alignItems: 'center' }}>Модель:</div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Select
+            onChange={(ModelId) => {
+              props.ProfileHandler('ChangeModel', ModelId);
+            }}
             size="small"
-            value={props.Profile.Profile.Model.Id}
+            value={props.Profile.Profile.ModelId}
             style={{ width: '160px' }}
             options={props.Profile.AllModels.map((Type) => {
               return { value: Type.Id, label: Type.Caption };
