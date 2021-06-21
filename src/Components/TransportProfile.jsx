@@ -189,8 +189,15 @@ export default function TransportPrfoile(props) {
                     <div style={{ cursor: 'pointer' }}>
                       <DatePicker
                         showTime={true}
-                        onOk={() => {
+                        onOk={(NewDate) => {
                           Modal.confirm({
+                            onOk: () => {
+                              props.ProfileHandler(
+                                'EditFirmDate',
+                                NewDate.format(),
+                                Index
+                              );
+                            },
                             title: 'Подтвердите изменение',
                             content: 'Вы действительно хотите изменить дату?',
                             okText: 'Да',
@@ -215,8 +222,15 @@ export default function TransportPrfoile(props) {
                   return (
                     <div style={{ cursor: 'pointer' }}>
                       <Select
-                        onSelect={() => {
+                        onSelect={(FirmId) => {
                           Modal.confirm({
+                            onOk: () => {
+                              props.ProfileHandler(
+                                'EditFirmCaption',
+                                FirmId,
+                                Index
+                              );
+                            },
                             title: 'Подтвердите изменение',
                             content:
                               'Вы действительно хотите изменить организацию?',

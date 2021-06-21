@@ -11,7 +11,7 @@ export default function TransportComponent() {
   const [SelectedKey, SetNewSelectedKey] = useState(null);
   const [Profile, SetNewProfile] = useState(null);
 
-  const TransportProfileHandler = (Action, Data) => {
+  const TransportProfileHandler = (Action, Data, Index) => {
     let NewProfile = { ...Profile };
     switch (Action) {
       case 'AddFirm':
@@ -52,6 +52,14 @@ export default function TransportComponent() {
             SetNewShowProfile(false);
           }
         );
+        break;
+      case 'EditFirmDate':
+        NewProfile.Profile.Owners[Index].TS = Data;
+        SetNewProfile(NewProfile);
+        break;
+      case 'EditFirmCaption':
+        NewProfile.Profile.Owners[Index].FirmId = Data;
+        SetNewProfile(NewProfile);
         break;
     }
   };
