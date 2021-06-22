@@ -23,12 +23,7 @@ export default function TransportComponent() {
         SetNewProfile(NewProfile);
         break;
       case 'DeleteFirm':
-        NewProfile.Profile.Owners.splice(
-          NewProfile.Profile.Owners.findIndex((Firm) => {
-            return Firm.Key == Data;
-          }),
-          1
-        );
+        NewProfile.Profile.Owners.splice(Index, 1);
         SetNewProfile(NewProfile);
         break;
       case 'ChangeCaption':
@@ -70,11 +65,7 @@ export default function TransportComponent() {
         SetNewProfile(NewProfile);
         break;
       case 'DeleteLocation':
-        NewProfile.Profile.Locations.splice(
-          NewProfile.Profile.Locations.findIndex((Location) => {
-            return Location.Key == Data;
-          }, 1)
-        );
+        NewProfile.Profile.Locations.splice(Index, 1);
         SetNewProfile(NewProfile);
         break;
       case 'AddLocation':

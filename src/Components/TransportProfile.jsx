@@ -4,6 +4,7 @@ import { Input, Select, Button, Table, DatePicker, Modal } from 'antd';
 import { CaretDownOutlined, CaretUpOutlined } from '@ant-design/icons';
 import Moment from 'moment';
 export default function TransportPrfoile(props) {
+  console.log(props);
   const [ShowFirmHistory, SetShowFirmHistory] = useState(false);
   const [ShowLocationHistory, SetShowLocationHistory] = useState(false);
   const [SelectedFirmKey, SetNewSelectedFirmKey] = useState(null);
@@ -139,7 +140,11 @@ export default function TransportPrfoile(props) {
               if (SelectedFirmKey != null) {
                 Modal.confirm({
                   onOk: () => {
-                    props.ProfileHandler('DeleteFirm', SelectedFirmKey);
+                    props.ProfileHandler(
+                      'DeleteFirm',
+                      undefined,
+                      SelectedFirmKey
+                    );
                     SetNewSelectedFirmKey(null);
                   },
                   title: 'Подтвердите действие',
@@ -270,7 +275,12 @@ export default function TransportPrfoile(props) {
             style={{ width: '135px' }}
             value={
               props.Profile.Profile.Locations.length != 0
-                ? props.Profile.Profile.Locations[0].Conditions.Caption
+                ? props.Profile.AllWorkConditions.find((Location) => {
+                    return (
+                      Location.Id ==
+                      props.Profile.Profile.Locations[0].ConditonsId
+                    );
+                  }).Caption
                 : 'Не указано'
             }
           />
@@ -308,7 +318,11 @@ export default function TransportPrfoile(props) {
                 Modal.confirm({
                   okText: 'Удалить',
                   onOk: () => {
-                    props.ProfileHandler('DeleteLocation', SelectedLocationKey);
+                    props.ProfileHandler(
+                      'DeleteLocation',
+                      undefined,
+                      SelectedLocationKey
+                    );
                     SetNewSelectedLocationKey(null);
                   },
                   okButtonProps: {
