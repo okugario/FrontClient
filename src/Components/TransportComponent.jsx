@@ -32,7 +32,7 @@ export default function TransportComponent() {
         SetNewProfile(NewProfile);
         break;
       case 'ChangeCaption':
-        NewProfile.Profile.caption = Data;
+        NewProfile.Profile.Caption = Data;
         SetNewProfile(NewProfile);
         break;
       case 'ChangeTransportType':
@@ -87,6 +87,11 @@ export default function TransportComponent() {
       })
     );
     PromiseArray.push(
+      ApiFetch('model/WorkConditions', 'GET', undefined, (Response) => {
+        NewProfile.AllWorkConditions = Response.data;
+      })
+    );
+    PromiseArray.push(
       ApiFetch(
         `model/Vehicles/${SelectedKey}`,
         'GET',
@@ -96,6 +101,7 @@ export default function TransportComponent() {
         }
       )
     );
+
     Promise.all(PromiseArray).then(() => {
       SetNewProfile(NewProfile);
       SetNewShowProfile(true);
@@ -105,6 +111,7 @@ export default function TransportComponent() {
   return (
     <div className="FullExtend">
       <Modal
+        maskClosable={false}
         onOk={() => {
           TransportProfileHandler('SaveProfile');
         }}
@@ -152,7 +159,7 @@ export default function TransportComponent() {
           {
             title: 'Наименование',
             key: 'caption',
-            dataIndex: 'caption',
+            dataIndex: 'Caption',
             render: (Record) => {
               return <div style={{ cursor: 'pointer' }}>{Record}</div>;
             },

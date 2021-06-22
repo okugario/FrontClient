@@ -6,6 +6,7 @@ import Moment from 'moment';
 export default function TransportPrfoile(props) {
   console.log(props);
   const [ShowFirmHistory, SetShowFirmHistory] = useState(false);
+  const [ShowLocationHistory, SetShowLocationHistory] = useState(false);
   const [SelectedKey, SetNewSelectedKey] = useState(null);
   return (
     <>
@@ -20,7 +21,7 @@ export default function TransportPrfoile(props) {
             }}
             size="small"
             style={{ width: '160px' }}
-            value={props.Profile.Profile.caption}
+            value={props.Profile.Profile.Caption}
           />
         </div>
       </div>
@@ -181,6 +182,7 @@ export default function TransportPrfoile(props) {
             size="small"
             columns={[
               {
+                width: 180,
                 title: 'Дата',
                 dataIndex: 'TS',
                 key: 'TS',
@@ -250,6 +252,91 @@ export default function TransportPrfoile(props) {
                     </div>
                   );
                 },
+              },
+            ]}
+          />
+        </>
+      ) : null}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          marginTop: '10px',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          Местоположение:
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Input
+            size="small"
+            style={{ width: '135px' }}
+            value={props.Profile.Profile.Locations[0].Conditions.Caption}
+          />
+          <Button
+            icon={
+              ShowLocationHistory ? <CaretUpOutlined /> : <CaretDownOutlined />
+            }
+            onClick={() => {
+              SetShowLocationHistory(!ShowLocationHistory);
+            }}
+            size="small"
+            type="primary"
+          />
+        </div>
+      </div>
+      {ShowLocationHistory ? (
+        <>
+          <Button
+            size="small"
+            type="primary"
+            style={{ margin: '5px' }}
+            onClick={() => {
+              props.ProfileHandler('AddFirm');
+            }}
+          >
+            Добавить
+          </Button>
+          <Button size="small" danger type="primary" style={{ margin: '5px' }}>
+            Удалить
+          </Button>
+          <Table
+            pagination={false}
+            rowKey="TS"
+            dataSource={props.Profile.Profile.Locations.map(
+              (Location, Index) => {
+                return {
+                  ConditonsId: Location.ConditonsId,
+                  TS: Location.TS,
+                };
+              }
+            )}
+            size="small"
+            columns={[
+              {
+                width: 180,
+                render: (Value, Record, Index) => {
+                  return (
+                    <DatePicker
+                      value={Moment(Value)}
+                      size="small"
+                      format="DD.MM.YYYY hh:mm:ss"
+                    />
+                  );
+                },
+                title: 'Дата',
+                key: 'TS',
+                dataIndex: 'TS',
+              },
+              {
+                render: (Value, Record, Index) => {
+                  return props.Profile.AllWorkConditions.find((Conditions) => {
+                    return Conditions.Id == Value;
+                  }).Caption;
+                },
+                title: 'Наименование',
+                key: 'ConditonsId',
+                dataIndex: 'ConditonsId',
               },
             ]}
           />

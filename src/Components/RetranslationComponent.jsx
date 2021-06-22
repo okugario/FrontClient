@@ -184,6 +184,7 @@ export default function RetranslationComponent() {
       <Modal
         okText="Сохранить"
         width="450px"
+        maskClosable={false}
         title="Профиль ретранслятора"
         visible={ShowProfile}
         onCancel={() => {
