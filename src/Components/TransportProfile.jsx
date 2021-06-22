@@ -139,7 +139,8 @@ export default function TransportPrfoile(props) {
               if (SelectedFirmKey != null) {
                 Modal.confirm({
                   onOk: () => {
-                    props.ProfileHandler('DeleteFirm');
+                    props.ProfileHandler('DeleteFirm', SelectedFirmKey);
+                    SetNewSelectedFirmKey(null);
                   },
                   title: 'Подтвердите действие',
                   content: 'Вы действительно хотите удалить данную запись?',
@@ -267,7 +268,11 @@ export default function TransportPrfoile(props) {
           <Input
             size="small"
             style={{ width: '135px' }}
-            value={props.Profile.Profile.Locations[0].Conditions.Caption}
+            value={
+              props.Profile.Profile.Locations.length != 0
+                ? props.Profile.Profile.Locations[0].Conditions.Caption
+                : 'Не указано'
+            }
           />
           <Button
             icon={
@@ -287,7 +292,9 @@ export default function TransportPrfoile(props) {
             size="small"
             type="primary"
             style={{ margin: '5px' }}
-            onClick={() => {}}
+            onClick={() => {
+              props.ProfileHandler('AddLocation');
+            }}
           >
             Добавить
           </Button>
@@ -300,6 +307,10 @@ export default function TransportPrfoile(props) {
               if (SelectedLocationKey != null) {
                 Modal.confirm({
                   okText: 'Удалить',
+                  onOk: () => {
+                    props.ProfileHandler('DeleteLocation', SelectedLocationKey);
+                    SetNewSelectedLocationKey(null);
+                  },
                   okButtonProps: {
                     type: 'primary',
                     danger: true,
@@ -351,6 +362,13 @@ export default function TransportPrfoile(props) {
                     <DatePicker
                       onOk={(Time) => {
                         Modal.confirm({
+                          onOk: () => {
+                            props.ProfileHandler(
+                              'EditLocationDate',
+                              Time.format(),
+                              Index
+                            );
+                          },
                           okButtonProps: { type: 'primary', size: 'small' },
                           okText: 'Да',
                           cancelText: 'Нет',
@@ -375,8 +393,15 @@ export default function TransportPrfoile(props) {
                   return (
                     <Select
                       style={{ width: '160px' }}
-                      onChange={() => {
+                      onChange={(Value) => {
                         Modal.confirm({
+                          onOk: () => {
+                            props.ProfileHandler(
+                              'EditLocationCaption',
+                              Value,
+                              Index
+                            );
+                          },
                           okButtonProps: { type: 'primary', size: 'small' },
                           okText: 'Да',
                           cancelText: 'Нет',

@@ -25,7 +25,7 @@ export default function TransportComponent() {
       case 'DeleteFirm':
         NewProfile.Profile.Owners.splice(
           NewProfile.Profile.Owners.findIndex((Firm) => {
-            return Firm.Key == SelectedKey;
+            return Firm.Key == Data;
           }),
           1
         );
@@ -59,6 +59,30 @@ export default function TransportComponent() {
         break;
       case 'EditFirmCaption':
         NewProfile.Profile.Owners[Index].FirmId = Data;
+        SetNewProfile(NewProfile);
+        break;
+      case 'EditLocationCaption':
+        NewProfile.Profile.Locations[Index].ConditonsId = Data;
+        SetNewProfile(NewProfile);
+        break;
+      case 'EditLocationDate':
+        NewProfile.Profile.Locations[Index].TS = Data;
+        SetNewProfile(NewProfile);
+        break;
+      case 'DeleteLocation':
+        NewProfile.Profile.Locations.splice(
+          NewProfile.Profile.Locations.findIndex((Location) => {
+            return Location.Key == Data;
+          }, 1)
+        );
+        SetNewProfile(NewProfile);
+        break;
+      case 'AddLocation':
+        NewProfile.Profile.Locations.push({
+          TS: Moment(),
+          VehicleId: NewProfile.Id,
+          ConditonsId: Profile.AllWorkConditions[0].Id,
+        });
         SetNewProfile(NewProfile);
         break;
     }
