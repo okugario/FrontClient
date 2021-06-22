@@ -4,10 +4,10 @@ import { Input, Select, Button, Table, DatePicker, Modal } from 'antd';
 import { CaretDownOutlined, CaretUpOutlined } from '@ant-design/icons';
 import Moment from 'moment';
 export default function TransportPrfoile(props) {
-  console.log(props);
   const [ShowFirmHistory, SetShowFirmHistory] = useState(false);
   const [ShowLocationHistory, SetShowLocationHistory] = useState(false);
-  const [SelectedKey, SetNewSelectedKey] = useState(null);
+  const [SelectedFirmKey, SetNewSelectedFirmKey] = useState(null);
+  const [SelectedLocationKey, SetNewSelectedLocationKey] = useState(null);
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -136,7 +136,7 @@ export default function TransportPrfoile(props) {
             type="primary"
             style={{ margin: '5px' }}
             onClick={() => {
-              if (SelectedKey != null) {
+              if (SelectedFirmKey != null) {
                 Modal.confirm({
                   onOk: () => {
                     props.ProfileHandler('DeleteFirm');
@@ -163,7 +163,7 @@ export default function TransportPrfoile(props) {
             onRow={(Record) => {
               return {
                 onClick: () => {
-                  SetNewSelectedKey(Record.Key);
+                  SetNewSelectedFirmKey(Record.Key);
                 },
               };
             }}
@@ -173,7 +173,7 @@ export default function TransportPrfoile(props) {
               renderCell: () => {
                 return null;
               },
-              selectedRowKeys: [SelectedKey],
+              selectedRowKeys: [SelectedFirmKey],
             }}
             pagination={false}
             dataSource={props.Profile.Profile.Owners.map((Owner, Index) => {
@@ -188,31 +188,29 @@ export default function TransportPrfoile(props) {
                 key: 'TS',
                 render: (Text, Record, Index) => {
                   return (
-                    <div style={{ cursor: 'pointer' }}>
-                      <DatePicker
-                        showTime={true}
-                        onOk={(NewDate) => {
-                          Modal.confirm({
-                            onOk: () => {
-                              props.ProfileHandler(
-                                'EditFirmDate',
-                                NewDate.format(),
-                                Index
-                              );
-                            },
-                            title: 'Подтвердите изменение',
-                            content: 'Вы действительно хотите изменить дату?',
-                            okText: 'Да',
-                            okButtonProps: { size: 'small' },
-                            cancelButtonProps: { size: 'small' },
-                            cancelText: 'Нет',
-                          });
-                        }}
-                        size="small"
-                        value={Moment(Text)}
-                        format="DD.MM.YYYY hh:mm:ss"
-                      />
-                    </div>
+                    <DatePicker
+                      showTime={true}
+                      onOk={(NewDate) => {
+                        Modal.confirm({
+                          onOk: () => {
+                            props.ProfileHandler(
+                              'EditFirmDate',
+                              NewDate.format(),
+                              Index
+                            );
+                          },
+                          title: 'Подтвердите изменение',
+                          content: 'Вы действительно хотите изменить дату?',
+                          okText: 'Да',
+                          okButtonProps: { size: 'small' },
+                          cancelButtonProps: { size: 'small' },
+                          cancelText: 'Нет',
+                        });
+                      }}
+                      size="small"
+                      value={Moment(Text)}
+                      format="DD.MM.YYYY hh:mm:ss"
+                    />
                   );
                 },
               },
@@ -222,34 +220,32 @@ export default function TransportPrfoile(props) {
                 key: 'FirmId',
                 render: (Text, Record, Index) => {
                   return (
-                    <div style={{ cursor: 'pointer' }}>
-                      <Select
-                        onSelect={(FirmId) => {
-                          Modal.confirm({
-                            onOk: () => {
-                              props.ProfileHandler(
-                                'EditFirmCaption',
-                                FirmId,
-                                Index
-                              );
-                            },
-                            title: 'Подтвердите изменение',
-                            content:
-                              'Вы действительно хотите изменить организацию?',
-                            okText: 'Да',
-                            okButtonProps: { size: 'small' },
-                            cancelButtonProps: { size: 'small' },
-                            cancelText: 'Нет',
-                          });
-                        }}
-                        style={{ width: '160px' }}
-                        value={Text}
-                        size="small"
-                        options={props.Profile.AllFirms.map((Type) => {
-                          return { value: Type.Id, label: Type.Caption };
-                        })}
-                      />
-                    </div>
+                    <Select
+                      onSelect={(FirmId) => {
+                        Modal.confirm({
+                          onOk: () => {
+                            props.ProfileHandler(
+                              'EditFirmCaption',
+                              FirmId,
+                              Index
+                            );
+                          },
+                          title: 'Подтвердите изменение',
+                          content:
+                            'Вы действительно хотите изменить организацию?',
+                          okText: 'Да',
+                          okButtonProps: { size: 'small' },
+                          cancelButtonProps: { size: 'small' },
+                          cancelText: 'Нет',
+                        });
+                      }}
+                      style={{ width: '160px' }}
+                      value={Text}
+                      size="small"
+                      options={props.Profile.AllFirms.map((Type) => {
+                        return { value: Type.Id, label: Type.Caption };
+                      })}
+                    />
                   );
                 },
               },
@@ -291,21 +287,56 @@ export default function TransportPrfoile(props) {
             size="small"
             type="primary"
             style={{ margin: '5px' }}
-            onClick={() => {
-              props.ProfileHandler('AddFirm');
-            }}
+            onClick={() => {}}
           >
             Добавить
           </Button>
-          <Button size="small" danger type="primary" style={{ margin: '5px' }}>
+          <Button
+            size="small"
+            danger
+            type="primary"
+            style={{ margin: '5px' }}
+            onClick={() => {
+              if (SelectedLocationKey != null) {
+                Modal.confirm({
+                  okText: 'Удалить',
+                  okButtonProps: {
+                    type: 'primary',
+                    danger: true,
+                    size: 'small',
+                  },
+                  cancelText: 'Отмена',
+                  cancelButtonProps: { size: 'small' },
+                  title: 'Подтвердите действие',
+                  content: 'Вы действительно хотите удалить данную запись?',
+                });
+              }
+            }}
+          >
             Удалить
           </Button>
           <Table
+            rowKey="Key"
+            onRow={(Record) => {
+              return {
+                onClick: () => {
+                  SetNewSelectedLocationKey(Record.Key);
+                },
+              };
+            }}
+            rowSelection={{
+              hideSelectAll: true,
+              columnWidth: 0,
+              renderCell: () => {
+                return null;
+              },
+              selectedRowKeys: [SelectedLocationKey],
+            }}
             pagination={false}
-            rowKey="TS"
             dataSource={props.Profile.Profile.Locations.map(
               (Location, Index) => {
                 return {
+                  Key: Index,
                   ConditonsId: Location.ConditonsId,
                   TS: Location.TS,
                 };
@@ -318,6 +349,17 @@ export default function TransportPrfoile(props) {
                 render: (Value, Record, Index) => {
                   return (
                     <DatePicker
+                      onOk={(Time) => {
+                        Modal.confirm({
+                          okButtonProps: { type: 'primary', size: 'small' },
+                          okText: 'Да',
+                          cancelText: 'Нет',
+                          cancelButtonProps: { size: 'small' },
+                          title: 'Подтвердите действие',
+                          content: 'Вы действительно хотите изменить дату?',
+                        });
+                      }}
+                      showTime={true}
                       value={Moment(Value)}
                       size="small"
                       format="DD.MM.YYYY hh:mm:ss"
@@ -330,9 +372,32 @@ export default function TransportPrfoile(props) {
               },
               {
                 render: (Value, Record, Index) => {
-                  return props.Profile.AllWorkConditions.find((Conditions) => {
-                    return Conditions.Id == Value;
-                  }).Caption;
+                  return (
+                    <Select
+                      style={{ width: '160px' }}
+                      onChange={() => {
+                        Modal.confirm({
+                          okButtonProps: { type: 'primary', size: 'small' },
+                          okText: 'Да',
+                          cancelText: 'Нет',
+                          cancelButtonProps: { size: 'small' },
+                          title: 'Подтвердите действие',
+                          content:
+                            'Вы действительно хотите изменить условия местоположение?',
+                        });
+                      }}
+                      value={Value}
+                      size="small"
+                      options={props.Profile.AllWorkConditions.map(
+                        (Conditions) => {
+                          return {
+                            value: Conditions.Id,
+                            label: Conditions.Caption,
+                          };
+                        }
+                      )}
+                    />
+                  );
                 },
                 title: 'Наименование',
                 key: 'ConditonsId',
