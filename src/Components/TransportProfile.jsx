@@ -1,14 +1,31 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { Input, Select, Button, Table, DatePicker, Modal } from 'antd';
-import { CaretDownOutlined, CaretUpOutlined } from '@ant-design/icons';
+import {
+  CaretDownOutlined,
+  CaretUpOutlined,
+  DashOutlined,
+} from '@ant-design/icons';
 import Moment from 'moment';
+import { ApiFetch } from '../Helpers/Helpers';
 export default function TransportPrfoile(props) {
   console.log(props);
+  const [TerminalProfile, SetNewTerminalProfile] = useState(null);
   const [ShowFirmHistory, SetShowFirmHistory] = useState(false);
   const [ShowLocationHistory, SetShowLocationHistory] = useState(false);
+  const [ShowEquipmentHistory, SetShowShowEquipmentHistory] = useState(false);
   const [SelectedFirmKey, SetNewSelectedFirmKey] = useState(null);
   const [SelectedLocationKey, SetNewSelectedLocationKey] = useState(null);
+  const RequestTerminalProfile = (TerminalID) => {
+    ApiFetch(
+      `model/UnitProfiles/${TerminalID}`,
+      'GET',
+      undefined,
+      (Response) => {
+        SetNewTerminalProfile(Response.data);
+      }
+    );
+  };
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -275,9 +292,9 @@ export default function TransportPrfoile(props) {
             style={{ width: '135px' }}
             value={
               props.Profile.Profile.Locations.length != 0
-                ? props.Profile.AllWorkConditions.find((Location) => {
+                ? props.Profile.AllWorkConditions.find((Condition) => {
                     return (
-                      Location.Id ==
+                      Condition.Id ==
                       props.Profile.Profile.Locations[0].ConditonsId
                     );
                   }).Caption
@@ -428,10 +445,10 @@ export default function TransportPrfoile(props) {
                       value={Value}
                       size="small"
                       options={props.Profile.AllWorkConditions.map(
-                        (Conditions) => {
+                        (Condition) => {
                           return {
-                            value: Conditions.Id,
-                            label: Conditions.Caption,
+                            value: Condition.Id,
+                            label: Condition.Caption,
                           };
                         }
                       )}
@@ -445,6 +462,89 @@ export default function TransportPrfoile(props) {
             ]}
           />
         </>
+      ) : null}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          marginTop: '10px',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          Оборудование:
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Input
+            size="small"
+            style={{ width: '135px' }}
+            value={props.Profile.Profile.Equipments[0].ObjectId}
+          />
+          <Button
+            onClick={() => {
+              SetShowShowEquipmentHistory(!ShowEquipmentHistory);
+            }}
+            size="small"
+            type="primary"
+            icon={
+              ShowEquipmentHistory ? <CaretUpOutlined /> : <CaretDownOutlined />
+            }
+          />
+        </div>
+      </div>
+      {ShowEquipmentHistory ? (
+        <Table
+          pagination={false}
+          rowKey="Key"
+          size="small"
+          dataSource={props.Profile.Profile.Equipments.map(
+            (Equipment, Index) => {
+              return {
+                Key: Index,
+                TS: Equipment.TS,
+                ObjectId: Equipment.ObjectId,
+                TerminalID: Equipment.UnitProfileID,
+              };
+            }
+          )}
+          columns={[
+            {
+              title: 'Дата',
+              key: 'TS',
+              dataIndex: 'TS',
+              render: (Text, Record, Index) => {
+                return (
+                  <DatePicker
+                    size="small"
+                    value={Moment(Text)}
+                    format="DD.MM.YYYY hh:mm:ss"
+                  />
+                );
+              },
+            },
+            {
+              title: 'ID терминала',
+              key: 'ObjectId',
+              dataIndex: 'ObjectId',
+              render: (Text, Record, Index) => {
+                return (
+                  <div
+                    style={{ display: 'flex', justifyContent: 'space-between' }}
+                  >
+                    {Text}
+                    <Button
+                      onClick={() => {
+                        RequestTerminalProfile(Record.TerminalID);
+                      }}
+                      size="small"
+                      type="primary"
+                      icon={<DashOutlined />}
+                    />
+                  </div>
+                );
+              },
+            },
+          ]}
+        />
       ) : null}
     </>
   );
