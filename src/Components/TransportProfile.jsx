@@ -9,7 +9,6 @@ import {
 import Moment from 'moment';
 import { ApiFetch } from '../Helpers/Helpers';
 export default function TransportPrfoile(props) {
-  console.log(props);
   const [TerminalProfile, SetNewTerminalProfile] = useState(null);
   const [ShowFirmHistory, SetShowFirmHistory] = useState(false);
   const [ShowLocationHistory, SetShowLocationHistory] = useState(false);
@@ -23,6 +22,10 @@ export default function TransportPrfoile(props) {
       undefined,
       (Response) => {
         SetNewTerminalProfile(Response.data);
+        props.ProfileHandler('ChangeProfileMode', {
+          Mode: 'TerminalProfile',
+          Title: 'Профиль терминала',
+        });
       }
     );
   };
@@ -537,16 +540,7 @@ export default function TransportPrfoile(props) {
                       }}
                       size="small"
                       type="primary"
-                      icon={
-                        <DashOutlined
-                          onClick={() => {
-                            props.ProfileHandler('ChangeProfileMode', {
-                              Mode: 'TerminalProfile',
-                              Title: 'Профиль терминала',
-                            });
-                          }}
-                        />
-                      }
+                      icon={<DashOutlined />}
                     />
                   </div>
                 );

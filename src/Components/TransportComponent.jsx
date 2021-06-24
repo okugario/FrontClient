@@ -5,6 +5,7 @@ import { Table, Modal } from 'antd';
 import { ApiFetch } from '../Helpers/Helpers';
 import Moment from 'moment';
 import ProfilePageHandler from './ProfilePageHandler';
+import TerminalProfile from './TerminalProfile';
 
 export default function TransportComponent() {
   const [TransportTable, SetNewTransportTable] = useState(null);
@@ -86,6 +87,19 @@ export default function TransportComponent() {
         break;
     }
   };
+  const GetProfile = (ModalMode) => {
+    switch (ModalMode) {
+      case 'TransportProfile':
+        return (
+          <TransportProfile
+            Profile={Profile}
+            ProfileHandler={TransportProfileHandler}
+          />
+        );
+      case 'TerminalProfile':
+        return <TerminalProfile ProfileHandler={TransportProfileHandler} />;
+    }
+  };
   const RequestTransportTable = () => {
     ApiFetch('model/Vehicles', 'GET', undefined, (Response) => {
       SetNewTransportTable(Response.data);
@@ -155,10 +169,7 @@ export default function TransportComponent() {
           SetNewShowProfile(false);
         }}
       >
-        <TransportProfile
-          Profile={Profile}
-          ProfileHandler={TransportProfileHandler}
-        />
+        {GetProfile(ProfileMode.Mode)}
       </Modal>
       <Table
         scroll={{ scrollToFirstRowOnChange: true, y: 700 }}
