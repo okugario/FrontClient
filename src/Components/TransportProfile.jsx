@@ -537,7 +537,16 @@ export default function TransportPrfoile(props) {
                       }}
                       size="small"
                       type="primary"
-                      icon={<DashOutlined />}
+                      icon={
+                        <DashOutlined
+                          onClick={() => {
+                            props.ProfileHandler('ChangeProfileMode', {
+                              Mode: 'TerminalProfile',
+                              Title: 'Профиль терминала',
+                            });
+                          }}
+                        />
+                      }
                     />
                   </div>
                 );

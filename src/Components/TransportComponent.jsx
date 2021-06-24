@@ -4,9 +4,14 @@ import TransportProfile from './TransportProfile';
 import { Table, Modal } from 'antd';
 import { ApiFetch } from '../Helpers/Helpers';
 import Moment from 'moment';
+import ProfilePageHandler from './ProfilePageHandler';
 
 export default function TransportComponent() {
   const [TransportTable, SetNewTransportTable] = useState(null);
+  const [ProfileMode, SetNewProfileMode] = useState({
+    Mode: 'TransportProfile',
+    Title: 'Профиль транспорта',
+  });
   const [ShowProfile, SetNewShowProfile] = useState(false);
   const [SelectedKey, SetNewSelectedKey] = useState(null);
   const [Profile, SetNewProfile] = useState(null);
@@ -14,6 +19,9 @@ export default function TransportComponent() {
   const TransportProfileHandler = (Action, Data, Index) => {
     let NewProfile = { ...Profile };
     switch (Action) {
+      case 'ChangeProfileMode':
+        SetNewProfileMode(Data);
+        break;
       case 'AddFirm':
         NewProfile.Profile.Owners.push({
           TS: Moment().format(),
@@ -131,7 +139,13 @@ export default function TransportComponent() {
           TransportProfileHandler('SaveProfile');
         }}
         destroyOnClose={true}
-        title="Профиль транспорта"
+        title={
+          <ProfilePageHandler
+            ProfileHandler={TransportProfileHandler}
+            Title={ProfileMode.Title}
+            BackIcon={ProfileMode.Mode != 'TransportProfile'}
+          />
+        }
         width="450px"
         okText="Сохранить"
         okButtonProps={{ size: 'small' }}
