@@ -87,13 +87,23 @@ export default function TransportComponent() {
         SetNewProfile(NewProfile);
         break;
       case 'RequestTerminalProfile':
-        ApiFetch(`model/UnitProfiles/${Data}`, 'GET', undefined, (Response) => {
-          SetNewTerminalProfile(Response.data);
-          TransportProfileHandler('ChangeProfileMode', {
-            Mode: 'TerminalProfile',
-            Title: 'Профиль терминала',
-          });
-        });
+        ApiFetch(
+          `model/UnitProfiles/${Data.TerminalID}`,
+          'GET',
+          undefined,
+          (Response) => {
+            Response.data.TransportCaption = Data.TransportCaption;
+
+            Response.data.Date = Data.TS;
+            Response.data.ObjectID = Data.ObjectID;
+
+            SetNewTerminalProfile(Response.data);
+            TransportProfileHandler('ChangeProfileMode', {
+              Mode: 'TerminalProfile',
+              Title: 'Профиль терминала',
+            });
+          }
+        );
 
         break;
     }

@@ -501,13 +501,7 @@ export default function TransportPrfoile(props) {
               key: 'TS',
               dataIndex: 'TS',
               render: (Text, Record, Index) => {
-                return (
-                  <DatePicker
-                    size="small"
-                    value={Moment(Text)}
-                    format="DD.MM.YYYY hh:mm:ss"
-                  />
-                );
+                return Moment(Text).format('DD.MM.YYYY hh:mm:ss');
               },
             },
             {
@@ -515,6 +509,7 @@ export default function TransportPrfoile(props) {
               key: 'ObjectId',
               dataIndex: 'ObjectId',
               render: (Text, Record, Index) => {
+                console.log(Record);
                 return (
                   <div
                     style={{ display: 'flex', justifyContent: 'space-between' }}
@@ -522,10 +517,12 @@ export default function TransportPrfoile(props) {
                     {Text}
                     <Button
                       onClick={() => {
-                        props.ProfileHandler(
-                          'RequestTerminalProfile',
-                          Record.TerminalID
-                        );
+                        props.ProfileHandler('RequestTerminalProfile', {
+                          TransportCaption: props.Profile.Profile.Caption,
+                          TerminalID: Record.TerminalID,
+                          ObjectID: Record.ObjectId,
+                          TS: Record.TS,
+                        });
                       }}
                       size="small"
                       type="primary"

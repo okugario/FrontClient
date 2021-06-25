@@ -1,9 +1,69 @@
 import * as React from 'react';
-import { Input, Checkbox, Select } from 'antd';
+import { Input, Checkbox, Select, Table, Button, DatePicker } from 'antd';
+import Moment from 'moment';
 export default function TerminalProfile(props) {
+  console.log(props.Profile);
   return (
     <>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          Транспортное средство:
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Input
+            disabled={true}
+            size="small"
+            style={{ width: '160px' }}
+            value={props.Profile.TransportCaption}
+          />
+        </div>
+      </div>
+      <div
+        style={{
+          marginTop: '10px',
+          display: 'flex',
+          justifyContent: 'space-between',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center' }}>Дата:</div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <DatePicker
+            format="DD.MM.YYYY hh:mm:ss"
+            size="small"
+            showTime={true}
+            style={{ width: '160px' }}
+            value={Moment(props.Profile.Date)}
+          />
+        </div>
+      </div>
+      <div
+        style={{
+          marginTop: '10px',
+          display: 'flex',
+          justifyContent: 'space-between',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center' }}>ID:</div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Input
+            size="small"
+            style={{ width: '160px' }}
+            value={props.Profile.ObjectID}
+          />
+        </div>
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          marginTop: '10px',
+        }}
+      >
         <div style={{ display: 'flex', alignItems: 'center' }}>
           Грузоподъемность:
         </div>
@@ -53,6 +113,74 @@ export default function TerminalProfile(props) {
           />
         </div>
       </div>
+
+      <Table
+        pagination={false}
+        rowKey="Key"
+        dataSource={props.Profile.Options.truck.inputs.map((Sensor, Index) => {
+          return { Key: Index, id: Sensor.id, k: Sensor.k };
+        })}
+        columns={[
+          {
+            title: 'Номер входа',
+            key: 'id',
+            dataIndex: 'id',
+            render: (Value, Record, Index) => {
+              return (
+                <Select
+                  size="small"
+                  value={Value}
+                  options={[
+                    { value: 0, label: 1 },
+                    { value: 1, label: 2 },
+                    { value: 2, label: 3 },
+                    { value: 3, label: 4 },
+                    { value: 4, label: 5 },
+                    { value: 5, label: 6 },
+                    { value: 6, label: 7 },
+                    { value: 7, label: 8 },
+                  ]}
+                />
+              );
+            },
+          },
+          {
+            title: 'Множитель',
+            key: 'k',
+            dataIndex: 'k',
+            render: (Value, Record, Index) => {
+              return (
+                <Input size="small" value={Value} style={{ width: '50px' }} />
+              );
+            },
+          },
+        ]}
+        size="small"
+        title={() => (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              marginTop: '10px',
+            }}
+          >
+            <span> Датчики давления в подвеске</span>
+            <div>
+              <Button size="small" type="primary" style={{ marginLeft: '5px' }}>
+                Добавить
+              </Button>
+              <Button
+                size="small"
+                danger
+                type="primary"
+                style={{ margin: '5px' }}
+              >
+                Удалить
+              </Button>
+            </div>
+          </div>
+        )}
+      />
     </>
   );
 }
