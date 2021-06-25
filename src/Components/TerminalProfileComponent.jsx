@@ -40,7 +40,17 @@ export default function TerminalProfile(props) {
           Система давления в шинах :
         </div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Select size="small" style={{ width: '160px' }} />
+          <Select
+            size="small"
+            value={props.Profile.Options.truck.tyresystem}
+            style={{ width: '160px' }}
+            options={[
+              { value: 'skt', label: 'СКТ' },
+              { value: 'parkm', label: 'ParkMaster' },
+              { value: 'presspro', label: 'Pressure Pro' },
+              { value: 'none', label: 'Не установлена' },
+            ]}
+          />
         </div>
       </div>
     </>
