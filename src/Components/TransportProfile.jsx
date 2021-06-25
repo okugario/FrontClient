@@ -7,28 +7,14 @@ import {
   DashOutlined,
 } from '@ant-design/icons';
 import Moment from 'moment';
-import { ApiFetch } from '../Helpers/Helpers';
+
 export default function TransportPrfoile(props) {
-  const [TerminalProfile, SetNewTerminalProfile] = useState(null);
   const [ShowFirmHistory, SetShowFirmHistory] = useState(false);
   const [ShowLocationHistory, SetShowLocationHistory] = useState(false);
   const [ShowEquipmentHistory, SetShowShowEquipmentHistory] = useState(false);
   const [SelectedFirmKey, SetNewSelectedFirmKey] = useState(null);
   const [SelectedLocationKey, SetNewSelectedLocationKey] = useState(null);
-  const RequestTerminalProfile = (TerminalID) => {
-    ApiFetch(
-      `model/UnitProfiles/${TerminalID}`,
-      'GET',
-      undefined,
-      (Response) => {
-        SetNewTerminalProfile(Response.data);
-        props.ProfileHandler('ChangeProfileMode', {
-          Mode: 'TerminalProfile',
-          Title: 'Профиль терминала',
-        });
-      }
-    );
-  };
+
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -536,7 +522,10 @@ export default function TransportPrfoile(props) {
                     {Text}
                     <Button
                       onClick={() => {
-                        RequestTerminalProfile(Record.TerminalID);
+                        props.ProfileHandler(
+                          'RequestTerminalProfile',
+                          Record.TerminalID
+                        );
                       }}
                       size="small"
                       type="primary"

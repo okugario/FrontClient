@@ -5,9 +5,10 @@ import { Table, Modal } from 'antd';
 import { ApiFetch } from '../Helpers/Helpers';
 import Moment from 'moment';
 import ProfilePageHandler from './ProfilePageHandler';
-import TerminalProfile from './TerminalProfile';
+import TerminalProfileComponent from './TerminalProfileComponent';
 
 export default function TransportComponent() {
+  const [TerminalProfile, SetNewTerminalProfile] = useState(null);
   const [TransportTable, SetNewTransportTable] = useState(null);
   const [ProfileMode, SetNewProfileMode] = useState({
     Mode: 'TransportProfile',
@@ -85,6 +86,16 @@ export default function TransportComponent() {
         });
         SetNewProfile(NewProfile);
         break;
+      case 'RequestTerminalProfile':
+        ApiFetch(`model/UnitProfiles/${Data}`, 'GET', undefined, (Response) => {
+          SetNewTerminalProfile(Response.data);
+          TransportProfileHandler('ChangeProfileMode', {
+            Mode: 'TerminalProfile',
+            Title: 'Профиль терминала',
+          });
+        });
+
+        break;
     }
   };
   const GetProfile = (ModalMode) => {
@@ -97,7 +108,12 @@ export default function TransportComponent() {
           />
         );
       case 'TerminalProfile':
-        return <TerminalProfile ProfileHandler={TransportProfileHandler} />;
+        return (
+          <TerminalProfileComponent
+            Profile={TerminalProfile}
+            ProfileHandler={TransportProfileHandler}
+          />
+        );
     }
   };
   const RequestTransportTable = () => {
@@ -166,6 +182,10 @@ export default function TransportComponent() {
         cancelButtonProps={{ size: 'small' }}
         visible={ShowProfile}
         onCancel={() => {
+          TransportProfileHandler('ChangeProfileMode', {
+            Mode: 'TransportProfile',
+            Title: 'Профиль транспорта',
+          });
           SetNewShowProfile(false);
         }}
       >
