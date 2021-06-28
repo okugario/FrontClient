@@ -467,7 +467,11 @@ export default function TransportPrfoile(props) {
           <Input
             size="small"
             style={{ width: '135px' }}
-            value={props.Profile.Profile.Equipments[0].ObjectId}
+            value={
+              props.Profile.Profile.Equipments.length > 0
+                ? props.Profile.Profile.Equipments[0].ObjectId
+                : 'Не указано'
+            }
           />
           <Button
             onClick={() => {
@@ -487,7 +491,9 @@ export default function TransportPrfoile(props) {
             size="small"
             type="primary"
             style={{ margin: '5px' }}
-            onClick={() => {}}
+            onClick={() => {
+              props.ProfileHandler('AddEquipment');
+            }}
           >
             Добавить
           </Button>
@@ -496,7 +502,26 @@ export default function TransportPrfoile(props) {
             danger
             type="primary"
             style={{ margin: '5px' }}
-            onClick={() => {}}
+            onClick={() => {
+              if (SelectedEquipmentKey != null) {
+                Modal.confirm({
+                  okText: 'Удалить',
+                  cancelText: 'Отмена',
+                  okButtonProps: { size: 'small', danger: true },
+                  cancelButtonProps: { size: 'small' },
+                  title: 'Подтвердите действие',
+                  content: 'Вы действительно хотите удалить данную запись?',
+                  onOk: () => {
+                    props.ProfileHandler(
+                      'DeleteEquipment',
+                      undefined,
+                      SelectedEquipmentKey
+                    );
+                    SetNewSelectedEquipmentKey(null);
+                  },
+                });
+              }
+            }}
           >
             Удалить
           </Button>
@@ -511,6 +536,7 @@ export default function TransportPrfoile(props) {
             }}
             rowSelection={{
               hideSelectAll: true,
+              columnWidth: 0,
               renderCell: () => {
                 return null;
               },
@@ -534,7 +560,11 @@ export default function TransportPrfoile(props) {
                 key: 'TS',
                 dataIndex: 'TS',
                 render: (Text, Record, Index) => {
-                  return Moment(Text).format('DD.MM.YYYY hh:mm:ss');
+                  return (
+                    <div style={{ cursor: 'pointer' }}>
+                      {Moment(Text).format('DD.MM.YYYY hh:mm:ss')}{' '}
+                    </div>
+                  );
                 },
               },
               {
@@ -545,6 +575,7 @@ export default function TransportPrfoile(props) {
                   return (
                     <div
                       style={{
+                        cursor: 'pointer',
                         display: 'flex',
                         justifyContent: 'space-between',
                       }}

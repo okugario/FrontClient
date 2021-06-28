@@ -22,6 +22,7 @@ export default function TransportComponent() {
   const TransportProfileHandler = (Action, Data, Index) => {
     let NewProfile = { ...Profile };
     let NewTerminalProfile = { ...TerminalProfile };
+
     switch (Action) {
       case 'ChangeProfileMode':
         SetNewProfileMode(Data);
@@ -112,11 +113,51 @@ export default function TransportComponent() {
         SetNewTerminalProfile(NewTerminalProfile);
         break;
       case 'ChangeTerminalID':
-        NewProfile.Profile.Equipments[TerminalIndex].ObjectId = Data;
+        NewTerminalProfile.Equipments[TerminalIndex].ObjectId = Data;
         SetNewTerminalProfile(NewTerminalProfile);
         break;
       case 'ChangeEquipmentDate':
-        NewProfile.Profile.Equipments[TerminalIndex].TS = Data;
+        NewTerminalProfile.Equipments[TerminalIndex].TS = Data;
+        SetNewTerminalProfile(NewTerminalProfile);
+        break;
+      case 'DeleteEquipment':
+        Profile.Profile.Equipments.splice(Index, 1);
+        SetNewTerminalProfile(NewProfile);
+        break;
+      case 'AddEquipment':
+        SetNewTerminalProfile({
+          Options: {
+            truck: {
+              canweight: false,
+              inputs: [],
+              maxweight: 50,
+              tyresystem: 'skt',
+            },
+          },
+        });
+        TransportProfileHandler('ChangeProfileMode', {
+          Mode: 'TerminalProfile',
+          Title: 'Профиль терминала',
+        });
+        break;
+      case 'AddSensor':
+        NewTerminalProfile.Options.truck.inputs.push({
+          id: 0,
+          k: 0.1,
+        });
+        SetNewTerminalProfile(NewTerminalProfile);
+        break;
+
+      case 'ChangeSensorEnterNumber':
+        NewTerminalProfile.Options.truck.inputs[Index].id = Data;
+        SetNewTerminalProfile(NewTerminalProfile);
+        break;
+      case 'ChangeSensorMultiplier':
+        NewTerminalProfile.Options.truck.inputs[Index].k = Data;
+        SetNewTerminalProfile(NewTerminalProfile);
+        break;
+      case 'DeleteSensor':
+        NewTerminalProfile.Options.truck.inputs.splice(Index, 1);
         SetNewTerminalProfile(NewTerminalProfile);
         break;
     }
@@ -133,10 +174,18 @@ export default function TransportComponent() {
       case 'TerminalProfile':
         return (
           <TerminalProfileComponent
-            TerminalID={Profile.Profile.Equipments[TerminalIndex].ObjectId}
+            TerminalID={
+              TerminalIndex != null
+                ? Profile.Profile.Equipments[TerminalIndex].ObjectId
+                : null
+            }
             TransportCaption={Profile.Profile.Caption}
             Profile={TerminalProfile}
-            Date={Profile.Profile.Equipments[TerminalIndex].TS}
+            Date={
+              TerminalIndex != null
+                ? Profile.Profile.Equipments[TerminalIndex].TS
+                : Moment()
+            }
             ProfileHandler={TransportProfileHandler}
           />
         );

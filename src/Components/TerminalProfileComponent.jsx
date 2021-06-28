@@ -1,8 +1,19 @@
 import * as React from 'react';
-import { Input, Checkbox, Select, Table, Button, DatePicker } from 'antd';
+import { useState } from 'react';
+import {
+  Input,
+  Checkbox,
+  Select,
+  Table,
+  Button,
+  DatePicker,
+  Modal,
+} from 'antd';
 import Moment from 'moment';
+
 export default function TerminalProfile(props) {
-  console.log(props.Profile);
+  const [SelectedSensorKey, SetNewSelectedSensorKey] = useState(null);
+
   return (
     <>
       <div
@@ -44,29 +55,32 @@ export default function TerminalProfile(props) {
           />
         </div>
       </div>
-      <div
-        style={{
-          marginTop: '10px',
-          display: 'flex',
-          justifyContent: 'space-between',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center' }}>ID:</div>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Input
-            onChange={(Event) => {
-              props.ProfileHandler(
-                'ChangeTerminalID',
-                Event.target.value,
-                props.Profile.Index
-              );
-            }}
-            size="small"
-            style={{ width: '160px' }}
-            value={props.TerminalID}
-          />
+      {props.TerminalID != null ? (
+        <div
+          style={{
+            marginTop: '10px',
+            display: 'flex',
+            justifyContent: 'space-between',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center' }}>ID:</div>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <Input
+              onChange={(Event) => {
+                props.ProfileHandler(
+                  'ChangeTerminalID',
+                  Event.target.value,
+                  props.Profile.Index
+                );
+              }}
+              size="small"
+              style={{ width: '160px' }}
+              value={props.TerminalID}
+            />
+          </div>
         </div>
-      </div>
+      ) : null}
+
       <div
         style={{
           display: 'flex',
@@ -144,15 +158,61 @@ export default function TerminalProfile(props) {
       >
         <span> Датчики давления в подвеске</span>
         <div>
-          <Button size="small" type="primary" style={{ marginLeft: '5px' }}>
+          <Button
+            size="small"
+            type="primary"
+            style={{ marginLeft: '5px' }}
+            onClick={() => {
+              props.ProfileHandler('AddSensor');
+            }}
+          >
             Добавить
           </Button>
-          <Button size="small" danger type="primary" style={{ margin: '5px' }}>
+          <Button
+            size="small"
+            danger
+            type="primary"
+            style={{ margin: '5px' }}
+            onClick={() => {
+              if (SelectedSensorKey != null) {
+                Modal.confirm({
+                  onOk: () => {
+                    props.ProfileHandler(
+                      'DeleteSensor',
+                      undefined,
+                      SelectedSensorKey
+                    );
+                    SetNewSelectedSensorKey(null);
+                  },
+                  title: 'Подтвердите действие',
+                  content: 'Удалить данный датчик?',
+                  cancelButtonProps: { size: 'small' },
+                  okButtonProps: { size: 'small', danger: true },
+                  okText: 'Удалить',
+                  cancelText: 'Отмена',
+                });
+              }
+            }}
+          >
             Удалить
           </Button>
         </div>
       </div>
       <Table
+        rowSelection={{
+          selectedRowKeys: [SelectedSensorKey],
+          hideSelectAll: true,
+          renderCell: () => {
+            return null;
+          },
+        }}
+        onRow={(Record) => {
+          return {
+            onClick: () => {
+              SetNewSelectedSensorKey(Record.Key);
+            },
+          };
+        }}
         pagination={false}
         rowKey="Key"
         dataSource={props.Profile.Options.truck.inputs.map((Sensor, Index) => {
@@ -165,20 +225,29 @@ export default function TerminalProfile(props) {
             dataIndex: 'id',
             render: (Value, Record, Index) => {
               return (
-                <Select
-                  size="small"
-                  value={Value}
-                  options={[
-                    { value: 0, label: 1 },
-                    { value: 1, label: 2 },
-                    { value: 2, label: 3 },
-                    { value: 3, label: 4 },
-                    { value: 4, label: 5 },
-                    { value: 5, label: 6 },
-                    { value: 6, label: 7 },
-                    { value: 7, label: 8 },
-                  ]}
-                />
+                <div style={{ cursor: 'pointer' }}>
+                  <Select
+                    onChange={(Value) => {
+                      props.ProfileHandler(
+                        'ChangeSensorEnterNumber',
+                        Value,
+                        Index
+                      );
+                    }}
+                    size="small"
+                    value={Value}
+                    options={[
+                      { value: 0, label: 1 },
+                      { value: 1, label: 2 },
+                      { value: 2, label: 3 },
+                      { value: 3, label: 4 },
+                      { value: 4, label: 5 },
+                      { value: 5, label: 6 },
+                      { value: 6, label: 7 },
+                      { value: 7, label: 8 },
+                    ]}
+                  />
+                </div>
               );
             },
           },
@@ -188,7 +257,20 @@ export default function TerminalProfile(props) {
             dataIndex: 'k',
             render: (Value, Record, Index) => {
               return (
-                <Input size="small" value={Value} style={{ width: '50px' }} />
+                <div style={{ cursor: 'pointer' }}>
+                  <Input
+                    size="small"
+                    value={Value}
+                    style={{ width: '50px' }}
+                    onChange={(Event) => {
+                      props.ProfileHandler(
+                        'ChangeSensorMultiplier',
+                        Event.target.value,
+                        Index
+                      );
+                    }}
+                  />
+                </div>
               );
             },
           },
