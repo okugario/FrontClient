@@ -14,6 +14,7 @@ export default function TransportPrfoile(props) {
   const [ShowEquipmentHistory, SetShowShowEquipmentHistory] = useState(false);
   const [SelectedFirmKey, SetNewSelectedFirmKey] = useState(null);
   const [SelectedLocationKey, SetNewSelectedLocationKey] = useState(null);
+  const [SelectedEquipmentKey, SetNewSelectedEquipmentKey] = useState(null);
 
   return (
     <>
@@ -481,59 +482,93 @@ export default function TransportPrfoile(props) {
         </div>
       </div>
       {ShowEquipmentHistory ? (
-        <Table
-          pagination={false}
-          rowKey="Key"
-          size="small"
-          dataSource={props.Profile.Profile.Equipments.map(
-            (Equipment, Index) => {
+        <>
+          <Button
+            size="small"
+            type="primary"
+            style={{ margin: '5px' }}
+            onClick={() => {}}
+          >
+            Добавить
+          </Button>
+          <Button
+            size="small"
+            danger
+            type="primary"
+            style={{ margin: '5px' }}
+            onClick={() => {}}
+          >
+            Удалить
+          </Button>
+          <Table
+            pagination={false}
+            onRow={(Record) => {
               return {
-                Key: Index,
-                TS: Equipment.TS,
-                ObjectId: Equipment.ObjectId,
-                TerminalID: Equipment.UnitProfileID,
+                onClick: () => {
+                  SetNewSelectedEquipmentKey(Record.Key);
+                },
               };
-            }
-          )}
-          columns={[
-            {
-              title: 'Дата',
-              key: 'TS',
-              dataIndex: 'TS',
-              render: (Text, Record, Index) => {
-                return Moment(Text).format('DD.MM.YYYY hh:mm:ss');
+            }}
+            rowSelection={{
+              hideSelectAll: true,
+              renderCell: () => {
+                return null;
               },
-            },
-            {
-              title: 'ID терминала',
-              key: 'ObjectId',
-              dataIndex: 'ObjectId',
-              render: (Text, Record, Index) => {
-                console.log(Record);
-                return (
-                  <div
-                    style={{ display: 'flex', justifyContent: 'space-between' }}
-                  >
-                    {Text}
-                    <Button
-                      onClick={() => {
-                        props.ProfileHandler('RequestTerminalProfile', {
-                          TransportCaption: props.Profile.Profile.Caption,
-                          TerminalID: Record.TerminalID,
-                          ObjectID: Record.ObjectId,
-                          TS: Record.TS,
-                        });
+              selectedRowKeys: [SelectedEquipmentKey],
+            }}
+            rowKey="Key"
+            size="small"
+            dataSource={props.Profile.Profile.Equipments.map(
+              (Equipment, Index) => {
+                return {
+                  Key: Index,
+                  TS: Equipment.TS,
+                  ObjectId: Equipment.ObjectId,
+                  TerminalID: Equipment.UnitProfileID,
+                };
+              }
+            )}
+            columns={[
+              {
+                title: 'Дата',
+                key: 'TS',
+                dataIndex: 'TS',
+                render: (Text, Record, Index) => {
+                  return Moment(Text).format('DD.MM.YYYY hh:mm:ss');
+                },
+              },
+              {
+                title: 'ID терминала',
+                key: 'ObjectId',
+                dataIndex: 'ObjectId',
+                render: (Text, Record, Index) => {
+                  return (
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
                       }}
-                      size="small"
-                      type="primary"
-                      icon={<DashOutlined />}
-                    />
-                  </div>
-                );
+                    >
+                      {Text}
+                      <Button
+                        onClick={() => {
+                          props.ProfileHandler(
+                            'RequestTerminalProfile',
+                            Record.TerminalID,
+                            Index
+                          );
+                        }}
+                        size="small"
+                        type="primary"
+                        icon={<DashOutlined />}
+                      />
+                    </div>
+                  );
+                },
               },
-            },
-          ]}
-        />
+            ]}
+          />
+        </>
       ) : null}
     </>
   );

@@ -19,7 +19,7 @@ export default function TerminalProfile(props) {
             disabled={true}
             size="small"
             style={{ width: '160px' }}
-            value={props.Profile.TransportCaption}
+            value={props.TransportCaption}
           />
         </div>
       </div>
@@ -33,11 +33,14 @@ export default function TerminalProfile(props) {
         <div style={{ display: 'flex', alignItems: 'center' }}>Дата:</div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <DatePicker
+            value={Moment(props.Date)}
+            onOk={(Value) => {
+              props.ProfileHandler('ChangeEquipmentDate', Value.format());
+            }}
             format="DD.MM.YYYY hh:mm:ss"
             size="small"
             showTime={true}
             style={{ width: '160px' }}
-            value={Moment(props.Profile.Date)}
           />
         </div>
       </div>
@@ -51,9 +54,16 @@ export default function TerminalProfile(props) {
         <div style={{ display: 'flex', alignItems: 'center' }}>ID:</div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Input
+            onChange={(Event) => {
+              props.ProfileHandler(
+                'ChangeTerminalID',
+                Event.target.value,
+                props.Profile.Index
+              );
+            }}
             size="small"
             style={{ width: '160px' }}
-            value={props.Profile.ObjectID}
+            value={props.TerminalID}
           />
         </div>
       </div>
@@ -69,6 +79,9 @@ export default function TerminalProfile(props) {
         </div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Input
+            onChange={(Event) => {
+              props.ProfileHandler('ChangeMaxWeight', Event.target.value);
+            }}
             size="small"
             style={{ width: '160px' }}
             value={props.Profile.Options.truck.maxweight}
@@ -86,7 +99,12 @@ export default function TerminalProfile(props) {
           Данные с CAN шины :
         </div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Checkbox checked={props.Profile.Options.truck.canweight} />
+          <Checkbox
+            checked={props.Profile.Options.truck.canweight}
+            onChange={(Event) => {
+              props.ProfileHandler('ChangeCanData', Event.target.checked);
+            }}
+          />
         </div>
       </div>
       <div
@@ -104,6 +122,9 @@ export default function TerminalProfile(props) {
             size="small"
             value={props.Profile.Options.truck.tyresystem}
             style={{ width: '160px' }}
+            onChange={(Value) => {
+              props.ProfileHandler('ChangeTyreSystem', Value);
+            }}
             options={[
               { value: 'skt', label: 'СКТ' },
               { value: 'parkm', label: 'ParkMaster' },
@@ -113,7 +134,24 @@ export default function TerminalProfile(props) {
           />
         </div>
       </div>
-
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginTop: '10px',
+        }}
+      >
+        <span> Датчики давления в подвеске</span>
+        <div>
+          <Button size="small" type="primary" style={{ marginLeft: '5px' }}>
+            Добавить
+          </Button>
+          <Button size="small" danger type="primary" style={{ margin: '5px' }}>
+            Удалить
+          </Button>
+        </div>
+      </div>
       <Table
         pagination={false}
         rowKey="Key"
@@ -156,30 +194,6 @@ export default function TerminalProfile(props) {
           },
         ]}
         size="small"
-        title={() => (
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              marginTop: '10px',
-            }}
-          >
-            <span> Датчики давления в подвеске</span>
-            <div>
-              <Button size="small" type="primary" style={{ marginLeft: '5px' }}>
-                Добавить
-              </Button>
-              <Button
-                size="small"
-                danger
-                type="primary"
-                style={{ margin: '5px' }}
-              >
-                Удалить
-              </Button>
-            </div>
-          </div>
-        )}
       />
     </>
   );

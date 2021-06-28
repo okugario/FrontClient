@@ -17,9 +17,11 @@ export default function TransportComponent() {
   const [ShowProfile, SetNewShowProfile] = useState(false);
   const [SelectedKey, SetNewSelectedKey] = useState(null);
   const [Profile, SetNewProfile] = useState(null);
+  const [TerminalIndex, SetNewTerminalIndex] = useState(null);
 
   const TransportProfileHandler = (Action, Data, Index) => {
     let NewProfile = { ...Profile };
+    let NewTerminalProfile = { ...TerminalProfile };
     switch (Action) {
       case 'ChangeProfileMode':
         SetNewProfileMode(Data);
@@ -87,24 +89,35 @@ export default function TransportComponent() {
         SetNewProfile(NewProfile);
         break;
       case 'RequestTerminalProfile':
-        ApiFetch(
-          `model/UnitProfiles/${Data.TerminalID}`,
-          'GET',
-          undefined,
-          (Response) => {
-            Response.data.TransportCaption = Data.TransportCaption;
+        SetNewTerminalIndex(Index);
+        ApiFetch(`model/UnitProfiles/${Data}`, 'GET', undefined, (Response) => {
+          SetNewTerminalProfile(Response.data);
+          TransportProfileHandler('ChangeProfileMode', {
+            Mode: 'TerminalProfile',
+            Title: 'Профиль терминала',
+          });
+        });
 
-            Response.data.Date = Data.TS;
-            Response.data.ObjectID = Data.ObjectID;
-
-            SetNewTerminalProfile(Response.data);
-            TransportProfileHandler('ChangeProfileMode', {
-              Mode: 'TerminalProfile',
-              Title: 'Профиль терминала',
-            });
-          }
-        );
-
+        break;
+      case 'ChangeCanData':
+        NewTerminalProfile.Options.truck.canweight = Data;
+        SetNewTerminalProfile(NewTerminalProfile);
+        break;
+      case 'ChangeMaxWeight':
+        NewTerminalProfile.Options.truck.maxweight = Data;
+        SetNewTerminalProfile(NewTerminalProfile);
+        break;
+      case 'ChangeTyreSystem':
+        NewTerminalProfile.Options.truck.tyresystem = Data;
+        SetNewTerminalProfile(NewTerminalProfile);
+        break;
+      case 'ChangeTerminalID':
+        NewProfile.Profile.Equipments[TerminalIndex].ObjectId = Data;
+        SetNewTerminalProfile(NewTerminalProfile);
+        break;
+      case 'ChangeEquipmentDate':
+        NewProfile.Profile.Equipments[TerminalIndex].TS = Data;
+        SetNewTerminalProfile(NewTerminalProfile);
         break;
     }
   };
@@ -120,7 +133,10 @@ export default function TransportComponent() {
       case 'TerminalProfile':
         return (
           <TerminalProfileComponent
+            TerminalID={Profile.Profile.Equipments[TerminalIndex].ObjectId}
+            TransportCaption={Profile.Profile.Caption}
             Profile={TerminalProfile}
+            Date={Profile.Profile.Equipments[TerminalIndex].TS}
             ProfileHandler={TransportProfileHandler}
           />
         );
