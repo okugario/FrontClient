@@ -88,8 +88,14 @@ export default function TransportPrfoile(props) {
             size="small"
             value={props.Profile.Profile.ModelId}
             style={{ width: '160px' }}
-            options={props.Profile.AllModels.map((Type) => {
-              return { value: Type.Id, label: Type.Caption };
+            options={props.Profile.AllModels.map((Model) => {
+              return {
+                value: Model.Id,
+                label: Model.Caption,
+                type: Model.TypeId,
+              };
+            }).filter((Model) => {
+              return Model.type == props.Profile.Profile.Model.TypeId;
             })}
           />
         </div>

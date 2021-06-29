@@ -45,21 +45,14 @@ export default function TransportComponent() {
         break;
       case 'ChangeTransportType':
         NewProfile.Profile.Model.TypeId = Data;
+        NewProfile.Profile.ModelId = NewProfile.AllModels.find((Model) => {
+          return Model.TypeId == Data;
+        }).Id;
         SetNewProfile(NewProfile);
         break;
       case 'ChangeModel':
         NewProfile.Profile.ModelId = Data;
         SetNewProfile(NewProfile);
-        break;
-      case 'SaveProfile':
-        ApiFetch(
-          `model/Vehicles/${NewProfile.Profile.Id}`,
-          'PATCH',
-          NewProfile.Profile,
-          (Response) => {
-            SetNewShowProfile(false);
-          }
-        );
         break;
       case 'EditFirmDate':
         NewProfile.Profile.Owners[Index].TS = Data;
@@ -84,7 +77,7 @@ export default function TransportComponent() {
       case 'AddLocation':
         NewProfile.Profile.Locations.push({
           TS: Moment(),
-          VehicleId: NewProfile.Id,
+          VehicleId: NewProfile.Profile.Id,
           ConditonsId: Profile.AllWorkConditions[0].Id,
         });
         SetNewProfile(NewProfile);
@@ -159,6 +152,18 @@ export default function TransportComponent() {
       case 'DeleteSensor':
         NewTerminalProfile.Options.truck.inputs.splice(Index, 1);
         SetNewTerminalProfile(NewTerminalProfile);
+        break;
+      case 'SaveProfile':
+        if ('Id' in NewProfile.Profile) {
+          ApiFetch(
+            `model/Vehicles/${NewProfile.Profile.Id}`,
+            'PATCH',
+            NewProfile.Profile,
+            (Response) => {
+              SetNewShowProfile(false);
+            }
+          );
+        }
         break;
     }
   };
