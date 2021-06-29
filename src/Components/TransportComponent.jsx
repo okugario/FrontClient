@@ -8,7 +8,6 @@ import ProfilePageHandler from './ProfilePageHandler';
 import TerminalProfileComponent from './TerminalProfileComponent';
 
 export default function TransportComponent() {
-  const [TerminalProfile, SetNewTerminalProfile] = useState(null);
   const [TransportTable, SetNewTransportTable] = useState(null);
   const [ProfileMode, SetNewProfileMode] = useState({
     Mode: 'TransportProfile',
@@ -21,11 +20,11 @@ export default function TransportComponent() {
 
   const TransportProfileHandler = (Action, Data, Index) => {
     let NewProfile = { ...Profile };
-    let NewTerminalProfile = { ...TerminalProfile };
 
     switch (Action) {
       case 'ChangeProfileMode':
         SetNewProfileMode(Data);
+        SetNewTerminalIndex(Index);
         break;
       case 'AddFirm':
         NewProfile.Profile.Owners.push({
@@ -76,94 +75,130 @@ export default function TransportComponent() {
         break;
       case 'AddLocation':
         NewProfile.Profile.Locations.push({
-          TS: Moment(),
+          TS: Moment().format(),
           VehicleId: NewProfile.Profile.Id,
           ConditonsId: Profile.AllWorkConditions[0].Id,
         });
         SetNewProfile(NewProfile);
         break;
-      case 'RequestTerminalProfile':
-        SetNewTerminalIndex(Index);
-        ApiFetch(`model/UnitProfiles/${Data}`, 'GET', undefined, (Response) => {
-          SetNewTerminalProfile(Response.data);
-          TransportProfileHandler('ChangeProfileMode', {
-            Mode: 'TerminalProfile',
-            Title: 'Профиль терминала',
-          });
-        });
 
-        break;
       case 'ChangeCanData':
-        NewTerminalProfile.Options.truck.canweight = Data;
-        SetNewTerminalProfile(NewTerminalProfile);
+        NewProfile.Profile.Equipments[
+          TerminalIndex
+        ].UnitProfile.Options.truck.canweight = Data;
+        SetNewProfile(NewProfile);
         break;
       case 'ChangeMaxWeight':
-        NewTerminalProfile.Options.truck.maxweight = Data;
-        SetNewTerminalProfile(NewTerminalProfile);
+        NewProfile.Profile.Equipments[
+          TerminalIndex
+        ].UnitProfile.Options.truck.maxweight = Data;
+        SetNewProfile(NewProfile);
         break;
       case 'ChangeTyreSystem':
-        NewTerminalProfile.Options.truck.tyresystem = Data;
-        SetNewTerminalProfile(NewTerminalProfile);
+        NewProfile.Profile.Equipments[
+          TerminalIndex
+        ].UnitProfile.Options.truck.tyresystem = Data;
+        SetNewProfile(NewProfile);
         break;
       case 'ChangeTerminalID':
-        NewTerminalProfile.Equipments[TerminalIndex].ObjectId = Data;
-        SetNewTerminalProfile(NewTerminalProfile);
+        NewProfile.Profile.Equipments[TerminalIndex].ObjectId = Data;
+        SetNewProfile(NewProfile);
         break;
       case 'ChangeEquipmentDate':
-        NewTerminalProfile.Equipments[TerminalIndex].TS = Data;
-        SetNewTerminalProfile(NewTerminalProfile);
+        NewProfile.Profile.Equipments[TerminalIndex].TS = Data;
+        SetNewProfile(NewProfile);
         break;
       case 'DeleteEquipment':
         Profile.Profile.Equipments.splice(Index, 1);
-        SetNewTerminalProfile(NewProfile);
+        SetNewProfile(NewProfile);
         break;
       case 'AddEquipment':
-        SetNewTerminalProfile({
-          Options: {
-            truck: {
-              canweight: false,
-              inputs: [],
-              maxweight: 50,
-              tyresystem: 'skt',
+        NewProfile.Profile.Equipments.push({
+          TS: Moment().format(),
+          VehicleId: NewProfile.Profile.Id,
+          UnitProfile: {
+            Options: {
+              truck: {
+                canweight: false,
+                inputs: [],
+                maxweight: 50,
+                tyresystem: 'skt',
+              },
             },
           },
         });
-        TransportProfileHandler('ChangeProfileMode', {
-          Mode: 'TerminalProfile',
-          Title: 'Профиль терминала',
-        });
+        SetNewProfile(NewProfile);
+
         break;
       case 'AddSensor':
-        NewTerminalProfile.Options.truck.inputs.push({
+        NewProfile.Profile.Equipments[
+          TerminalIndex
+        ].UnitProfile.Options.truck.inputs.push({
           id: 0,
           k: 0.1,
         });
-        SetNewTerminalProfile(NewTerminalProfile);
+        SetNewProfile(NewProfile);
         break;
 
       case 'ChangeSensorEnterNumber':
-        NewTerminalProfile.Options.truck.inputs[Index].id = Data;
-        SetNewTerminalProfile(NewTerminalProfile);
+        NewProfile.Profile.Equipments[
+          TerminalIndex
+        ].UnitProfile.Options.truck.inputs[Index].id = Data;
+        SetNewProfile(NewProfile);
         break;
       case 'ChangeSensorMultiplier':
-        NewTerminalProfile.Options.truck.inputs[Index].k = Data;
-        SetNewTerminalProfile(NewTerminalProfile);
+        NewProfile.Profile.Equipments[
+          TerminalIndex
+        ].UnitProfile.Options.truck.inputs[Index].k = Data;
+        SetNewProfile(NewProfile);
         break;
       case 'DeleteSensor':
-        NewTerminalProfile.Options.truck.inputs.splice(Index, 1);
-        SetNewTerminalProfile(NewTerminalProfile);
+        NewProfile.Profile.Equipments[
+          TerminalIndex
+        ].UnitProfile.Options.truck.inputs.splice(Index, 1);
+        SetNewProfile(NewProfile);
         break;
       case 'SaveProfile':
-        if ('Id' in NewProfile.Profile) {
+        if (ProfileMode.Mode == 'TransportProfile') {
+          if ('Id' in NewProfile.Profile) {
+            ApiFetch(
+              `model/Vehicles/${NewProfile.Profile.Id}`,
+              'PATCH',
+              NewProfile.Profile,
+              (Response) => {
+                SetNewShowProfile(false);
+                SetNewProfileMode({
+                  Mode: 'TransportProfile',
+                  Title: 'Профиль транспорта',
+                });
+              }
+            );
+          }
+        } else {
           ApiFetch(
-            `model/Vehicles/${NewProfile.Profile.Id}`,
-            'PATCH',
-            NewProfile.Profile,
+            `model/VehicleEquipments${
+              'UnitProfileID' in NewProfile.Profile.Equipments[TerminalIndex]
+                ? `/${NewProfile.Profile.Equipments[TerminalIndex].VehicleId}`
+                : ''
+            }${
+              'UnitProfileID' in NewProfile.Profile.Equipments[TerminalIndex]
+                ? `/${NewProfile.Profile.Equipments[TerminalIndex].TS}`
+                : ''
+            }`,
+            'UnitProfileID' in NewProfile.Profile.Equipments[TerminalIndex]
+              ? 'PATCH'
+              : 'POST',
+            NewProfile.Profile.Equipments[TerminalIndex],
             (Response) => {
               SetNewShowProfile(false);
+              SetNewProfileMode({
+                Mode: 'TransportProfile',
+                Title: 'Профиль транспорта',
+              });
             }
           );
         }
+
         break;
     }
   };
@@ -179,18 +214,8 @@ export default function TransportComponent() {
       case 'TerminalProfile':
         return (
           <TerminalProfileComponent
-            TerminalID={
-              TerminalIndex != null
-                ? Profile.Profile.Equipments[TerminalIndex].ObjectId
-                : null
-            }
             TransportCaption={Profile.Profile.Caption}
-            Profile={TerminalProfile}
-            Date={
-              TerminalIndex != null
-                ? Profile.Profile.Equipments[TerminalIndex].TS
-                : Moment()
-            }
+            TerminalProfile={Profile.Profile.Equipments[TerminalIndex]}
             ProfileHandler={TransportProfileHandler}
           />
         );

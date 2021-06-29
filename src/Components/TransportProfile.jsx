@@ -40,23 +40,6 @@ export default function TransportPrfoile(props) {
           marginTop: '10px',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center' }}>Номер АТ:</div>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Input
-            size="small"
-            style={{ width: '160px' }}
-            disabled
-            value={props.Profile.Profile.Id}
-          />
-        </div>
-      </div>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          marginTop: '10px',
-        }}
-      >
         <div style={{ display: 'flex', alignItems: 'center' }}>Тип ТС:</div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Select
@@ -568,7 +551,7 @@ export default function TransportPrfoile(props) {
                 render: (Text, Record, Index) => {
                   return (
                     <div style={{ cursor: 'pointer' }}>
-                      {Moment(Text).format('DD.MM.YYYY hh:mm:ss')}{' '}
+                      {Moment(Text).format('DD.MM.YYYY hh:mm:ss')}
                     </div>
                   );
                 },
@@ -590,8 +573,11 @@ export default function TransportPrfoile(props) {
                       <Button
                         onClick={() => {
                           props.ProfileHandler(
-                            'RequestTerminalProfile',
-                            Record.TerminalID,
+                            'ChangeProfileMode',
+                            {
+                              Mode: 'TerminalProfile',
+                              Title: 'Профиль терминала',
+                            },
                             Index
                           );
                         }}
