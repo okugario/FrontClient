@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import TransportProfile from './TransportProfile';
-import { Table, Modal } from 'antd';
+import { Table, Modal, Button } from 'antd';
 import { ApiFetch } from '../Helpers/Helpers';
 import Moment from 'moment';
 import ProfilePageHandler from './ProfilePageHandler';
@@ -22,6 +22,62 @@ export default function TransportComponent() {
     let NewProfile = { ...Profile };
 
     switch (Action) {
+      case 'DeleteTransport':
+        ApiFetch(
+          `model/Vehicles/${SelectedKey}`,
+          'DELETE',
+          undefined,
+          (Response) => {
+            RequestTransportTable();
+          }
+        );
+        break;
+      case 'AddTransport':
+        NewProfile = {
+          AllTypes: [],
+          AllModels: [],
+          Profile: {
+            Caption: '',
+            ModelId: '',
+            Model: {},
+            Owners: [],
+            Equipments: [],
+            Locations: [],
+          },
+        };
+        let PromiseArray = [];
+        PromiseArray.push(
+          ApiFetch('model/VehicleModels', 'GET', undefined, (Response) => {
+            NewProfile.AllModels = Response.data;
+            NewProfile.Profile.ModelId = Response.data.find((Model) => {
+              return Model.Caption == '-';
+            }).Id;
+          })
+        );
+        PromiseArray.push(
+          ApiFetch('model/VehicleTypes', 'GET', undefined, (Response) => {
+            NewProfile.AllTypes = Response.data;
+            NewProfile.Profile.Model.TypeId = Response.data.find((Type) => {
+              return Type.Caption == '-';
+            }).Id;
+          })
+        );
+        PromiseArray.push(
+          ApiFetch('model/Firms', 'GET', undefined, (Response) => {
+            NewProfile.AllFirms = Response.data;
+          })
+        );
+        PromiseArray.push(
+          ApiFetch('model/WorkConditions', 'GET', undefined, (Response) => {
+            NewProfile.AllWorkConditions = Response.data;
+          })
+        );
+        Promise.all(PromiseArray).then(() => {
+          SetNewProfile(NewProfile);
+          SetNewShowProfile(true);
+        });
+
+        break;
       case 'ChangeProfileMode':
         if (Data.Mode == 'TransportProfile') {
           const NewProfile = { ...Profile };
@@ -185,16 +241,18 @@ export default function TransportComponent() {
         break;
       case 'SaveProfile':
         if (ProfileMode.Mode == 'TransportProfile') {
-          if ('Id' in NewProfile.Profile) {
-            ApiFetch(
-              `model/Vehicles/${NewProfile.Profile.Id}`,
-              'PATCH',
-              NewProfile.Profile,
-              (Response) => {
+          ApiFetch(
+            `model/Vehicles${
+              'Id' in NewProfile.Profile ? `/${NewProfile.Profile.Id}` : ''
+            }`,
+            'Id' in NewProfile.Profile ? 'PATCH' : 'POST',
+            NewProfile.Profile,
+            (Response) => {
+              RequestTransportTable().then(() => {
                 SetNewShowProfile(false);
-              }
-            );
-          }
+              });
+            }
+          );
         } else {
           ApiFetch(
             `model/VehicleEquipments${
@@ -242,7 +300,7 @@ export default function TransportComponent() {
     }
   };
   const RequestTransportTable = () => {
-    ApiFetch('model/Vehicles', 'GET', undefined, (Response) => {
+    return ApiFetch('model/Vehicles', 'GET', undefined, (Response) => {
       SetNewTransportTable(Response.data);
     });
   };
@@ -315,6 +373,47 @@ export default function TransportComponent() {
       >
         {GetProfile(ProfileMode.Mode)}
       </Modal>
+      <div
+        style={{
+          width: '200px',
+          display: 'flex',
+          justifyContent: 'space-evenly',
+          marginBottom: '5px',
+        }}
+      >
+        <Button
+          size="small"
+          type="primary"
+          onClick={() => {
+            TransportProfileHandler('AddTransport');
+          }}
+        >
+          Добавить
+        </Button>
+        <Button
+          size="small"
+          danger
+          type="primary"
+          onClick={() => {
+            if (SelectedKey != null) {
+              Modal.confirm({
+                okButtonProps: { size: 'small', danger: true, type: 'primary' },
+                okText: 'Удалить',
+                cancelText: 'Отмена',
+                cancelButtonProps: { size: 'small' },
+                onOk: () => {
+                  TransportProfileHandler('DeleteTransport');
+                },
+                title: 'Подтвердите действие',
+                content:
+                  'Вы действительно хотите удалить транспортное средство?',
+              });
+            }
+          }}
+        >
+          Удалить
+        </Button>
+      </div>
       <Table
         scroll={{ scrollToFirstRowOnChange: true, y: 700 }}
         onRow={(Record) => {
