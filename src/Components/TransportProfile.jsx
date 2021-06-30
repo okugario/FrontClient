@@ -481,7 +481,11 @@ export default function TransportPrfoile(props) {
             type="primary"
             style={{ margin: '5px' }}
             onClick={() => {
-              props.ProfileHandler('AddEquipment');
+              props.ProfileHandler(
+                'AddEquipment',
+                undefined,
+                props.Profile.Profile.Equipments.length
+              );
             }}
           >
             Добавить

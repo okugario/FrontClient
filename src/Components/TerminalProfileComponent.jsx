@@ -12,7 +12,6 @@ import {
 import Moment from 'moment';
 
 export default function TerminalProfile(props) {
-  console.log(props);
   const [SelectedSensorKey, SetNewSelectedSensorKey] = useState(null);
 
   return (

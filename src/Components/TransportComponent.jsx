@@ -23,8 +23,24 @@ export default function TransportComponent() {
 
     switch (Action) {
       case 'ChangeProfileMode':
-        SetNewProfileMode(Data);
-        SetNewTerminalIndex(Index);
+        if (Data.Mode == 'TransportProfile') {
+          const NewProfile = { ...Profile };
+          ApiFetch(
+            `model/Vehicles/${SelectedKey}`,
+            'GET',
+            undefined,
+            (Response) => {
+              NewProfile.Profile.Equipments = Response.data.Equipments;
+              SetNewProfile(NewProfile);
+              SetNewProfileMode(Data);
+              SetNewTerminalIndex(Index);
+            }
+          );
+        } else {
+          SetNewProfileMode(Data);
+          SetNewTerminalIndex(Index);
+        }
+
         break;
       case 'AddFirm':
         NewProfile.Profile.Owners.push({
@@ -116,6 +132,7 @@ export default function TransportComponent() {
         NewProfile.Profile.Equipments.push({
           TS: Moment().format(),
           VehicleId: NewProfile.Profile.Id,
+
           UnitProfile: {
             Options: {
               truck: {
@@ -128,6 +145,14 @@ export default function TransportComponent() {
           },
         });
         SetNewProfile(NewProfile);
+        TransportProfileHandler(
+          'ChangeProfileMode',
+          {
+            Mode: 'TerminalProfile',
+            Title: 'Профиль терминала',
+          },
+          NewProfile.Profile.Equipments.length - 1
+        );
 
         break;
       case 'AddSensor':
@@ -167,10 +192,6 @@ export default function TransportComponent() {
               NewProfile.Profile,
               (Response) => {
                 SetNewShowProfile(false);
-                SetNewProfileMode({
-                  Mode: 'TransportProfile',
-                  Title: 'Профиль транспорта',
-                });
               }
             );
           }
@@ -190,8 +211,7 @@ export default function TransportComponent() {
               : 'POST',
             NewProfile.Profile.Equipments[TerminalIndex],
             (Response) => {
-              SetNewShowProfile(false);
-              SetNewProfileMode({
+              TransportProfileHandler('ChangeProfileMode', {
                 Mode: 'TransportProfile',
                 Title: 'Профиль транспорта',
               });
@@ -260,9 +280,8 @@ export default function TransportComponent() {
       )
     );
 
-    Promise.all(PromiseArray).then(() => {
+    return Promise.all(PromiseArray).then(() => {
       SetNewProfile(NewProfile);
-      SetNewShowProfile(true);
     });
   };
   useEffect(RequestTransportTable, []);
@@ -304,7 +323,9 @@ export default function TransportComponent() {
               SetNewSelectedKey(Record.Id);
             },
             onDoubleClick: () => {
-              RequestProfile();
+              RequestProfile().then(() => {
+                SetNewShowProfile(true);
+              });
             },
           };
         }}
