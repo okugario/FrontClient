@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import TransportProfile from './TransportProfile';
-import { Table, Modal, Button } from 'antd';
+import { Table, Modal, Button, message } from 'antd';
 import { ApiFetch } from '../Helpers/Helpers';
 import Moment from 'moment';
 import ProfilePageHandler from './ProfilePageHandler';
@@ -241,18 +241,27 @@ export default function TransportComponent() {
         break;
       case 'SaveProfile':
         if (ProfileMode.Mode == 'TransportProfile') {
-          ApiFetch(
-            `model/Vehicles${
-              'Id' in NewProfile.Profile ? `/${NewProfile.Profile.Id}` : ''
-            }`,
-            'Id' in NewProfile.Profile ? 'PATCH' : 'POST',
-            NewProfile.Profile,
-            (Response) => {
-              RequestTransportTable().then(() => {
-                SetNewShowProfile(false);
-              });
-            }
-          );
+          if (
+            Profile.Profile.Caption != '' &&
+            TransportTable.every((Transport) => {
+              return Transport.Caption != Profile.Profile.Caption;
+            })
+          ) {
+            ApiFetch(
+              `model/Vehicles${
+                'Id' in NewProfile.Profile ? `/${NewProfile.Profile.Id}` : ''
+              }`,
+              'Id' in NewProfile.Profile ? 'PATCH' : 'POST',
+              NewProfile.Profile,
+              (Response) => {
+                RequestTransportTable().then(() => {
+                  SetNewShowProfile(false);
+                });
+              }
+            );
+          } else {
+            message.warning('Укажите корректное наименование');
+          }
         } else {
           ApiFetch(
             `model/VehicleEquipments${
