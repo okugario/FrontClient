@@ -50,6 +50,12 @@ export class Tab {
           case 'VehicleTypes':
             Item.Component = <CrudObjectsComponent />;
             break;
+          case 'Manufacturers':
+            Item.Component = <CrudObjectsComponent />;
+            break;
+          case 'Firms':
+            Item.Component = <CrudObjectsComponent />;
+            break;
         }
         return Item;
       });
