@@ -25,10 +25,7 @@ const ComponentList = [
     Component: React.lazy(() => import('./RolesComponent')),
     Keys: ['AccessRoles'],
   },
-  {
-    Component: React.lazy(() => import('./TransportTypeComponent')),
-    Keys: ['VehicleTypes'],
-  },
+
   {
     Component: React.lazy(() => import('./MapComponent')),
     Keys: ['map'],
@@ -84,6 +81,7 @@ export default class App extends React.Component {
         { id: 'statistic', caption: 'Статистика' },
         { id: 'Vehicles', caption: 'Транспорт' },
         { id: 'Regions', caption: 'Участки' },
+        { id: 'VehicleTypes', caption: 'Типы ТС' },
       ],
     });
     GlobalStore.AddTab({

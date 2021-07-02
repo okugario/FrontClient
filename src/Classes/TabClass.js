@@ -15,7 +15,7 @@ import MapComponent from '../Components/MapComponent';
 import RetranslationComponent from '../Components/RetranslationComponent';
 import StatisticComponent from '../Components/StatisticComponent';
 import TransportComponent from '../Components/TransportComponent';
-import RegionsComponent from '../Components/RegionsComponent';
+import CrudObjectsComponent from '../Components/CrudObjectsComponent';
 import LoadsReportComponent from '../Components/LoadsReportComponent';
 
 export class Tab {
@@ -39,13 +39,16 @@ export class Tab {
             Item.Component = <TransportComponent />;
             break;
           case 'Regions':
-            Item.Component = <RegionsComponent />;
+            Item.Component = <CrudObjectsComponent />;
             break;
           case 'tripsReport':
             Item.Component = <TripsReportComponent />;
             break;
           case 'loadsReport':
             Item.Component = <LoadsReportComponent />;
+            break;
+          case 'VehicleTypes':
+            Item.Component = <CrudObjectsComponent />;
             break;
         }
         return Item;
