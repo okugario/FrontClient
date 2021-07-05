@@ -1,6 +1,8 @@
 import * as React from 'react';
-import { Input, Select, DatePicker } from 'antd';
+import { Input, Select, TimePicker } from 'antd';
+import Moment from 'moment';
 export default function WorkConditionsProfileComponent(props) {
+  console.log(props.Profile);
   return (
     <>
       <div
@@ -13,7 +15,14 @@ export default function WorkConditionsProfileComponent(props) {
           Наименование:
         </div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Input size="small" style={{ width: '160px' }} />
+          <Input
+            onChange={(Event) => {
+              props.ProfileHandler('ChangeCaption', Event.target.value);
+            }}
+            size="small"
+            style={{ width: '160px' }}
+            value={props.Profile.Profile.Caption}
+          />
         </div>
       </div>
       <div
@@ -25,7 +34,15 @@ export default function WorkConditionsProfileComponent(props) {
       >
         <div style={{ display: 'flex', alignItems: 'center' }}>Подрядчик:</div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Select size="small" style={{ width: '160px' }} />
+          <Select
+            value={props.Profile.Profile.ContractorId}
+            size="small"
+            style={{ width: '160px' }}
+            onChange={(Value) => {
+              props.ProfileHandler('ChangeContractor', Value);
+            }}
+            options={props.Profile.AllFirms}
+          />
         </div>
       </div>
       <div
@@ -37,7 +54,15 @@ export default function WorkConditionsProfileComponent(props) {
       >
         <div style={{ display: 'flex', alignItems: 'center' }}>Заказчик:</div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Select size="small" style={{ width: '160px' }} />
+          <Select
+            onChange={(Value) => {
+              props.ProfileHandler('ChangeCustomer', Value);
+            }}
+            value={props.Profile.Profile.CustomerId}
+            size="small"
+            style={{ width: '160px' }}
+            options={props.Profile.AllFirms}
+          />
         </div>
       </div>
       <div
@@ -49,7 +74,15 @@ export default function WorkConditionsProfileComponent(props) {
       >
         <div style={{ display: 'flex', alignItems: 'center' }}>Участок:</div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Select size="small" style={{ width: '160px' }} />
+          <Select
+            onChange={(Value) => {
+              props.ProfileHandler('ChangeRegion', Value);
+            }}
+            value={props.Profile.Profile.RegionId}
+            size="small"
+            style={{ width: '160px' }}
+            options={props.Profile.AllRegions}
+          />
         </div>
       </div>
       <div
@@ -63,7 +96,17 @@ export default function WorkConditionsProfileComponent(props) {
           Начало смены:
         </div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <DatePicker size="small" style={{ width: '160px' }} showTime={true} />
+          <TimePicker
+            size="small"
+            style={{ width: '160px' }}
+            showTime={true}
+            showSecond={false}
+            format="hh:mm"
+            onOk={(Value) => {
+              props.ProfileHandler('ChangeShiftStart', Value.format('hh:mm'));
+            }}
+            value={Moment(props.Profile.Profile.ShiftStart, 'hh:mm')}
+          />
         </div>
       </div>
 
@@ -78,7 +121,14 @@ export default function WorkConditionsProfileComponent(props) {
           Зона погрузки:
         </div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Input size="small" style={{ width: '160px' }} />
+          <Input
+            onChange={(Event) => {
+              props.ProfileHandler('ChangeLoadZone', Event.target.value);
+            }}
+            size="small"
+            style={{ width: '160px' }}
+            value={props.Profile.Profile.LoadZone}
+          />
         </div>
       </div>
       <div
@@ -92,7 +142,14 @@ export default function WorkConditionsProfileComponent(props) {
           Простой с оплатой:
         </div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Input size="small" style={{ width: '160px' }} />
+          <Input
+            onChange={(Event) => {
+              props.ProfileHandler('ChangeIdlePay', Event.target.value);
+            }}
+            size="small"
+            style={{ width: '160px' }}
+            value={props.Profile.Profile.IdlePay}
+          />
         </div>
       </div>
       <div
@@ -106,7 +163,19 @@ export default function WorkConditionsProfileComponent(props) {
           Группировка рейсов:
         </div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Select size="small" style={{ width: '160px' }} />
+          <Select
+            onChange={(Value) => {
+              props.ProfileHandler('ChangeGrouping', Value);
+            }}
+            size="small"
+            value={props.Profile.Profile.Grouping}
+            style={{ width: '160px' }}
+            options={[
+              { value: 'By50', label: 'По 50' },
+              { value: 'By100', label: 'По 100' },
+              { value: 'ByRate', label: 'По тарифу' },
+            ]}
+          />
         </div>
       </div>
       <div
