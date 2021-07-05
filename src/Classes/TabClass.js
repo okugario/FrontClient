@@ -16,6 +16,7 @@ import RetranslationComponent from '../Components/RetranslationComponent';
 import StatisticComponent from '../Components/StatisticComponent';
 import TransportComponent from '../Components/TransportComponent';
 import CrudObjectsComponent from '../Components/CrudObjectsComponent';
+import WorkConditionsComponent from '../Components/WorkConditionsComponent';
 import LoadsReportComponent from '../Components/LoadsReportComponent';
 
 export class Tab {
@@ -55,6 +56,9 @@ export class Tab {
             break;
           case 'Firms':
             Item.Component = <CrudObjectsComponent />;
+            break;
+          case 'WorkConditions':
+            Item.Component = <WorkConditionsComponent />;
             break;
         }
         return Item;

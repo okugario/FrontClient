@@ -81,6 +81,7 @@ export default class App extends React.Component {
         { id: 'VehicleTypes', caption: 'Типы ТС' },
         { id: 'Manufacturers', caption: 'Производители' },
         { id: 'Firms', caption: 'Организации' },
+        { id: 'WorkConditions', caption: 'Условия работы' },
       ],
     });
     GlobalStore.AddTab({
