@@ -18,6 +18,7 @@ import TransportComponent from '../Components/TransportComponent';
 import CrudObjectsComponent from '../Components/CrudObjectsComponent';
 import WorkConditionsComponent from '../Components/WorkConditionsComponent';
 import LoadsReportComponent from '../Components/LoadsReportComponent';
+import LoadsPassportComponent from '../Components/LoadsPassportComponent';
 
 export class Tab {
   constructor(TabObject, OpenTabs) {
@@ -59,6 +60,9 @@ export class Tab {
             break;
           case 'WorkConditions':
             Item.Component = <WorkConditionsComponent />;
+            break;
+          case 'DiggerPassports':
+            Item.Component = <LoadsPassportComponent />;
             break;
         }
         return Item;

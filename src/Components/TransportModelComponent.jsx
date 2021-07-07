@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { Table, Modal } from 'antd';
 import { ApiFetch } from '../Helpers/Helpers';
-import TransportModelProfile from './TransportModelProfile';
+
 export default function TransportModelComponent() {
   const [SelectedKey, SetNewSelectedKey] = useState(null);
   const [ShowProfile, SetNewShowProfile] = useState(false);

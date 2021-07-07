@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { Table, Modal } from 'antd';
 import { ApiFetch } from '../Helpers/Helpers';
-import OrganizationProfile from './OrganizationProfile';
+
 export default function OrganizationsComponent() {
   const [SelectedKey, SetNewSelectedKey] = useState(null);
   const [ShowProfile, SetNewShowProfile] = useState(false);

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { Table, Modal } from 'antd';
 import { ApiFetch } from '../Helpers/Helpers';
-import RoleProfile from './RoleProfile';
+
 export default function RolesComponent() {
   const [SelectedKey, SetNewSelectedKey] = useState(null);
   const [ShowProfile, SetNewShowProfile] = useState(false);
@@ -32,9 +32,7 @@ export default function RolesComponent() {
         onCancel={() => {
           SetNewShowProfile(false);
         }}
-      >
-        <RoleProfile />
-      </Modal>
+      ></Modal>
       <Table
         scroll={{ scrollToFirstRowOnChange: true, y: 700 }}
         pagination={false}

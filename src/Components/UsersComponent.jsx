@@ -2,7 +2,6 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { Table, Modal } from 'antd';
 import { ApiFetch } from '../Helpers/Helpers';
-import UserProfile from './UserProfile';
 
 export default function UsersComponent() {
   const [UsersTable, SetNewUsersTable] = useState(null);
@@ -28,9 +27,7 @@ export default function UsersComponent() {
         onCancel={() => {
           SetNewShowProfile(false);
         }}
-      >
-        <UserProfile />
-      </Modal>
+      ></Modal>
       <Table
         scroll={{ scrollToFirstRowOnChange: true, y: 700 }}
         pagination={false}
