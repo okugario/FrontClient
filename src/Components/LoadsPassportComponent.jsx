@@ -1,11 +1,15 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { Button, Table, DatePicker } from 'antd';
+import { Button, Table, Modal } from 'antd';
 import { ApiFetch } from '../Helpers/Helpers';
 import Moment from 'moment';
+import LoadsPassportProfile from './LoadsPassportProfile';
 
 export default function LoadsPassportComponent(props) {
   const [PassportsTable, SetNewPassportsTable] = useState([]);
+  const [SelectedKey, SetNewSelectedKey] = useState(null);
+  const [ShowProfile, SetNewShowProfile] = useState(false);
+  const [Profile, SetNewProfile] = useState(null);
   const RequestPassportsTable = () => {
     ApiFetch('model/DiggerPassports', 'GET', undefined, (Response) => {
       SetNewPassportsTable(
@@ -14,15 +18,67 @@ export default function LoadsPassportComponent(props) {
             Key: Index,
             TS: Passport.TS,
             DiggerModel: Passport.DiggerModel.Caption,
+            DiggerModelId: Passport.DiggerModel.Id,
             Conditons: Passport.Conditions.Caption,
+            ConditonsId: Passport.Conditions.Id,
           };
         })
       );
     });
   };
+  const RequestLoadsPassport = () => {
+    let PromiseArray = [];
+    let NewProfile = {};
+    PromiseArray.push(
+      ApiFetch(
+        `model/DiggerPassports/${PassportsTable[SelectedKey].ConditonsId}/${PassportsTable[SelectedKey].DiggerModelId}/${PassportsTable[SelectedKey].TS}`,
+        'GET',
+        undefined,
+        (Response) => {
+          NewProfile.Profile = Response.data;
+        }
+      )
+    );
+    PromiseArray.push(
+      ApiFetch('model/VehicleModels', 'GET', undefined, (Response) => {
+        NewProfile.AllDiggerModels = Response.data.filter((Model) => {
+          return Model.Type.Caption == 'Экскаватор';
+        });
+        NewProfile.AllTruckModels = Response.data.filter((Model) => {
+          return Model.Type.Caption == 'Самосвал';
+        });
+      })
+    );
+    PromiseArray.push(
+      ApiFetch('model/LoadTypes', 'GET', undefined, (Response) => {
+        NewProfile.AllLoadTypes = Response.data;
+      })
+    );
+    PromiseArray.push(
+      ApiFetch('model/WorkConditions', 'GET', undefined, (Response) => {
+        NewProfile.AllWorkConditions = Response.data;
+      })
+    );
+    return Promise.all(PromiseArray).then(() => {
+      SetNewProfile(NewProfile);
+    });
+  };
   useEffect(RequestPassportsTable, []);
   return (
     <>
+      <Modal
+        visible={ShowProfile}
+        title="Паспорт загрузки"
+        okButtonProps={{ type: 'primary', size: 'small' }}
+        cancelButtonProps={{ size: 'small' }}
+        okText="Сохранить"
+        cancelText="Отмена"
+        onCancel={() => {
+          SetNewShowProfile(false);
+        }}
+      >
+        <LoadsPassportProfile Profile={Profile} />
+      </Modal>
       <div
         style={{
           width: '200px',
@@ -39,10 +95,30 @@ export default function LoadsPassportComponent(props) {
         </Button>
       </div>
       <Table
+        rowSelection={{
+          columnWidth: 0,
+          selectedRowKeys: [SelectedKey],
+          hideSelectAll: true,
+          renderCell: () => {
+            return null;
+          },
+        }}
         pagination={false}
         rowKey="Key"
         dataSource={PassportsTable}
         size="small"
+        onRow={(Record) => {
+          return {
+            onClick: () => {
+              SetNewSelectedKey(Record['Key']);
+            },
+            onDoubleClick: () => {
+              RequestLoadsPassport().then(() => {
+                SetNewShowProfile(true);
+              });
+            },
+          };
+        }}
         columns={[
           {
             key: 'TS',
