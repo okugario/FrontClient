@@ -26,6 +26,49 @@ export default function LoadsPassportComponent(props) {
       );
     });
   };
+  const LoadsPassportHandler = (Action, Data, Index) => {
+    let NewProfile = { ...Profile };
+    switch (Action) {
+      case 'ChangeWorkConditions':
+        NewProfile.Profile.ConditonsId = Data;
+        SetNewProfile(NewProfile);
+        break;
+      case 'ChangeDiggerModel':
+        NewProfile.Profile.DiggerModelId = Data;
+        SetNewProfile(NewProfile);
+        break;
+
+      case 'ChangeTruckModel':
+        NewProfile.Profile.Options.Trucks[Index].TruckModelId = Data;
+        SetNewProfile(NewProfile);
+        break;
+      case 'ChangeLoadType':
+        NewProfile.Profile.Options.Trucks[Index].LoadTypeId = Data;
+        SetNewProfile(NewProfile);
+        break;
+      case 'ChangeVolume':
+        NewProfile.Profile.Options.Trucks[Index].Volume = Data;
+        SetNewProfile(NewProfile);
+        break;
+      case 'ChangeWeight':
+        NewProfile.Profile.Options.Trucks[Index].Weight = Data;
+        SetNewProfile(NewProfile);
+        break;
+      case 'AddStandart':
+        NewProfile.Profile.Options.Trucks.push({
+          LoadTypeId: NewProfile.AllLoadTypes[0].Id,
+          TruckModelId: NewProfile.AllTruckModels[0].Id,
+          Volume: 0,
+          Weight: 0,
+        });
+        SetNewProfile(NewProfile);
+        break;
+      case 'DeleteStandart':
+        NewProfile.Profile.Options.Trucks.splice(Data, 1);
+        SetNewProfile(NewProfile);
+        break;
+    }
+  };
   const RequestLoadsPassport = () => {
     let PromiseArray = [];
     let NewProfile = {};
@@ -77,7 +120,10 @@ export default function LoadsPassportComponent(props) {
           SetNewShowProfile(false);
         }}
       >
-        <LoadsPassportProfile Profile={Profile} />
+        <LoadsPassportProfile
+          Profile={Profile}
+          ProfileHandler={LoadsPassportHandler}
+        />
       </Modal>
       <div
         style={{
