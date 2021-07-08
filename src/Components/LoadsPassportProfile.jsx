@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { Select, Table, Button, Input, Modal } from 'antd';
+import Moment from 'moment';
+import { Select, Table, Button, Input, Modal, DatePicker } from 'antd';
 
 export default function LoadsPassportProfile(props) {
-  console.log(props);
   const [SelectedKey, SetNewSelectedKey] = useState(null);
   return (
     <>
@@ -13,14 +13,31 @@ export default function LoadsPassportProfile(props) {
           justifyContent: 'space-between',
         }}
       >
+        <div style={{ display: 'flex', alignItems: 'center' }}>Время:</div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <DatePicker
+            disabled={true}
+            size="small"
+            style={{ width: '160px' }}
+            showTime={true}
+            value={Moment(props.Profile.Profile.TS)}
+            format="DD.MM.YYYY hh:mm:ss"
+          />
+        </div>
+      </div>
+      <div
+        style={{
+          marginTop: '10px',
+          display: 'flex',
+          justifyContent: 'space-between',
+        }}
+      >
         <div style={{ display: 'flex', alignItems: 'center' }}>
           Условия работы:
         </div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Select
-            onChange={(Value) => {
-              props.ProfileHandler('ChangeWorkConditions', Value);
-            }}
+            disabled={true}
             value={props.Profile.Profile.ConditonsId}
             size="small"
             style={{ width: '160px' }}
@@ -42,9 +59,7 @@ export default function LoadsPassportProfile(props) {
         </div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Select
-            onChange={(Value) => {
-              props.ProfileHandler('ChangeDiggerModel', Value);
-            }}
+            disabled={true}
             value={props.Profile.Profile.DiggerModelId}
             size="small"
             style={{ width: '160px' }}
@@ -139,7 +154,7 @@ export default function LoadsPassportProfile(props) {
                       props.ProfileHandler('ChangeTruckModel', Value, Index);
                     }}
                     size="small"
-                    style={{ width: '160px' }}
+                    style={{ width: '140px' }}
                     options={props.Profile.AllTruckModels.map((Model) => {
                       return { value: Model.Id, label: Model.Caption };
                     })}
@@ -156,7 +171,7 @@ export default function LoadsPassportProfile(props) {
               return (
                 <div style={{ cursor: 'pointer' }}>
                   <Select
-                    style={{ width: '140px' }}
+                    style={{ width: '110px' }}
                     onChange={(Value) => {
                       props.ProfileHandler('ChangeLoadType', Value, Index);
                     }}

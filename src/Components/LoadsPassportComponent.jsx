@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { Button, Table, Modal } from 'antd';
+import { Button, Table, Modal, message } from 'antd';
 import { ApiFetch } from '../Helpers/Helpers';
 import Moment from 'moment';
 import LoadsPassportProfile from './LoadsPassportProfile';
@@ -29,15 +29,6 @@ export default function LoadsPassportComponent(props) {
   const LoadsPassportHandler = (Action, Data, Index) => {
     let NewProfile = { ...Profile };
     switch (Action) {
-      case 'ChangeWorkConditions':
-        NewProfile.Profile.ConditonsId = Data;
-        SetNewProfile(NewProfile);
-        break;
-      case 'ChangeDiggerModel':
-        NewProfile.Profile.DiggerModelId = Data;
-        SetNewProfile(NewProfile);
-        break;
-
       case 'ChangeTruckModel':
         NewProfile.Profile.Options.Trucks[Index].TruckModelId = Data;
         SetNewProfile(NewProfile);
@@ -66,6 +57,37 @@ export default function LoadsPassportComponent(props) {
       case 'DeleteStandart':
         NewProfile.Profile.Options.Trucks.splice(Data, 1);
         SetNewProfile(NewProfile);
+        break;
+      case 'ChangeTime':
+        NewProfile.Profile.TS = Data;
+        SetNewProfile(NewProfile);
+        break;
+      case 'SaveProfile':
+        if (
+          NewProfile.Profile.Options.Trucks.some((Standart) => {
+            return NewProfile.Profile.Options.Trucks.every(
+              (CurrentStandart) => {
+                return (
+                  Standart.TruckModelId == CurrentStandart.TruckModelId &&
+                  Standart.LoadTypeId == CurrentStandart.LoadTypeId
+                );
+              }
+            );
+          })
+        ) {
+          message.warning('Повторяющаяся запись');
+        } else {
+          ApiFetch(
+            `model/DiggerPassports/${PassportsTable[SelectedKey].ConditonsId}/${PassportsTable[SelectedKey].DiggerModelId}/${PassportsTable[SelectedKey].TS}`,
+            'PATCH',
+            NewProfile.Profile,
+            (Response) => {
+              console.log(Response);
+              SetNewShowProfile(false);
+            }
+          );
+        }
+
         break;
     }
   };
@@ -110,6 +132,9 @@ export default function LoadsPassportComponent(props) {
   return (
     <>
       <Modal
+        onOk={() => {
+          LoadsPassportHandler('SaveProfile');
+        }}
         visible={ShowProfile}
         title="Паспорт загрузки"
         okButtonProps={{ type: 'primary', size: 'small' }}
