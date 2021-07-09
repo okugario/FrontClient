@@ -26,7 +26,21 @@ export default function LoadsPassportComponent(props) {
       );
     });
   };
-
+  const CheckUniqale = (Trucks) => {
+    let Count = 0;
+    Trucks.forEach((Truck) => {
+      Count = 0;
+      Trucks.forEach((CurrentTruck) => {
+        if (
+          Truck.LoadTypeId == CurrentTruck.LoadTypeId &&
+          Truck.TruckModelId == CurrentTruck.TruckModelId
+        ) {
+          Count = Count + 1;
+        }
+      });
+    });
+    return Count == 1;
+  };
   const LoadsPassportHandler = (Action, Data, Index) => {
     let NewProfile = { ...Profile };
     switch (Action) {
@@ -124,24 +138,36 @@ export default function LoadsPassportComponent(props) {
         SetNewProfile(NewProfile);
         break;
       case 'SaveProfile':
-        ApiFetch(
-          `model/DiggerPassports${
-            'DiggerModel' in NewProfile.Profile &&
-            'Conditions' in NewProfile.Profile
-              ? `/${PassportsTable[SelectedKey].ConditonsId}/${PassportsTable[SelectedKey].DiggerModelId}/${PassportsTable[SelectedKey].TS}`
-              : ''
-          }`,
-          'DiggerModel' in NewProfile.Profile &&
-            'Conditions' in NewProfile.Profile
-            ? 'PATCH'
-            : 'POST',
-          NewProfile.Profile,
-          (Response) => {
-            RequestPassportsTable().then(() => {
-              SetNewShowProfile(false);
-            });
+        if (
+          NewProfile.Profile.Options.Trucks.every((Truck) => {
+            return Truck.Volume > 0 && Truck.Weight > 0;
+          })
+        ) {
+          if (CheckUniqale(NewProfile.Profile.Options.Trucks)) {
+            ApiFetch(
+              `model/DiggerPassports${
+                'DiggerModel' in NewProfile.Profile &&
+                'Conditions' in NewProfile.Profile
+                  ? `/${PassportsTable[SelectedKey].ConditonsId}/${PassportsTable[SelectedKey].DiggerModelId}/${PassportsTable[SelectedKey].TS}`
+                  : ''
+              }`,
+              'DiggerModel' in NewProfile.Profile &&
+                'Conditions' in NewProfile.Profile
+                ? 'PATCH'
+                : 'POST',
+              NewProfile.Profile,
+              (Response) => {
+                RequestPassportsTable().then(() => {
+                  SetNewShowProfile(false);
+                });
+              }
+            );
+          } else {
+            message.warning('Повторяющееся значение в строках');
           }
-        );
+        } else {
+          message.warning('Заполните поля объем и вес правильно');
+        }
 
         break;
     }
@@ -190,6 +216,7 @@ export default function LoadsPassportComponent(props) {
         onOk={() => {
           LoadsPassportHandler('SaveProfile');
         }}
+        maskClosable={false}
         visible={ShowProfile}
         title="Паспорт загрузки"
         okButtonProps={{ type: 'primary', size: 'small' }}
