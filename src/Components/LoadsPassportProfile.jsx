@@ -16,7 +16,13 @@ export default function LoadsPassportProfile(props) {
         <div style={{ display: 'flex', alignItems: 'center' }}>Время:</div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <DatePicker
-            disabled={true}
+            onOk={(Date) => {
+              props.ProfileHandler('ChangeDate', Date.format());
+            }}
+            disabled={
+              'Conditions' in props.Profile.Profile &&
+              'DiggerModel' in props.Profile.Profile
+            }
             size="small"
             style={{ width: '160px' }}
             showTime={true}
@@ -37,7 +43,10 @@ export default function LoadsPassportProfile(props) {
         </div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Select
-            disabled={true}
+            onChange={(Value) => {
+              props.ProfileHandler('ChangeWorkCondition', Value);
+            }}
+            disabled={'Conditions' in props.Profile.Profile}
             value={props.Profile.Profile.ConditonsId}
             size="small"
             style={{ width: '160px' }}
@@ -59,7 +68,10 @@ export default function LoadsPassportProfile(props) {
         </div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Select
-            disabled={true}
+            onChange={(Value) => {
+              props.ProfileHandler('ChangeDiggerModel', Value);
+            }}
+            disabled={'DiggerModel' in props.Profile.Profile}
             value={props.Profile.Profile.DiggerModelId}
             size="small"
             style={{ width: '160px' }}

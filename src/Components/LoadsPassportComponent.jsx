@@ -11,7 +11,7 @@ export default function LoadsPassportComponent(props) {
   const [ShowProfile, SetNewShowProfile] = useState(false);
   const [Profile, SetNewProfile] = useState(null);
   const RequestPassportsTable = () => {
-    ApiFetch('model/DiggerPassports', 'GET', undefined, (Response) => {
+    return ApiFetch('model/DiggerPassports', 'GET', undefined, (Response) => {
       SetNewPassportsTable(
         Response.data.map((Passport, Index) => {
           return {
@@ -26,9 +26,46 @@ export default function LoadsPassportComponent(props) {
       );
     });
   };
+
   const LoadsPassportHandler = (Action, Data, Index) => {
     let NewProfile = { ...Profile };
     switch (Action) {
+      case 'AddPassport':
+        let PromiseArray = [];
+        PromiseArray.push(
+          ApiFetch('model/VehicleModels', 'GET', undefined, (Response) => {
+            NewProfile.AllDiggerModels = Response.data.filter((Model) => {
+              return Model.Type.Caption == 'Экскаватор';
+            });
+            NewProfile.AllTruckModels = Response.data.filter((Model) => {
+              return Model.Type.Caption == 'Самосвал';
+            });
+          })
+        );
+        PromiseArray.push(
+          ApiFetch('model/LoadTypes', 'GET', undefined, (Response) => {
+            NewProfile.AllLoadTypes = Response.data;
+          })
+        );
+        PromiseArray.push(
+          ApiFetch('model/WorkConditions', 'GET', undefined, (Response) => {
+            NewProfile.AllWorkConditions = Response.data;
+          })
+        );
+        Promise.all(PromiseArray).then(() => {
+          NewProfile.Profile = {
+            TS: Moment('08:00:00', 'hh:mm:ss').format(),
+            Options: {
+              Trucks: [],
+            },
+            ConditonsId: NewProfile.AllWorkConditions[0].Id,
+            DiggerModelId: NewProfile.AllDiggerModels[0].Id,
+          };
+          SetNewProfile(NewProfile);
+          SetNewShowProfile(true);
+        });
+
+        break;
       case 'ChangeTruckModel':
         NewProfile.Profile.Options.Trucks[Index].TruckModelId = Data;
         SetNewProfile(NewProfile);
@@ -44,6 +81,30 @@ export default function LoadsPassportComponent(props) {
       case 'ChangeWeight':
         NewProfile.Profile.Options.Trucks[Index].Weight = Data;
         SetNewProfile(NewProfile);
+        break;
+      case 'ChangeDate':
+        NewProfile.Profile.TS = Data;
+        SetNewProfile(NewProfile);
+        break;
+      case 'ChangeDiggerModel':
+        NewProfile.Profile.DiggerModelId = Data;
+        SetNewProfile(NewProfile);
+        break;
+      case 'ChangeWorkCondition':
+        NewProfile.Profile.ConditonsId = Data;
+        SetNewProfile(NewProfile);
+        break;
+      case 'DeletePassport':
+        ApiFetch(
+          `model/DiggerPassports/${PassportsTable[SelectedKey].ConditonsId}/${PassportsTable[SelectedKey].DiggerModelId}/${PassportsTable[SelectedKey].TS}`,
+          'DELETE',
+          undefined,
+          (Response) => {
+            SetNewSelectedKey(null);
+            RequestPassportsTable().then(() => {});
+          }
+        );
+
         break;
       case 'AddStandart':
         NewProfile.Profile.Options.Trucks.push({
@@ -63,30 +124,24 @@ export default function LoadsPassportComponent(props) {
         SetNewProfile(NewProfile);
         break;
       case 'SaveProfile':
-        if (
-          NewProfile.Profile.Options.Trucks.some((Standart) => {
-            return NewProfile.Profile.Options.Trucks.every(
-              (CurrentStandart) => {
-                return (
-                  Standart.TruckModelId == CurrentStandart.TruckModelId &&
-                  Standart.LoadTypeId == CurrentStandart.LoadTypeId
-                );
-              }
-            );
-          })
-        ) {
-          message.warning('Повторяющаяся запись');
-        } else {
-          ApiFetch(
-            `model/DiggerPassports/${PassportsTable[SelectedKey].ConditonsId}/${PassportsTable[SelectedKey].DiggerModelId}/${PassportsTable[SelectedKey].TS}`,
-            'PATCH',
-            NewProfile.Profile,
-            (Response) => {
-              console.log(Response);
+        ApiFetch(
+          `model/DiggerPassports${
+            'DiggerModel' in NewProfile.Profile &&
+            'Conditions' in NewProfile.Profile
+              ? `/${PassportsTable[SelectedKey].ConditonsId}/${PassportsTable[SelectedKey].DiggerModelId}/${PassportsTable[SelectedKey].TS}`
+              : ''
+          }`,
+          'DiggerModel' in NewProfile.Profile &&
+            'Conditions' in NewProfile.Profile
+            ? 'PATCH'
+            : 'POST',
+          NewProfile.Profile,
+          (Response) => {
+            RequestPassportsTable().then(() => {
               SetNewShowProfile(false);
-            }
-          );
-        }
+            });
+          }
+        );
 
         break;
     }
@@ -158,10 +213,35 @@ export default function LoadsPassportComponent(props) {
           marginBottom: '5px',
         }}
       >
-        <Button size="small" type="primary" onClick={() => {}}>
+        <Button
+          size="small"
+          type="primary"
+          onClick={() => {
+            LoadsPassportHandler('AddPassport');
+          }}
+        >
           Добавить
         </Button>
-        <Button size="small" danger type="primary" onClick={() => {}}>
+        <Button
+          size="small"
+          danger
+          type="primary"
+          onClick={() => {
+            if (SelectedKey != null) {
+              Modal.confirm({
+                title: 'Подтвердите действие',
+                content: 'Вы действительно хотите удалить объект?',
+                okButtonProps: { type: 'primary', danger: true, size: 'small' },
+                okText: 'Удалить',
+                cancelText: 'Отмена',
+                cancelButtonProps: { size: 'small' },
+                onOk: () => {
+                  LoadsPassportHandler('DeletePassport');
+                },
+              });
+            }
+          }}
+        >
           Удалить
         </Button>
       </div>
