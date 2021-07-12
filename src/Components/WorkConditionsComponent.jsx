@@ -103,7 +103,7 @@ export default function WorkConditionsComponent(props) {
         onCancel={() => {
           SetNewShowProfile(false);
         }}
-        title="Профиль условий"
+        title="Профиль условий работы"
         width="450px"
         visible={ShowProfile}
         okButtonProps={{ size: 'small', type: 'primary' }}

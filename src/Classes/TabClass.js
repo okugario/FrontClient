@@ -58,6 +58,9 @@ export class Tab {
           case 'Firms':
             Item.Component = <CrudObjectsComponent />;
             break;
+          case 'LoadTypes':
+            Item.Component = <CrudObjectsComponent />;
+            break;
           case 'WorkConditions':
             Item.Component = <WorkConditionsComponent />;
             break;

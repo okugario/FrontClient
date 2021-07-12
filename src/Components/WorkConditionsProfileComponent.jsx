@@ -1,8 +1,7 @@
 import * as React from 'react';
-import { Input, Select, TimePicker } from 'antd';
+import { Input, Select, TimePicker, Table } from 'antd';
 import Moment from 'moment';
 export default function WorkConditionsProfileComponent(props) {
-  console.log(props.Profile);
   return (
     <>
       <div
@@ -206,6 +205,7 @@ export default function WorkConditionsProfileComponent(props) {
           <Input disabled={true} size="small" style={{ width: '160px' }} />
         </div>
       </div>
+      <Table size="small" />
     </>
   );
 }
