@@ -87,6 +87,13 @@ export default function WorkConditionsComponent(props) {
         });
       })
     );
+    PromiseArray.push(
+      ApiFetch('model/VehicleModels', 'GET', undefined, (Response) => {
+        NewProfile.AllDiggerModels = Response.data.filter((Model) => {
+          return Model.Type.Caption == 'Экскаватор';
+        });
+      })
+    );
     return Promise.all(PromiseArray).then(() => {
       SetNewWorkConditionsProfile(NewProfile);
     });

@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Input, Select, TimePicker, Table } from 'antd';
+import { Input, Select, TimePicker, Table, Button } from 'antd';
+import { DashOutlined } from '@ant-design/icons';
 import Moment from 'moment';
 export default function WorkConditionsProfileComponent(props) {
   return (
@@ -205,7 +206,67 @@ export default function WorkConditionsProfileComponent(props) {
           <Input disabled={true} size="small" style={{ width: '160px' }} />
         </div>
       </div>
-      <Table size="small" />
+      <div
+        style={{
+          width: '160px',
+          height: '50px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: '5px',
+        }}
+      >
+        <Button size="small" type="primary" onClick={() => {}}>
+          Добавить
+        </Button>
+        <Button size="small" danger type="primary" onClick={() => {}}>
+          Удалить
+        </Button>
+      </div>
+      <Table
+        pagination={false}
+        rowKey="Key"
+        size="small"
+        dataSource={props.Profile.Profile.DiggerPassports.map(
+          (Passport, Index) => {
+            return {
+              Key: Index,
+              TS: Passport.TS,
+              DiggerModelId: props.Profile.AllDiggerModels.find((Model) => {
+                return Model.Id == Passport.DiggerModelId;
+              }).Caption,
+            };
+          }
+        )}
+        columns={[
+          {
+            title: 'Время',
+            dataIndex: 'TS',
+            key: 'TS',
+            render: (Value, Record, Index) => {
+              return Moment(Value).format('DD:MM:YYYY hh:mm:ss');
+            },
+          },
+          {
+            render: (Value, Record, Index) => {
+              return (
+                <>
+                  {Value}
+                  <Button
+                    size="small"
+                    type="primary"
+                    icon={<DashOutlined />}
+                    style={{ marginLeft: '10px' }}
+                  />
+                </>
+              );
+            },
+            title: 'Модель экскаватора',
+            dataIndex: 'DiggerModelId',
+            key: 'DiggerModelId',
+          },
+        ]}
+      />
     </>
   );
 }
