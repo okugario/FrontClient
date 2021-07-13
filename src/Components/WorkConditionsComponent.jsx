@@ -83,7 +83,14 @@ export default function WorkConditionsComponent(props) {
                 ? 'PATCH'
                 : 'POST',
               NewProfile.Profile,
-              (Response) => {}
+              (Response) => {
+                RequestWorkConditionsProfile().then(() => {
+                  WorkConditionsHandler('ChangeProfileMode', {
+                    Title: 'Профиль условий работы',
+                    Mode: 'WorkConditions',
+                  });
+                });
+              }
             );
           } else {
             message.warning('Повторяющееся значение в строках');
