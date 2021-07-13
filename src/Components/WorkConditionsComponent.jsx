@@ -1,50 +1,244 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { Table, Button, Modal } from 'antd';
-import WorkConditionsProfileComponent from './WorkConditionsProfileComponent';
+import WorkConditionsProfile from './WorkConditionsProfile';
 import { ApiFetch } from '../Helpers/Helpers';
+import ProfilePageHandler from './ProfilePageHandler';
+import LoadsPassportProfile from './LoadsPassportProfile';
 export default function WorkConditionsComponent(props) {
+  const [ProfileMode, SetNewProfileMode] = useState({
+    Title: 'Профиль условий работы',
+    Mode: 'WorkConditions',
+  });
   const [WorkConditionsTable, SetNewWorkConditionsTable] = useState([]);
   const [SelectedKey, SetNewSelectedKey] = useState(null);
-  const [WorkConditionsProfile, SetNewWorkConditionsProfile] = useState(null);
+  const [Profile, SetNewProfile] = useState(null);
+  const [LoadProfile, SetNewLoadProfile] = useState(null);
   const [ShowProfile, SetNewShowProfile] = useState(false);
-  const WorkConditionsHandler = (Action, Data) => {
-    let NewProfile = { ...WorkConditionsProfile };
+  const LoadsPassportHandler = (Action, Data, Index) => {
+    let NewProfile = { ...LoadProfile };
     switch (Action) {
-      case 'ChangeCaption':
-        NewProfile.Profile.Caption = Data;
-        SetNewWorkConditionsProfile(NewProfile);
+      case 'AddPassport':
+        let PromiseArray = [];
+        PromiseArray.push(
+          ApiFetch('model/VehicleModels', 'GET', undefined, (Response) => {
+            NewProfile.AllDiggerModels = Response.data.filter((Model) => {
+              return Model.Type.Caption == 'Экскаватор';
+            });
+            NewProfile.AllTruckModels = Response.data.filter((Model) => {
+              return Model.Type.Caption == 'Самосвал';
+            });
+          })
+        );
+        PromiseArray.push(
+          ApiFetch('model/LoadTypes', 'GET', undefined, (Response) => {
+            NewProfile.AllLoadTypes = Response.data;
+          })
+        );
+        PromiseArray.push(
+          ApiFetch('model/WorkConditions', 'GET', undefined, (Response) => {
+            NewProfile.AllWorkConditions = Response.data;
+          })
+        );
+        Promise.all(PromiseArray).then(() => {
+          NewProfile.Profile = {
+            TS: Moment('08:00:00', 'hh:mm:ss').format(),
+            Options: {
+              Trucks: [],
+            },
+            ConditonsId: NewProfile.AllWorkConditions[0].Id,
+            DiggerModelId: NewProfile.AllDiggerModels[0].Id,
+          };
+          SetNewLoadProfile(NewProfile);
+        });
+
         break;
-      case 'ChangeContractor':
-        NewProfile.Profile.ContractorId = Data;
-        SetNewWorkConditionsProfile(NewProfile);
+      case 'ChangeTruckModel':
+        NewProfile.Profile.Options.Trucks[Index].TruckModelId = Data;
+        SetNewLoadProfile(NewProfile);
         break;
-      case 'ChangeCustomer':
-        NewProfile.Profile.CustomerId = Data;
-        SetNewWorkConditionsProfile(NewProfile);
+      case 'ChangeLoadType':
+        NewProfile.Profile.Options.Trucks[Index].LoadTypeId = Data;
+        SetNewLoadProfile(NewProfile);
         break;
-      case 'ChangeRegion':
-        NewProfile.Profile.RegionId = Data;
-        SetNewWorkConditionsProfile(NewProfile);
+      case 'ChangeVolume':
+        NewProfile.Profile.Options.Trucks[Index].Volume = Data;
+        SetNewLoadProfile(NewProfile);
         break;
-      case 'ChangeShiftStart':
-        NewProfile.Profile.ShiftStart = Data;
-        SetNewWorkConditionsProfile(NewProfile);
+      case 'ChangeWeight':
+        NewProfile.Profile.Options.Trucks[Index].Weight = Data;
+        SetNewLoadProfile(NewProfile);
         break;
-      case 'ChangeLoadZone':
-        NewProfile.Profile.LoadZone = Data;
-        SetNewWorkConditionsProfile(NewProfile);
+      case 'ChangeDate':
+        NewProfile.Profile.TS = Data;
+        SetNewLoadProfile(NewProfile);
         break;
-      case 'ChangeIdlePay':
-        NewProfile.Profile.IdlePay = Data;
-        SetNewWorkConditionsProfile(NewProfile);
+      case 'ChangeDiggerModel':
+        NewProfile.Profile.DiggerModelId = Data;
+        SetNewLoadProfile(NewProfile);
         break;
-      case 'ChangeGrouping':
-        NewProfile.Profile.Grouping = Data;
-        SetNewWorkConditionsProfile(NewProfile);
+      case 'ChangeWorkCondition':
+        NewProfile.Profile.ConditonsId = Data;
+        SetNewLoadProfile(NewProfile);
+        break;
+      case 'DeletePassport':
+        ApiFetch(
+          `model/DiggerPassports/${PassportsTable[SelectedKey].ConditonsId}/${PassportsTable[SelectedKey].DiggerModelId}/${PassportsTable[SelectedKey].TS}`,
+          'DELETE',
+          undefined,
+          (Response) => {
+            SetNewSelectedKey(null);
+          }
+        );
+
+        break;
+      case 'AddStandart':
+        NewProfile.Profile.Options.Trucks.push({
+          LoadTypeId: NewProfile.AllLoadTypes[0].Id,
+          TruckModelId: NewProfile.AllTruckModels[0].Id,
+          Volume: 0,
+          Weight: 0,
+        });
+        SetNewLoadProfile(NewProfile);
+        break;
+      case 'DeleteStandart':
+        NewProfile.Profile.Options.Trucks.splice(Data, 1);
+        SetNewLoadProfile(NewProfile);
+        break;
+      case 'ChangeTime':
+        NewProfile.Profile.TS = Data;
+        SetNewLoadProfile(NewProfile);
+        break;
+      case 'SaveProfile':
+        if (
+          NewProfile.Profile.Options.Trucks.every((Truck) => {
+            return Truck.Volume > 0 && Truck.Weight > 0;
+          })
+        ) {
+          if (CheckUniqale(NewProfile.Profile.Options.Trucks)) {
+            ApiFetch(
+              `model/DiggerPassports${
+                'DiggerModel' in NewProfile.Profile &&
+                'Conditions' in NewProfile.Profile
+                  ? `/${PassportsTable[SelectedKey].ConditonsId}/${PassportsTable[SelectedKey].DiggerModelId}/${PassportsTable[SelectedKey].TS}`
+                  : ''
+              }`,
+              'DiggerModel' in NewProfile.Profile &&
+                'Conditions' in NewProfile.Profile
+                ? 'PATCH'
+                : 'POST',
+              NewProfile.Profile,
+              (Response) => {}
+            );
+          } else {
+            message.warning('Повторяющееся значение в строках');
+          }
+        } else {
+          message.warning('Заполните поля объем и вес правильно');
+        }
+
         break;
     }
   };
+  const WorkConditionsHandler = (Action, Data, Index) => {
+    let NewProfile = { ...Profile };
+    switch (Action) {
+      case 'RequestLoadsPassport':
+        let PromiseArray = [];
+        PromiseArray.push(
+          ApiFetch(
+            `model/DiggerPassports/${Profile.Profile.DiggerPassports[Index].ConditonsId}/${Profile.Profile.DiggerPassports[Index].DiggerModelId}/${Profile.Profile.DiggerPassports[Index].TS}`,
+            'GET',
+            undefined,
+            (Response) => {
+              NewProfile.Profile = Response.data;
+            }
+          )
+        );
+        PromiseArray.push(
+          ApiFetch('model/VehicleModels', 'GET', undefined, (Response) => {
+            NewProfile.AllDiggerModels = Response.data.filter((Model) => {
+              return Model.Type.Caption == 'Экскаватор';
+            });
+            NewProfile.AllTruckModels = Response.data.filter((Model) => {
+              return Model.Type.Caption == 'Самосвал';
+            });
+          })
+        );
+        PromiseArray.push(
+          ApiFetch('model/LoadTypes', 'GET', undefined, (Response) => {
+            NewProfile.AllLoadTypes = Response.data;
+          })
+        );
+        PromiseArray.push(
+          ApiFetch('model/WorkConditions', 'GET', undefined, (Response) => {
+            NewProfile.AllWorkConditions = Response.data;
+          })
+        );
+        Promise.all(PromiseArray).then(() => {
+          SetNewLoadProfile(NewProfile);
+          WorkConditionsHandler('ChangeProfileMode', {
+            Title: 'Профиль паспорта загрузки',
+            Mode: 'LoadingPassport',
+          });
+        });
+        break;
+      case 'ChangeProfileMode':
+        SetNewProfileMode(Data);
+        break;
+      case 'ChangeCaption':
+        NewProfile.Profile.Caption = Data;
+        SetNewProfile(NewProfile);
+        break;
+      case 'ChangeContractor':
+        NewProfile.Profile.ContractorId = Data;
+        SetNewProfile(NewProfile);
+        break;
+      case 'ChangeCustomer':
+        NewProfile.Profile.CustomerId = Data;
+        SetNewProfile(NewProfile);
+        break;
+      case 'ChangeRegion':
+        NewProfile.Profile.RegionId = Data;
+        SetNewProfile(NewProfile);
+        break;
+      case 'ChangeShiftStart':
+        NewProfile.Profile.ShiftStart = Data;
+        SetNewProfile(NewProfile);
+        break;
+      case 'ChangeLoadZone':
+        NewProfile.Profile.LoadZone = Data;
+        SetNewProfile(NewProfile);
+        break;
+      case 'ChangeIdlePay':
+        NewProfile.Profile.IdlePay = Data;
+        SetNewProfile(NewProfile);
+        break;
+      case 'ChangeGrouping':
+        NewProfile.Profile.Grouping = Data;
+        SetNewProfile(NewProfile);
+        break;
+    }
+  };
+  const GetProfile = (Mode) => {
+    switch (Mode) {
+      case 'WorkConditions':
+        return (
+          <WorkConditionsProfile
+            Profile={Profile}
+            ProfileHandler={WorkConditionsHandler}
+          />
+        );
+      case 'LoadingPassport':
+        return (
+          <LoadsPassportProfile
+            Profile={LoadProfile}
+            ProfileHandler={LoadsPassportHandler}
+          />
+        );
+    }
+  };
+
   const RequestWorkConditionsProfile = () => {
     let NewProfile = {};
     let PromiseArray = [];
@@ -95,7 +289,7 @@ export default function WorkConditionsComponent(props) {
       })
     );
     return Promise.all(PromiseArray).then(() => {
-      SetNewWorkConditionsProfile(NewProfile);
+      SetNewProfile(NewProfile);
     });
   };
   const RequestTable = () => {
@@ -108,10 +302,24 @@ export default function WorkConditionsComponent(props) {
     <>
       <Modal
         onCancel={() => {
+          SetNewProfileMode({
+            Title: 'Профиль условий работы',
+            Mode: 'WorkConditions',
+          });
           SetNewShowProfile(false);
         }}
-        title="Профиль условий работы"
-        width="450px"
+        title={
+          <ProfilePageHandler
+            Title={ProfileMode.Title}
+            ShowBackIcon={ProfileMode.Mode == 'LoadingPassport'}
+            OnBack={() => {
+              WorkConditionsHandler('ChangeProfileMode', {
+                Title: 'Профиль условий работы',
+                Mode: 'WorkConditions',
+              });
+            }}
+          />
+        }
         visible={ShowProfile}
         okButtonProps={{ size: 'small', type: 'primary' }}
         okText="Сохранить"
@@ -119,10 +327,7 @@ export default function WorkConditionsComponent(props) {
         cancelButtonProps={{ size: 'small' }}
         cancelText="Отмена"
       >
-        <WorkConditionsProfileComponent
-          Profile={WorkConditionsProfile}
-          ProfileHandler={WorkConditionsHandler}
-        />
+        {GetProfile(ProfileMode.Mode)}
       </Modal>
       <div
         style={{

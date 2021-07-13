@@ -1,8 +1,10 @@
 import * as React from 'react';
 import { Input, Select, TimePicker, Table, Button } from 'antd';
 import { DashOutlined } from '@ant-design/icons';
+import { useState } from 'react';
 import Moment from 'moment';
-export default function WorkConditionsProfileComponent(props) {
+export default function WorkConditionsProfile(props) {
+  const [SelectedKey, SetNewSelectedKey] = useState(null);
   return (
     <>
       <div
@@ -224,7 +226,22 @@ export default function WorkConditionsProfileComponent(props) {
         </Button>
       </div>
       <Table
+        onRow={(Record) => {
+          return {
+            onClick: () => {
+              SetNewSelectedKey(Record['Key']);
+            },
+          };
+        }}
         pagination={false}
+        rowSelection={{
+          columnWidth: 0,
+          selectedRowKeys: [SelectedKey],
+          hideSelectAll: true,
+          renderCell: () => {
+            return null;
+          },
+        }}
         rowKey="Key"
         size="small"
         dataSource={props.Profile.Profile.DiggerPassports.map(
@@ -244,21 +261,32 @@ export default function WorkConditionsProfileComponent(props) {
             dataIndex: 'TS',
             key: 'TS',
             render: (Value, Record, Index) => {
-              return Moment(Value).format('DD:MM:YYYY hh:mm:ss');
+              return (
+                <div style={{ cursor: 'pointer' }}>
+                  {Moment(Value).format('DD:MM:YYYY hh:mm:ss')}
+                </div>
+              );
             },
           },
           {
             render: (Value, Record, Index) => {
               return (
-                <>
+                <div style={{ cursor: 'pointer' }}>
                   {Value}
                   <Button
+                    onClick={() => {
+                      props.ProfileHandler(
+                        'RequestLoadsPassport',
+                        undefined,
+                        Index
+                      );
+                    }}
                     size="small"
                     type="primary"
                     icon={<DashOutlined />}
                     style={{ marginLeft: '10px' }}
                   />
-                </>
+                </div>
               );
             },
             title: 'Модель экскаватора',
