@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
+
 import { Button, Table, Modal, message } from 'antd';
-import { ApiFetch } from '../Helpers/Helpers';
+import { ApiFetch, CheckUniqale } from '../Helpers/Helpers';
 import Moment from 'moment';
 import LoadsPassportProfile from './LoadsPassportProfile';
 
@@ -26,21 +27,7 @@ export default function LoadsPassportComponent(props) {
       );
     });
   };
-  const CheckUniqale = (Trucks) => {
-    let Count = 0;
-    Trucks.forEach((Truck) => {
-      Count = 0;
-      Trucks.forEach((CurrentTruck) => {
-        if (
-          Truck.LoadTypeId == CurrentTruck.LoadTypeId &&
-          Truck.TruckModelId == CurrentTruck.TruckModelId
-        ) {
-          Count = Count + 1;
-        }
-      });
-    });
-    return Count == 1;
-  };
+
   const LoadsPassportHandler = (Action, Data, Index) => {
     let NewProfile = { ...Profile };
     switch (Action) {

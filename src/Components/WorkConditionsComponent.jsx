@@ -1,8 +1,9 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { Table, Button, Modal } from 'antd';
+import { Table, Button, Modal, message } from 'antd';
 import WorkConditionsProfile from './WorkConditionsProfile';
-import { ApiFetch } from '../Helpers/Helpers';
+import { ApiFetch, CheckUniqale } from '../Helpers/Helpers';
+import Moment from 'moment';
 import ProfilePageHandler from './ProfilePageHandler';
 import LoadsPassportProfile from './LoadsPassportProfile';
 export default function WorkConditionsComponent(props) {
@@ -18,8 +19,87 @@ export default function WorkConditionsComponent(props) {
   const LoadsPassportHandler = (Action, Data, Index) => {
     let NewProfile = { ...LoadProfile };
     switch (Action) {
+      case 'ChangeTruckModel':
+        NewProfile.Profile.Options.Trucks[Index].TruckModelId = Data;
+        SetNewLoadProfile(NewProfile);
+        break;
+      case 'ChangeLoadType':
+        NewProfile.Profile.Options.Trucks[Index].LoadTypeId = Data;
+        SetNewLoadProfile(NewProfile);
+        break;
+      case 'ChangeVolume':
+        NewProfile.Profile.Options.Trucks[Index].Volume = Data;
+        SetNewLoadProfile(NewProfile);
+        break;
+      case 'ChangeWeight':
+        NewProfile.Profile.Options.Trucks[Index].Weight = Data;
+        SetNewLoadProfile(NewProfile);
+        break;
+      case 'ChangeDate':
+        NewProfile.Profile.TS = Data;
+        SetNewLoadProfile(NewProfile);
+        break;
+      case 'ChangeDiggerModel':
+        NewProfile.Profile.DiggerModelId = Data;
+        SetNewLoadProfile(NewProfile);
+        break;
+      case 'ChangeWorkCondition':
+        NewProfile.Profile.ConditonsId = Data;
+        SetNewLoadProfile(NewProfile);
+        break;
+      case 'AddStandart':
+        NewProfile.Profile.Options.Trucks.push({
+          LoadTypeId: NewProfile.AllLoadTypes[0].Id,
+          TruckModelId: NewProfile.AllTruckModels[0].Id,
+          Volume: 0,
+          Weight: 0,
+        });
+        SetNewLoadProfile(NewProfile);
+        break;
+      case 'DeleteStandart':
+        NewProfile.Profile.Options.Trucks.splice(Data, 1);
+        SetNewLoadProfile(NewProfile);
+        break;
+      case 'ChangeTime':
+        NewProfile.Profile.TS = Data;
+        SetNewLoadProfile(NewProfile);
+        break;
+      case 'SaveProfile':
+        if (
+          NewProfile.Profile.Options.Trucks.every((Truck) => {
+            return Truck.Volume > 0 && Truck.Weight > 0;
+          })
+        ) {
+          if (CheckUniqale(NewProfile.Profile.Options.Trucks)) {
+            ApiFetch(
+              `model/DiggerPassports${
+                'DiggerModel' in NewProfile.Profile &&
+                'Conditions' in NewProfile.Profile
+                  ? `/${NewProfile.Profile.ConditonsId}/${NewProfile.Profile.DiggerModelId}/${NewProfile.Profile.TS}`
+                  : ''
+              }`,
+              'DiggerModel' in NewProfile.Profile &&
+                'Conditions' in NewProfile.Profile
+                ? 'PATCH'
+                : 'POST',
+              NewProfile.Profile,
+              (Response) => {}
+            );
+          } else {
+            message.warning('Повторяющееся значение в строках');
+          }
+        } else {
+          message.warning('Заполните поля объем и вес правильно');
+        }
+
+        break;
+    }
+  };
+  const WorkConditionsHandler = (Action, Data, Index) => {
+    let PromiseArray = [];
+    let NewProfile = { ...Profile };
+    switch (Action) {
       case 'AddPassport':
-        let PromiseArray = [];
         PromiseArray.push(
           ApiFetch('model/VehicleModels', 'GET', undefined, (Response) => {
             NewProfile.AllDiggerModels = Response.data.filter((Model) => {
@@ -50,101 +130,13 @@ export default function WorkConditionsComponent(props) {
             DiggerModelId: NewProfile.AllDiggerModels[0].Id,
           };
           SetNewLoadProfile(NewProfile);
+          WorkConditionsHandler('ChangeProfileMode', {
+            Title: 'Профиль паспорта загрузки',
+            Mode: 'LoadingPassport',
+          });
         });
-
         break;
-      case 'ChangeTruckModel':
-        NewProfile.Profile.Options.Trucks[Index].TruckModelId = Data;
-        SetNewLoadProfile(NewProfile);
-        break;
-      case 'ChangeLoadType':
-        NewProfile.Profile.Options.Trucks[Index].LoadTypeId = Data;
-        SetNewLoadProfile(NewProfile);
-        break;
-      case 'ChangeVolume':
-        NewProfile.Profile.Options.Trucks[Index].Volume = Data;
-        SetNewLoadProfile(NewProfile);
-        break;
-      case 'ChangeWeight':
-        NewProfile.Profile.Options.Trucks[Index].Weight = Data;
-        SetNewLoadProfile(NewProfile);
-        break;
-      case 'ChangeDate':
-        NewProfile.Profile.TS = Data;
-        SetNewLoadProfile(NewProfile);
-        break;
-      case 'ChangeDiggerModel':
-        NewProfile.Profile.DiggerModelId = Data;
-        SetNewLoadProfile(NewProfile);
-        break;
-      case 'ChangeWorkCondition':
-        NewProfile.Profile.ConditonsId = Data;
-        SetNewLoadProfile(NewProfile);
-        break;
-      case 'DeletePassport':
-        ApiFetch(
-          `model/DiggerPassports/${PassportsTable[SelectedKey].ConditonsId}/${PassportsTable[SelectedKey].DiggerModelId}/${PassportsTable[SelectedKey].TS}`,
-          'DELETE',
-          undefined,
-          (Response) => {
-            SetNewSelectedKey(null);
-          }
-        );
-
-        break;
-      case 'AddStandart':
-        NewProfile.Profile.Options.Trucks.push({
-          LoadTypeId: NewProfile.AllLoadTypes[0].Id,
-          TruckModelId: NewProfile.AllTruckModels[0].Id,
-          Volume: 0,
-          Weight: 0,
-        });
-        SetNewLoadProfile(NewProfile);
-        break;
-      case 'DeleteStandart':
-        NewProfile.Profile.Options.Trucks.splice(Data, 1);
-        SetNewLoadProfile(NewProfile);
-        break;
-      case 'ChangeTime':
-        NewProfile.Profile.TS = Data;
-        SetNewLoadProfile(NewProfile);
-        break;
-      case 'SaveProfile':
-        if (
-          NewProfile.Profile.Options.Trucks.every((Truck) => {
-            return Truck.Volume > 0 && Truck.Weight > 0;
-          })
-        ) {
-          if (CheckUniqale(NewProfile.Profile.Options.Trucks)) {
-            ApiFetch(
-              `model/DiggerPassports${
-                'DiggerModel' in NewProfile.Profile &&
-                'Conditions' in NewProfile.Profile
-                  ? `/${PassportsTable[SelectedKey].ConditonsId}/${PassportsTable[SelectedKey].DiggerModelId}/${PassportsTable[SelectedKey].TS}`
-                  : ''
-              }`,
-              'DiggerModel' in NewProfile.Profile &&
-                'Conditions' in NewProfile.Profile
-                ? 'PATCH'
-                : 'POST',
-              NewProfile.Profile,
-              (Response) => {}
-            );
-          } else {
-            message.warning('Повторяющееся значение в строках');
-          }
-        } else {
-          message.warning('Заполните поля объем и вес правильно');
-        }
-
-        break;
-    }
-  };
-  const WorkConditionsHandler = (Action, Data, Index) => {
-    let NewProfile = { ...Profile };
-    switch (Action) {
       case 'RequestLoadsPassport':
-        let PromiseArray = [];
         PromiseArray.push(
           ApiFetch(
             `model/DiggerPassports/${Profile.Profile.DiggerPassports[Index].ConditonsId}/${Profile.Profile.DiggerPassports[Index].DiggerModelId}/${Profile.Profile.DiggerPassports[Index].TS}`,
@@ -321,6 +313,11 @@ export default function WorkConditionsComponent(props) {
           />
         }
         visible={ShowProfile}
+        onOk={() => {
+          ProfileMode.Mode == 'LoadingPassport'
+            ? LoadsPassportHandler('SaveProfile')
+            : WorkConditionsHandler('SaveProfile');
+        }}
         okButtonProps={{ size: 'small', type: 'primary' }}
         okText="Сохранить"
         maskClosable={false}

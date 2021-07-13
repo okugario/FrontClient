@@ -218,7 +218,13 @@ export default function WorkConditionsProfile(props) {
           marginBottom: '5px',
         }}
       >
-        <Button size="small" type="primary" onClick={() => {}}>
+        <Button
+          size="small"
+          type="primary"
+          onClick={() => {
+            props.ProfileHandler('AddPassport');
+          }}
+        >
           Добавить
         </Button>
         <Button size="small" danger type="primary" onClick={() => {}}>

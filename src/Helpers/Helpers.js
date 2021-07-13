@@ -1,5 +1,19 @@
 import Moment from 'moment';
-
+export const CheckUniqale = (Trucks) => {
+  let Count = 0;
+  Trucks.forEach((Truck) => {
+    Count = 0;
+    Trucks.forEach((CurrentTruck) => {
+      if (
+        Truck.LoadTypeId == CurrentTruck.LoadTypeId &&
+        Truck.TruckModelId == CurrentTruck.TruckModelId
+      ) {
+        Count = Count + 1;
+      }
+    });
+  });
+  return Count <= 1;
+};
 export const ApiFetch = (Adress, Method, Body, Callback) => {
   return new Promise((resolve, reject) => {
     fetch(Adress, { body: JSON.stringify(Body), method: Method })
