@@ -362,9 +362,14 @@ export default function TransportComponent() {
         destroyOnClose={true}
         title={
           <ProfilePageHandler
-            ProfileHandler={TransportProfileHandler}
+            OnBack={() => {
+              TransportProfileHandler('ChangeProfileMode', {
+                Mode: 'TransportProfile',
+                Title: 'Профиль транспорта',
+              });
+            }}
             Title={ProfileMode.Title}
-            BackIcon={ProfileMode.Mode != 'TransportProfile'}
+            ShowBackIcon={ProfileMode.Mode == 'TerminalProfile'}
           />
         }
         width="450px"

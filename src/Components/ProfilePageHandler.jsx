@@ -3,15 +3,12 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 export default function ProfilePageHandler(props) {
   return (
     <div style={{ display: 'flex' }}>
-      {props.BackIcon ? (
+      {props.ShowBackIcon ? (
         <div style={{ width: '20px' }}>
           <ArrowLeftOutlined
             style={{ cursor: 'pointer' }}
             onClick={() => {
-              props.ProfileHandler('ChangeProfileMode', {
-                Mode: 'TransportProfile',
-                Title: 'Профиль транспорта',
-              });
+              props.OnBack();
             }}
           />
         </div>
