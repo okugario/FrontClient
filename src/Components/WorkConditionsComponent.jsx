@@ -202,20 +202,38 @@ export default function WorkConditionsComponent(props) {
         SetNewProfile(NewProfile);
         break;
       case 'ChangeShiftStart':
-        NewProfile.Profile.ShiftStart = Data;
+        NewProfile.Profile.Options.ShiftStart = Data;
         SetNewProfile(NewProfile);
         break;
       case 'ChangeLoadZone':
-        NewProfile.Profile.LoadZone = Data;
+        NewProfile.Profile.Options.LoadZone = Data;
         SetNewProfile(NewProfile);
         break;
       case 'ChangeIdlePay':
-        NewProfile.Profile.IdlePay = Data;
+        NewProfile.Profile.Options.IdlePay = Data;
         SetNewProfile(NewProfile);
         break;
       case 'ChangeGrouping':
-        NewProfile.Profile.Grouping = Data;
+        NewProfile.Profile.Options.Grouping = Data;
         SetNewProfile(NewProfile);
+        break;
+      case 'SaveProfile':
+        if (NewProfile.Profile.Options.IdlePay.length == 0) {
+          message.warning('Заполните поле простоя с оплатой');
+        } else {
+          if (NewProfile.Profile.Options.LoadZone.length == 0) {
+            message.warning('Заполните поле зоны погрузки');
+          } else {
+            ApiFetch(
+              `model/WorkConditions/${NewProfile.Profile.Id}`,
+              'PATCH',
+              NewProfile.Profile,
+              (Response) => {
+                SetNewShowProfile(false);
+              }
+            );
+          }
+        }
         break;
     }
   };
@@ -248,17 +266,17 @@ export default function WorkConditionsComponent(props) {
         undefined,
         (Response) => {
           NewProfile.Profile = Response.data;
-          if (!('ShiftStart' in NewProfile.Profile)) {
-            NewProfile.Profile.ShiftStart = '08:00';
+          if (!('ShiftStart' in NewProfile.Profile.Options)) {
+            NewProfile.Profile.Options.ShiftStart = '08:00';
           }
-          if (!('LoadZone' in NewProfile.Profile)) {
-            NewProfile.Profile.LoadZone = 70;
+          if (!('LoadZone' in NewProfile.Profile.Options)) {
+            NewProfile.Profile.Options.LoadZone = 70;
           }
-          if (!('IdlePay' in NewProfile.Profile)) {
-            NewProfile.Profile.IdlePay = 0;
+          if (!('IdlePay' in NewProfile.Profile.Options)) {
+            NewProfile.Profile.Options.IdlePay = 0;
           }
-          if (!('Grouping' in NewProfile.Profile)) {
-            NewProfile.Profile.Grouping = 'By100';
+          if (!('Grouping' in NewProfile.Profile.Options)) {
+            NewProfile.Profile.Options.Grouping = 'By100';
           }
         }
       )

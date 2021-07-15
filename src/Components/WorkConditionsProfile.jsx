@@ -107,7 +107,7 @@ export default function WorkConditionsProfile(props) {
             onOk={(Value) => {
               props.ProfileHandler('ChangeShiftStart', Value.format('hh:mm'));
             }}
-            value={Moment(props.Profile.Profile.ShiftStart, 'hh:mm')}
+            value={Moment(props.Profile.Profile.Options.ShiftStart, 'hh:mm')}
           />
         </div>
       </div>
@@ -129,7 +129,7 @@ export default function WorkConditionsProfile(props) {
             }}
             size="small"
             style={{ width: '160px' }}
-            value={props.Profile.Profile.LoadZone}
+            value={props.Profile.Profile.Options.LoadZone}
           />
         </div>
       </div>
@@ -150,7 +150,7 @@ export default function WorkConditionsProfile(props) {
             }}
             size="small"
             style={{ width: '160px' }}
-            value={props.Profile.Profile.IdlePay}
+            value={props.Profile.Profile.Options.IdlePay}
           />
         </div>
       </div>
@@ -170,7 +170,7 @@ export default function WorkConditionsProfile(props) {
               props.ProfileHandler('ChangeGrouping', Value);
             }}
             size="small"
-            value={props.Profile.Profile.Grouping}
+            value={props.Profile.Profile.Options.Grouping}
             style={{ width: '160px' }}
             options={[
               { value: 'By50', label: 'По 50' },
