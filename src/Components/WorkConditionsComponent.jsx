@@ -104,8 +104,71 @@ export default function WorkConditionsComponent(props) {
   };
   const WorkConditionsHandler = (Action, Data, Index) => {
     let PromiseArray = [];
-    let NewProfile = { ...Profile };
+    let NewProfile = Profile != null ? { ...Profile } : {};
     switch (Action) {
+      case 'DeleteWorkCondition':
+        ApiFetch(
+          `model/WorkConditions/${SelectedKey}`,
+          'DELETE',
+          undefined,
+          (Response) => {
+            RequestTable().then(() => {
+              SetNewSelectedKey(null);
+            });
+          }
+        ).catch(() => {
+          message.error('Удалите связанные объекты');
+        });
+        break;
+      case 'AddWorkCondition':
+        PromiseArray.push(
+          ApiFetch('model/Firms', 'GET', undefined, (Response) => {
+            NewProfile.AllFirms = Response.data.map((Firm) => {
+              return { value: Firm.Id, label: Firm.Caption };
+            });
+          })
+        );
+        PromiseArray.push(
+          ApiFetch('model/Regions', 'GET', undefined, (Response) => {
+            NewProfile.AllRegions = Response.data.map((Region) => {
+              return {
+                value: Region.Id,
+                label: Region.Caption,
+              };
+            });
+          })
+        );
+        PromiseArray.push(
+          ApiFetch('model/VehicleModels', 'GET', undefined, (Response) => {
+            NewProfile.AllDiggerModels = Response.data.filter((Model) => {
+              return Model.Type.Caption == 'Экскаватор';
+            });
+          })
+        );
+        Promise.all(PromiseArray).then(() => {
+          NewProfile.Profile = {
+            Caption: '',
+            Options: {
+              ShiftStart: '08:00',
+              LoadZone: 70,
+              IdlePay: 0,
+              Grouping: 'By100',
+            },
+            ContractorId: NewProfile.AllFirms.find((Firm) => {
+              return Firm.label == '-';
+            }).value,
+            CustomerId: NewProfile.AllFirms.find((Firm) => {
+              return Firm.label == '-';
+            }).value,
+            RegionId: NewProfile.AllRegions.find((Region) => {
+              return Region.label == '-';
+            }).value,
+            DiggerPassports: [],
+          };
+          SetNewProfile(NewProfile);
+          SetNewShowProfile(true);
+        });
+        break;
       case 'AddPassport':
         PromiseArray.push(
           ApiFetch('model/VehicleModels', 'GET', undefined, (Response) => {
@@ -218,22 +281,27 @@ export default function WorkConditionsComponent(props) {
         SetNewProfile(NewProfile);
         break;
       case 'SaveProfile':
-        if (NewProfile.Profile.Options.IdlePay.length == 0) {
-          message.warning('Заполните поле простоя с оплатой');
+        if (
+          NewProfile.Profile.Options.LoadZone.length == 0 ||
+          NewProfile.Profile.Options.IdlePay.length == 0 ||
+          NewProfile.Profile.Caption.length == 0
+        ) {
+          message.warning('Заполните все поля');
         } else {
-          if (NewProfile.Profile.Options.LoadZone.length == 0) {
-            message.warning('Заполните поле зоны погрузки');
-          } else {
-            ApiFetch(
-              `model/WorkConditions/${NewProfile.Profile.Id}`,
-              'PATCH',
-              NewProfile.Profile,
-              (Response) => {
+          ApiFetch(
+            `model/WorkConditions${
+              'Id' in NewProfile.Profile ? `/${NewProfile.Profile.Id}` : ''
+            }`,
+            'Id' in NewProfile.Profile ? 'PATCH' : 'POST',
+            NewProfile.Profile,
+            (Response) => {
+              RequestTable().then(() => {
                 SetNewShowProfile(false);
-              }
-            );
-          }
+              });
+            }
+          );
         }
+
         break;
     }
   };
@@ -310,7 +378,7 @@ export default function WorkConditionsComponent(props) {
     });
   };
   const RequestTable = () => {
-    ApiFetch('model/WorkConditions', 'GET', undefined, (Response) => {
+    return ApiFetch('model/WorkConditions', 'GET', undefined, (Response) => {
       SetNewWorkConditionsTable(Response.data);
     });
   };
@@ -359,7 +427,13 @@ export default function WorkConditionsComponent(props) {
           marginBottom: '5px',
         }}
       >
-        <Button size="small" type="primary" onClick={() => {}}>
+        <Button
+          size="small"
+          type="primary"
+          onClick={() => {
+            WorkConditionsHandler('AddWorkCondition');
+          }}
+        >
           Добавить
         </Button>
         <Button
@@ -380,7 +454,9 @@ export default function WorkConditionsComponent(props) {
                 title: 'Подтвердите действие',
                 content: 'Вы действительно хотите удалить объект?',
 
-                onOk: () => {},
+                onOk: () => {
+                  WorkConditionsHandler('DeleteWorkCondition');
+                },
               });
             }
           }}
