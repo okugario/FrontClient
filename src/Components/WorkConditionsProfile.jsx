@@ -1,8 +1,9 @@
 import * as React from 'react';
-import { Input, Select, TimePicker, Table, Button } from 'antd';
+import { Input, Select, TimePicker, Table, Button, Modal } from 'antd';
 import { DashOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import Moment from 'moment';
+
 export default function WorkConditionsProfile(props) {
   const [SelectedKey, SetNewSelectedKey] = useState(null);
   return (
@@ -227,7 +228,30 @@ export default function WorkConditionsProfile(props) {
         >
           Добавить
         </Button>
-        <Button size="small" danger type="primary" onClick={() => {}}>
+        <Button
+          size="small"
+          danger
+          type="primary"
+          onClick={() => {
+            if (SelectedKey != null) {
+              Modal.confirm({
+                cancelButtonProps: { size: 'small' },
+                onOk: () => {
+                  props.ProfileHandler(
+                    'DeletePassport',
+                    undefined,
+                    SelectedKey
+                  );
+                  SetNewSelectedKey(null);
+                },
+                okButtonProps: { size: 'small', type: 'primary', danger: true },
+                okText: 'Удалить',
+                cancelText: 'Отмена',
+                content: 'Вы действительно хотите удалить объект?',
+              });
+            }
+          }}
+        >
           Удалить
         </Button>
       </div>

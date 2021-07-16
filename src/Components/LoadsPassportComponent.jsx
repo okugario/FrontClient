@@ -102,7 +102,7 @@ export default function LoadsPassportComponent(props) {
           undefined,
           (Response) => {
             SetNewSelectedKey(null);
-            RequestPassportsTable().then(() => {});
+            RequestPassportsTable();
           }
         );
 

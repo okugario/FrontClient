@@ -56,6 +56,7 @@ export default function WorkConditionsComponent(props) {
         });
         SetNewLoadProfile(NewProfile);
         break;
+
       case 'DeleteStandart':
         NewProfile.Profile.Options.Trucks.splice(Data, 1);
         SetNewLoadProfile(NewProfile);
@@ -105,7 +106,18 @@ export default function WorkConditionsComponent(props) {
   const WorkConditionsHandler = (Action, Data, Index) => {
     let PromiseArray = [];
     let NewProfile = Profile != null ? { ...Profile } : {};
+
     switch (Action) {
+      case 'DeletePassport':
+        ApiFetch(
+          `model/DiggerPassports/${Profile.Profile.DiggerPassports[Index].ConditonsId}/${Profile.Profile.DiggerPassports[Index].DiggerModelId}/${Profile.Profile.DiggerPassports[Index].TS}`,
+          'DELETE',
+          undefined,
+          (Response) => {
+            RequestWorkConditionsProfile();
+          }
+        );
+        break;
       case 'DeleteWorkCondition':
         ApiFetch(
           `model/WorkConditions/${SelectedKey}`,
@@ -197,7 +209,7 @@ export default function WorkConditionsComponent(props) {
               Options: {
                 Trucks: [],
               },
-              ConditonsId: NewProfile.AllWorkConditions[0].Id,
+              ConditonsId: Profile.Profile.Id,
               DiggerModelId: NewProfile.AllDiggerModels[0].Id,
             };
             SetNewLoadProfile(NewProfile);
@@ -232,8 +244,67 @@ export default function WorkConditionsComponent(props) {
                       SetNewSelectedKey(NewProfile.Profile.Id);
                     });
                     SetNewProfile(NewProfile);
+                    let NewLoadProfile = {};
+                    PromiseArray.push(
+                      ApiFetch(
+                        'model/VehicleModels',
+                        'GET',
+                        undefined,
+                        (Response) => {
+                          NewLoadProfile.AllDiggerModels = Response.data.filter(
+                            (Model) => {
+                              return Model.Type.Caption == 'Экскаватор';
+                            }
+                          );
+                          NewLoadProfile.AllTruckModels = Response.data.filter(
+                            (Model) => {
+                              return Model.Type.Caption == 'Самосвал';
+                            }
+                          );
+                        }
+                      )
+                    );
+                    PromiseArray.push(
+                      ApiFetch(
+                        'model/LoadTypes',
+                        'GET',
+                        undefined,
+                        (Response) => {
+                          NewLoadProfile.AllLoadTypes = Response.data;
+                        }
+                      )
+                    );
+                    PromiseArray.push(
+                      ApiFetch(
+                        'model/WorkConditions',
+                        'GET',
+                        undefined,
+                        (Response) => {
+                          NewLoadProfile.AllWorkConditions = Response.data;
+                        }
+                      )
+                    );
+                    Promise.all(PromiseArray).then(() => {
+                      NewLoadProfile.Profile = {
+                        TS: Moment('08:00:00', 'hh:mm:ss').format(),
+                        Options: {
+                          Trucks: [],
+                        },
+                        ConditonsId: NewProfile.Profile.Id,
+                        DiggerModelId: NewLoadProfile.AllDiggerModels[0].Id,
+                      };
+
+                      SetNewLoadProfile(NewLoadProfile);
+
+                      WorkConditionsHandler('ChangeProfileMode', {
+                        Title: 'Профиль паспорта загрузки',
+                        Mode: 'LoadingPassport',
+                      });
+                    });
                   }
-                );
+                ).catch(() => {
+                  message.error('Укажите другое наименование');
+                });
               }
             },
             okText: 'Сохранить',
@@ -340,7 +411,9 @@ export default function WorkConditionsComponent(props) {
                 SetNewShowProfile(false);
               });
             }
-          );
+          ).catch(() => {
+            message.error('Укажите другое наименование');
+          });
         }
 
         break;
