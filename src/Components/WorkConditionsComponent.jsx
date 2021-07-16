@@ -170,41 +170,82 @@ export default function WorkConditionsComponent(props) {
         });
         break;
       case 'AddPassport':
-        PromiseArray.push(
-          ApiFetch('model/VehicleModels', 'GET', undefined, (Response) => {
-            NewProfile.AllDiggerModels = Response.data.filter((Model) => {
-              return Model.Type.Caption == 'Экскаватор';
+        if ('Id' in NewProfile.Profile) {
+          PromiseArray.push(
+            ApiFetch('model/VehicleModels', 'GET', undefined, (Response) => {
+              NewProfile.AllDiggerModels = Response.data.filter((Model) => {
+                return Model.Type.Caption == 'Экскаватор';
+              });
+              NewProfile.AllTruckModels = Response.data.filter((Model) => {
+                return Model.Type.Caption == 'Самосвал';
+              });
+            })
+          );
+          PromiseArray.push(
+            ApiFetch('model/LoadTypes', 'GET', undefined, (Response) => {
+              NewProfile.AllLoadTypes = Response.data;
+            })
+          );
+          PromiseArray.push(
+            ApiFetch('model/WorkConditions', 'GET', undefined, (Response) => {
+              NewProfile.AllWorkConditions = Response.data;
+            })
+          );
+          Promise.all(PromiseArray).then(() => {
+            NewProfile.Profile = {
+              TS: Moment('08:00:00', 'hh:mm:ss').format(),
+              Options: {
+                Trucks: [],
+              },
+              ConditonsId: NewProfile.AllWorkConditions[0].Id,
+              DiggerModelId: NewProfile.AllDiggerModels[0].Id,
+            };
+            SetNewLoadProfile(NewProfile);
+            WorkConditionsHandler('ChangeProfileMode', {
+              Title: 'Профиль паспорта загрузки',
+              Mode: 'LoadingPassport',
             });
-            NewProfile.AllTruckModels = Response.data.filter((Model) => {
-              return Model.Type.Caption == 'Самосвал';
-            });
-          })
-        );
-        PromiseArray.push(
-          ApiFetch('model/LoadTypes', 'GET', undefined, (Response) => {
-            NewProfile.AllLoadTypes = Response.data;
-          })
-        );
-        PromiseArray.push(
-          ApiFetch('model/WorkConditions', 'GET', undefined, (Response) => {
-            NewProfile.AllWorkConditions = Response.data;
-          })
-        );
-        Promise.all(PromiseArray).then(() => {
-          NewProfile.Profile = {
-            TS: Moment('08:00:00', 'hh:mm:ss').format(),
-            Options: {
-              Trucks: [],
-            },
-            ConditonsId: NewProfile.AllWorkConditions[0].Id,
-            DiggerModelId: NewProfile.AllDiggerModels[0].Id,
-          };
-          SetNewLoadProfile(NewProfile);
-          WorkConditionsHandler('ChangeProfileMode', {
-            Title: 'Профиль паспорта загрузки',
-            Mode: 'LoadingPassport',
           });
-        });
+        } else {
+          Modal.confirm({
+            content: (
+              <div style={{ textAlign: 'center' }}>
+                Для добавления паспорта загрузки требуется сохранить новый
+                профиль условий работы.Сохранить?
+              </div>
+            ),
+            onOk: () => {
+              if (
+                NewProfile.Profile.Options.LoadZone.length == 0 ||
+                NewProfile.Profile.Options.IdlePay.length == 0 ||
+                NewProfile.Profile.Caption.length == 0
+              ) {
+                message.warning('Заполните все поля');
+              } else {
+                ApiFetch(
+                  'model/WorkConditions',
+                  'POST',
+                  NewProfile.Profile,
+                  (Response) => {
+                    NewProfile.Profile = Response.data;
+                    RequestTable().then(() => {
+                      SetNewSelectedKey(NewProfile.Profile.Id);
+                    });
+                    SetNewProfile(NewProfile);
+                  }
+                );
+              }
+            },
+            okText: 'Сохранить',
+            cancelText: 'Отмена',
+            cancelButtonProps: { size: 'small' },
+            okButtonProps: {
+              size: 'small',
+              type: 'primary',
+            },
+          });
+        }
+
         break;
       case 'RequestLoadsPassport':
         PromiseArray.push(
