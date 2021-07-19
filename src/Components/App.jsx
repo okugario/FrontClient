@@ -10,20 +10,8 @@ import 'antd/dist/antd.css';
 import '../CSS/AppComponent.css';
 const ComponentList = [
   {
-    Component: React.lazy(() => import('./OrganizationsComponent')),
-    Keys: ['Firms'],
-  },
-  {
     Component: React.lazy(() => import('./IntervalComponent')),
     Keys: ['IntervalComponent'],
-  },
-  {
-    Component: React.lazy(() => import('./TransportModelComponent')),
-    Keys: ['VehicleModels'],
-  },
-  {
-    Component: React.lazy(() => import('./RolesComponent')),
-    Keys: ['AccessRoles'],
   },
 
   {
@@ -95,6 +83,12 @@ export default class App extends React.Component {
         { id: 'tripsReport', caption: 'Отчет по рейсам' },
         { id: 'loadsReport', caption: 'Отчет по погрузкам' },
       ],
+    });
+    GlobalStore.AddTab({
+      caption: 'Действия',
+      id: 'workplace',
+      type: 'workplace',
+      items: [{ caption: 'Наряды экскаваторов', id: 'diggerOrder' }],
     });
   }
   GetComponent(ComponentID) {

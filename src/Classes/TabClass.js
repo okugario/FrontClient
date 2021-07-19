@@ -19,7 +19,7 @@ import CrudObjectsComponent from '../Components/CrudObjectsComponent';
 import WorkConditionsComponent from '../Components/WorkConditionsComponent';
 import LoadsReportComponent from '../Components/LoadsReportComponent';
 import LoadsPassportComponent from '../Components/LoadsPassportComponent';
-
+import DiggerOrderComponent from '../Components/DiggerOrderComponent';
 export class Tab {
   constructor(TabObject, OpenTabs) {
     this.Id = TabObject.id;
@@ -148,6 +148,20 @@ export class Tab {
           LeftMenu: ['AdministrationMenu'],
         };
 
+        break;
+      case 'workplace':
+        this.Options = {
+          LeftMenu: ['AdministrationMenu'],
+          CurrentMenuItem: TabObject.items[0],
+        };
+        this.Items = TabObject.items.map((Item) => {
+          switch (Item.id) {
+            case 'diggerOrder':
+              Item.Component = <DiggerOrderComponent />;
+              break;
+          }
+          return Item;
+        });
         break;
     }
 
