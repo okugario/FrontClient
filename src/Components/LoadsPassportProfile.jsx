@@ -47,7 +47,7 @@ export default function LoadsPassportProfile(props) {
               props.ProfileHandler('ChangeWorkCondition', Value);
             }}
             disabled={'Conditions' in props.Profile.Profile}
-            value={props.Profile.Profile.ConditonsId}
+            value={props.Profile.Profile.ConditionsId}
             size="small"
             style={{ width: '160px' }}
             options={props.Profile.AllWorkConditions.map((WorkCondition) => {
@@ -200,17 +200,19 @@ export default function LoadsPassportProfile(props) {
           {
             title: 'Объем',
             key: 'Volume',
+            width: 80,
             dataIndex: 'Volume',
             render: (Value, Record, Index) => {
               return (
                 <div style={{ cursor: 'pointer' }}>
                   <Input
+                    type="number"
                     size="small"
                     value={Value}
                     onChange={(Event) => {
                       props.ProfileHandler(
                         'ChangeVolume',
-                        Event.target.value,
+                        Event.target.valueAsNumber,
                         Index
                       );
                     }}
@@ -221,18 +223,20 @@ export default function LoadsPassportProfile(props) {
           },
           {
             title: 'Вес',
+            width: 80,
             key: 'Weight',
             dataIndex: 'Weight',
             render: (Value, Record, Index) => {
               return (
                 <div style={{ cursor: 'pointer' }}>
                   <Input
+                    type="number"
                     size="small"
                     value={Value}
                     onChange={(Event) => {
                       props.ProfileHandler(
                         'ChangeWeight',
-                        Event.target.value,
+                        Event.target.valueAsNumber,
                         Index
                       );
                     }}

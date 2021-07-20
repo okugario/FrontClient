@@ -34,6 +34,7 @@ export default function WorkConditionsComponent(props) {
       case 'ChangeWeight':
         NewProfile.Profile.Options.Trucks[Index].Weight = Data;
         SetNewLoadProfile(NewProfile);
+
         break;
       case 'ChangeDate':
         NewProfile.Profile.TS = Data;
@@ -44,7 +45,7 @@ export default function WorkConditionsComponent(props) {
         SetNewLoadProfile(NewProfile);
         break;
       case 'ChangeWorkCondition':
-        NewProfile.Profile.ConditonsId = Data;
+        NewProfile.Profile.ConditionsId = Data;
         SetNewLoadProfile(NewProfile);
         break;
       case 'AddStandart':
@@ -76,7 +77,7 @@ export default function WorkConditionsComponent(props) {
               `model/DiggerPassports${
                 'DiggerModel' in NewProfile.Profile &&
                 'Conditions' in NewProfile.Profile
-                  ? `/${NewProfile.Profile.ConditonsId}/${NewProfile.Profile.DiggerModelId}/${NewProfile.Profile.TS}`
+                  ? `/${NewProfile.Profile.ConditionsId}/${NewProfile.Profile.DiggerModelId}/${NewProfile.Profile.TS}`
                   : ''
               }`,
               'DiggerModel' in NewProfile.Profile &&
@@ -110,7 +111,7 @@ export default function WorkConditionsComponent(props) {
     switch (Action) {
       case 'DeletePassport':
         ApiFetch(
-          `model/DiggerPassports/${Profile.Profile.DiggerPassports[Index].ConditonsId}/${Profile.Profile.DiggerPassports[Index].DiggerModelId}/${Profile.Profile.DiggerPassports[Index].TS}`,
+          `model/DiggerPassports/${Profile.Profile.DiggerPassports[Index].ConditionsId}/${Profile.Profile.DiggerPassports[Index].DiggerModelId}/${Profile.Profile.DiggerPassports[Index].TS}`,
           'DELETE',
           undefined,
           (Response) => {
@@ -209,7 +210,7 @@ export default function WorkConditionsComponent(props) {
               Options: {
                 Trucks: [],
               },
-              ConditonsId: Profile.Profile.Id,
+              ConditionsId: Profile.Profile.Id,
               DiggerModelId: NewProfile.AllDiggerModels[0].Id,
             };
             SetNewLoadProfile(NewProfile);
@@ -290,7 +291,7 @@ export default function WorkConditionsComponent(props) {
                         Options: {
                           Trucks: [],
                         },
-                        ConditonsId: NewProfile.Profile.Id,
+                        ConditionsId: NewProfile.Profile.Id,
                         DiggerModelId: NewLoadProfile.AllDiggerModels[0].Id,
                       };
 
@@ -321,7 +322,7 @@ export default function WorkConditionsComponent(props) {
       case 'RequestLoadsPassport':
         PromiseArray.push(
           ApiFetch(
-            `model/DiggerPassports/${Profile.Profile.DiggerPassports[Index].ConditonsId}/${Profile.Profile.DiggerPassports[Index].DiggerModelId}/${Profile.Profile.DiggerPassports[Index].TS}`,
+            `model/DiggerPassports/${Profile.Profile.DiggerPassports[Index].ConditionsId}/${Profile.Profile.DiggerPassports[Index].DiggerModelId}/${Profile.Profile.DiggerPassports[Index].TS}`,
             'GET',
             undefined,
             (Response) => {

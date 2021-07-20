@@ -20,8 +20,8 @@ export default function LoadsPassportComponent(props) {
             TS: Passport.TS,
             DiggerModel: Passport.DiggerModel.Caption,
             DiggerModelId: Passport.DiggerModel.Id,
-            Conditons: Passport.Conditions.Caption,
-            ConditonsId: Passport.Conditions.Id,
+            Conditions: Passport.Conditions.Caption,
+            ConditionsId: Passport.Conditions.Id,
           };
         })
       );
@@ -59,7 +59,7 @@ export default function LoadsPassportComponent(props) {
             Options: {
               Trucks: [],
             },
-            ConditonsId: NewProfile.AllWorkConditions[0].Id,
+            ConditionsId: NewProfile.AllWorkConditions[0].Id,
             DiggerModelId: NewProfile.AllDiggerModels[0].Id,
           };
           SetNewProfile(NewProfile);
@@ -92,12 +92,12 @@ export default function LoadsPassportComponent(props) {
         SetNewProfile(NewProfile);
         break;
       case 'ChangeWorkCondition':
-        NewProfile.Profile.ConditonsId = Data;
+        NewProfile.Profile.ConditionsId = Data;
         SetNewProfile(NewProfile);
         break;
       case 'DeletePassport':
         ApiFetch(
-          `model/DiggerPassports/${PassportsTable[SelectedKey].ConditonsId}/${PassportsTable[SelectedKey].DiggerModelId}/${PassportsTable[SelectedKey].TS}`,
+          `model/DiggerPassports/${PassportsTable[SelectedKey].ConditionsId}/${PassportsTable[SelectedKey].DiggerModelId}/${PassportsTable[SelectedKey].TS}`,
           'DELETE',
           undefined,
           (Response) => {
@@ -135,7 +135,7 @@ export default function LoadsPassportComponent(props) {
               `model/DiggerPassports${
                 'DiggerModel' in NewProfile.Profile &&
                 'Conditions' in NewProfile.Profile
-                  ? `/${PassportsTable[SelectedKey].ConditonsId}/${PassportsTable[SelectedKey].DiggerModelId}/${PassportsTable[SelectedKey].TS}`
+                  ? `/${PassportsTable[SelectedKey].ConditionsId}/${PassportsTable[SelectedKey].DiggerModelId}/${PassportsTable[SelectedKey].TS}`
                   : ''
               }`,
               'DiggerModel' in NewProfile.Profile &&
@@ -164,7 +164,7 @@ export default function LoadsPassportComponent(props) {
     let NewProfile = {};
     PromiseArray.push(
       ApiFetch(
-        `model/DiggerPassports/${PassportsTable[SelectedKey].ConditonsId}/${PassportsTable[SelectedKey].DiggerModelId}/${PassportsTable[SelectedKey].TS}`,
+        `model/DiggerPassports/${PassportsTable[SelectedKey].ConditionsId}/${PassportsTable[SelectedKey].DiggerModelId}/${PassportsTable[SelectedKey].TS}`,
         'GET',
         undefined,
         (Response) => {
@@ -309,8 +309,8 @@ export default function LoadsPassportComponent(props) {
             render: (Value) => {
               return <div style={{ cursor: 'pointer' }}>{Value}</div>;
             },
-            key: 'Conditons',
-            dataIndex: 'Conditons',
+            key: 'Conditions',
+            dataIndex: 'Conditions',
             title: 'Условия работы',
           },
         ]}

@@ -134,7 +134,7 @@ export default function TransportComponent() {
         SetNewProfile(NewProfile);
         break;
       case 'EditLocationCaption':
-        NewProfile.Profile.Locations[Index].ConditonsId = Data;
+        NewProfile.Profile.Locations[Index].ConditionsId = Data;
         SetNewProfile(NewProfile);
         break;
       case 'EditLocationDate':
@@ -149,7 +149,7 @@ export default function TransportComponent() {
         NewProfile.Profile.Locations.push({
           TS: Moment().format(),
           VehicleId: NewProfile.Profile.Id,
-          ConditonsId: Profile.AllWorkConditions[0].Id,
+          ConditionsId: Profile.AllWorkConditions[0].Id,
         });
         SetNewProfile(NewProfile);
         break;

@@ -274,7 +274,7 @@ export default function TransportPrfoile(props) {
                 ? props.Profile.AllWorkConditions.find((Condition) => {
                     return (
                       Condition.Id ==
-                      props.Profile.Profile.Locations[0].ConditonsId
+                      props.Profile.Profile.Locations[0].ConditionsId
                     );
                   }).Caption
                 : 'Не указано'
@@ -358,7 +358,7 @@ export default function TransportPrfoile(props) {
               (Location, Index) => {
                 return {
                   Key: Index,
-                  ConditonsId: Location.ConditonsId,
+                  ConditionsId: Location.ConditionsId,
                   TS: Location.TS,
                 };
               }
@@ -435,8 +435,8 @@ export default function TransportPrfoile(props) {
                   );
                 },
                 title: 'Наименование',
-                key: 'ConditonsId',
-                dataIndex: 'ConditonsId',
+                key: 'ConditionsId',
+                dataIndex: 'ConditionsId',
               },
             ]}
           />
