@@ -1,6 +1,8 @@
 import * as React from 'react';
-import { DatePicker, Select, Table, Button } from 'antd';
+import { DatePicker, Select, Table, Button, Input, TimePicker } from 'antd';
+import Moment from 'moment';
 export default function DiggerOrderProfile(props) {
+  console.log(props);
   return (
     <>
       <div
@@ -11,7 +13,14 @@ export default function DiggerOrderProfile(props) {
       >
         <div style={{ display: 'flex', alignItems: 'center' }}>Дата:</div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <DatePicker size="small" />
+          <DatePicker
+            onOk={(Moment) => {}}
+            size="small"
+            format="DD.MM.YYYY"
+            value={Moment(
+              props.Profile.Profile.ShiftCode.toString().slice(0, 7)
+            )}
+          />
         </div>
       </div>
       <div
@@ -24,6 +33,7 @@ export default function DiggerOrderProfile(props) {
         <div style={{ display: 'flex', alignItems: 'center' }}>Смена:</div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Select
+            value={props.Profile.Profile.ShiftCode.toString().slice(7)}
             size="small"
             options={[
               { value: 1, label: 1 },
@@ -43,7 +53,11 @@ export default function DiggerOrderProfile(props) {
           Условия работы:
         </div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Select size="small" />
+          <Select
+            size="small"
+            options={props.Profile.AllWorkConditions}
+            value={props.Profile.Profile.ConditionsId}
+          />
         </div>
       </div>
       <div
@@ -54,7 +68,13 @@ export default function DiggerOrderProfile(props) {
           marginBottom: '5px',
         }}
       >
-        <Button size="small" type="primary" onClick={() => {}}>
+        <Button
+          size="small"
+          type="primary"
+          onClick={() => {
+            props.ProfileHandler('AddLoadType');
+          }}
+        >
           Добавить
         </Button>
         <Button size="small" danger type="primary" onClick={() => {}}>
@@ -62,12 +82,68 @@ export default function DiggerOrderProfile(props) {
         </Button>
       </div>
       <Table
+        pagination={false}
+        rowKey="Key"
+        dataSource={props.Profile.Profile.Options.LoadDiggerOrders.map(
+          (DiggerOrder, Index) => {
+            DiggerOrder.Key = Index;
+            return DiggerOrder;
+          }
+        )}
         size="small"
         columns={[
-          { title: 'Экскаватор', key: 'Digger', dataIndex: 'Digger' },
-          { title: 'Вид груза', key: 'LoadType', dataIndex: 'LoadType' },
-          { title: 'Объем', key: 'Value', dataIndex: 'Value' },
           {
+            title: 'Экскаватор',
+            key: 'Digger',
+            dataIndex: 'Digger',
+            render: (Value, Record, Index) => {
+              return (
+                <div style={{ cursor: 'pointer' }}>
+                  <Select
+                    size="small"
+                    options={props.Profile.AllDiggers}
+                    value={Value}
+                  />
+                </div>
+              );
+            },
+          },
+          {
+            title: 'Вид груза',
+            key: 'LoadType',
+            dataIndex: 'LoadType',
+            render: (Value, Record, Index) => {
+              return (
+                <div style={{ cursor: 'pointer' }}>
+                  <Select
+                    size="small"
+                    value={Value}
+                    options={props.Profile.AllLoadTypes}
+                  />
+                </div>
+              );
+            },
+          },
+          {
+            title: 'Объем',
+            key: 'Value',
+            dataIndex: 'Value',
+            render: (Value, Record, Index) => {
+              return (
+                <div style={{ cursor: 'pointer' }}>
+                  <Input size="small" value={Value} style={{ width: '50px' }} />
+                </div>
+              );
+            },
+          },
+          {
+            render: (Value, Record, Index) => {
+              return (
+                <div style={{ cursor: 'pointer' }}>
+                  <TimePicker size="small" value={Moment(Value, 'hh:mm:ss')} />
+                </div>
+              );
+            },
             title: 'Время начала',
             key: 'StartTime',
             dataIndex: 'StartTime',

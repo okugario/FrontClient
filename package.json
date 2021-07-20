@@ -23,12 +23,12 @@
     "@babel/plugin-proposal-decorators": "^7.14.5",
     "@babel/preset-env": "^7.14.7",
     "@babel/preset-react": "^7.14.5",
-    "antd": "^4.16.7",
+    "antd": "^4.16.8",
     "babel-loader": "^8.2.2",
     "chart.js": "^3.4.1",
     "chartjs-adapter-moment": "^1.0.0",
     "chartjs-plugin-zoom": "^1.1.1",
-    "css-loader": "^6.0.0",
+    "css-loader": "^6.2.0",
     "d3": "^7.0.0",
     "file-loader": "^6.2.0",
     "mobx": "^6.3.2",
@@ -37,7 +37,7 @@
     "ol": "^6.6.1",
     "react-highlight-words": "^0.17.0",
     "style-loader": "^3.1.0",
-    "webpack": "^5.44.0",
+    "webpack": "^5.45.1",
     "webpack-cli": "^4.7.2"
   },
   "dependencies": {

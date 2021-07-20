@@ -9,31 +9,87 @@ export default function DiggerOrderComponent(props) {
   const [SelectedKey, SetNewSelectedKey] = useState(null);
   const [ShowProfile, SetNewShowProfile] = useState(false);
   const [Profile, SetNewProfile] = useState(null);
+  const DiggerOrderHandler = (Action, Data, Index) => {
+    let NewProfile = { ...Profile };
+    switch (Action) {
+      case 'AddLoadType':
+        NewProfile.Profile.Options.LoadDiggerOrders.push({
+          Digger: NewProfile.AllDiggers[0].value,
+          LoadType: NewProfile.AllLoadTypes[0].value,
+          Value: 0,
+          StartTime:
+            NewProfile.Profile.ShiftCode.toString().slice(7) == '1'
+              ? '8:00:00'
+              : '20:00:00',
+        });
+        SetNewProfile(NewProfile);
+        break;
+    }
+  };
   const RequestDiggerTable = () => {
     ApiFetch('model/DiggerOrders', 'GET', undefined, (Response) => {
       SetNewDiggerTable(
-        Response.data.map((Object, Index) => {
+        Response.data.map((DiggerOrder, Index) => {
           return {
             Key: Index,
-            Date: Object.ShiftCode,
-            Shift: Object.ShiftCode,
-            Conditions: Object.Conditions.Caption,
-            ConditionsId: Object.ConditionsId,
+            Date: DiggerOrder.ShiftCode,
+            Shift: DiggerOrder.ShiftCode,
+            Conditions: DiggerOrder.Conditions.Caption,
+            ConditionsId: DiggerOrder.ConditionsId,
           };
         })
       );
     });
   };
   const RequestProfile = () => {
-    ApiFetch(
-      `model/DiggerOrders/${DiggerTable[SelectedKey].ConditionsId}/${DiggerTable[SelectedKey].Shift}`,
-      'GET',
-      undefined,
-      (Response) => {
-        SetNewProfile(Response.data);
-        SetNewShowProfile(true);
-      }
+    let PromiseArray = [];
+    let NewProfile = {};
+    PromiseArray.push(
+      ApiFetch(
+        `model/DiggerOrders/${DiggerTable[SelectedKey].ConditionsId}/${DiggerTable[SelectedKey].Shift}`,
+        'GET',
+        undefined,
+        (Response) => {
+          NewProfile.Profile = Response.data;
+          NewProfile.Profile.Options.LoadDiggerOrders = [];
+        }
+      )
     );
+    PromiseArray.push(
+      ApiFetch('model/WorkConditions', 'GET', undefined, (Response) => {
+        NewProfile.AllWorkConditions = Response.data.map((WorkCondition) => {
+          return { value: WorkCondition.Id, label: WorkCondition.Caption };
+        });
+      })
+    );
+    PromiseArray.push(
+      ApiFetch('model/Vehicles', 'GET', undefined, (VehicleResponse) => {
+        ApiFetch('model/VehicleTypes', 'GET', undefined, (TypeResponse) => {
+          let DiggerTypeId = TypeResponse.data.find((Type) => {
+            return Type.Caption == 'Экскаватор';
+          }).Id;
+
+          NewProfile.AllDiggers = VehicleResponse.data
+            .filter((Vehicle) => {
+              return Vehicle.Model.TypeId == DiggerTypeId;
+            })
+            .map((Digger) => {
+              return { value: Digger.Id, label: Digger.Caption };
+            });
+        });
+      })
+    );
+    PromiseArray.push(
+      ApiFetch('model/LoadTypes', 'GET', undefined, (Response) => {
+        NewProfile.AllLoadTypes = Response.data.map((Type) => {
+          return { value: Type.Id, label: Type.Caption };
+        });
+      })
+    );
+    Promise.all(PromiseArray).then(() => {
+      SetNewProfile(NewProfile);
+      SetNewShowProfile(true);
+    });
   };
   useEffect(RequestDiggerTable, []);
   return (
@@ -50,7 +106,10 @@ export default function DiggerOrderComponent(props) {
           SetNewShowProfile(false);
         }}
       >
-        <DiggerOrderProfile Profile={Profile} />
+        <DiggerOrderProfile
+          Profile={Profile}
+          ProfileHandler={DiggerOrderHandler}
+        />
       </Modal>
       <div
         style={{
