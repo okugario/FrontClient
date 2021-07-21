@@ -1,8 +1,19 @@
 import * as React from 'react';
-import { DatePicker, Select, Table, Button, Input, TimePicker } from 'antd';
+import { useState } from 'react';
+import {
+  DatePicker,
+  Select,
+  Table,
+  Button,
+  Input,
+  TimePicker,
+  Modal,
+} from 'antd';
 import Moment from 'moment';
+
 export default function DiggerOrderProfile(props) {
-  console.log(props);
+  const [SelectedKey, SetNewSelectedKey] = useState(null);
+
   return (
     <>
       <div
@@ -14,11 +25,13 @@ export default function DiggerOrderProfile(props) {
         <div style={{ display: 'flex', alignItems: 'center' }}>Дата:</div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <DatePicker
-            onOk={(Moment) => {}}
+            onSelect={(Moment) => {
+              props.ProfileHandler('ChangeDate', Moment);
+            }}
             size="small"
             format="DD.MM.YYYY"
             value={Moment(
-              props.Profile.Profile.ShiftCode.toString().slice(0, 7)
+              Math.trunc(props.Profile.Profile.ShiftCode / 10).toString()
             )}
           />
         </div>
@@ -33,7 +46,10 @@ export default function DiggerOrderProfile(props) {
         <div style={{ display: 'flex', alignItems: 'center' }}>Смена:</div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Select
-            value={props.Profile.Profile.ShiftCode.toString().slice(7)}
+            onChange={(Value) => {
+              props.ProfileHandler('ChangeShift', Value);
+            }}
+            value={props.Profile.Profile.ShiftCode % 10}
             size="small"
             options={[
               { value: 1, label: 1 },
@@ -54,6 +70,9 @@ export default function DiggerOrderProfile(props) {
         </div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Select
+            onChange={(Value) => {
+              props.ProfileHandler('ChangeWorkConditions', Value);
+            }}
             size="small"
             options={props.Profile.AllWorkConditions}
             value={props.Profile.Profile.ConditionsId}
@@ -72,16 +91,54 @@ export default function DiggerOrderProfile(props) {
           size="small"
           type="primary"
           onClick={() => {
-            props.ProfileHandler('AddLoadType');
+            props.ProfileHandler('AddLoadDiggerOrder');
           }}
         >
           Добавить
         </Button>
-        <Button size="small" danger type="primary" onClick={() => {}}>
+        <Button
+          size="small"
+          danger
+          type="primary"
+          onClick={() => {
+            if (SelectedKey != null) {
+              Modal.confirm({
+                title: 'Подтвердите действие',
+                okButtonProps: { type: 'primary', size: 'small', danger: true },
+                okText: 'Удалить',
+                cancelButtonProps: { size: 'small' },
+                cancelText: 'Отмена',
+                content: 'Вы действительно хотите удалить объект?',
+                onOk: () => {
+                  props.ProfileHandler(
+                    'DeleteLoadDiggerOrder',
+                    undefined,
+                    SelectedKey
+                  );
+                },
+              });
+            }
+          }}
+        >
           Удалить
         </Button>
       </div>
       <Table
+        onRow={(Record) => {
+          return {
+            onClick: () => {
+              SetNewSelectedKey(Record['Key']);
+            },
+          };
+        }}
+        rowSelection={{
+          columnWidth: 0,
+          selectedRowKeys: [SelectedKey],
+          hideSelectAll: true,
+          renderCell: () => {
+            return null;
+          },
+        }}
         pagination={false}
         rowKey="Key"
         dataSource={props.Profile.Profile.Options.LoadDiggerOrders.map(
@@ -100,6 +157,9 @@ export default function DiggerOrderProfile(props) {
               return (
                 <div style={{ cursor: 'pointer' }}>
                   <Select
+                    onChange={(Value) => {
+                      props.ProfileHandler('ChangeLoadDigger', Value, Index);
+                    }}
                     size="small"
                     options={props.Profile.AllDiggers}
                     value={Value}
@@ -119,6 +179,9 @@ export default function DiggerOrderProfile(props) {
                     size="small"
                     value={Value}
                     options={props.Profile.AllLoadTypes}
+                    onChange={(Value) => {
+                      props.ProfileHandler('ChangeLoadType', Value, Index);
+                    }}
                   />
                 </div>
               );
@@ -131,7 +194,18 @@ export default function DiggerOrderProfile(props) {
             render: (Value, Record, Index) => {
               return (
                 <div style={{ cursor: 'pointer' }}>
-                  <Input size="small" value={Value} style={{ width: '50px' }} />
+                  <Input
+                    size="small"
+                    value={Value}
+                    style={{ width: '50px' }}
+                    onChange={(Event) => {
+                      props.ProfileHandler(
+                        'ChangeValue',
+                        Event.target.value,
+                        Index
+                      );
+                    }}
+                  />
                 </div>
               );
             },
@@ -140,10 +214,17 @@ export default function DiggerOrderProfile(props) {
             render: (Value, Record, Index) => {
               return (
                 <div style={{ cursor: 'pointer' }}>
-                  <TimePicker size="small" value={Moment(Value, 'hh:mm:ss')} />
+                  <TimePicker
+                    size="small"
+                    value={Moment(Value, 'hh:mm:ss')}
+                    onOk={(Moment) => {
+                      props.ProfileHandler('ChangeOrderDate', Moment, Index);
+                    }}
+                  />
                 </div>
               );
             },
+            width: 120,
             title: 'Время начала',
             key: 'StartTime',
             dataIndex: 'StartTime',
