@@ -56,6 +56,25 @@ export default function TerminalProfile(props) {
         </div>
       </div>
 
+      <div
+        style={{
+          marginTop: '10px',
+          display: 'flex',
+          justifyContent: 'space-between',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center' }}>ID:</div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Input
+            onChange={(Event) => {
+              props.ProfileHandler('ChangeTerminalID', Event.target.value);
+            }}
+            size="small"
+            style={{ width: '160px' }}
+            value={props.TerminalProfile.ObjectId}
+          />
+        </div>
+      </div>
       {Object.keys(props.TerminalProfile.UnitProfile.Options).length > 0 ? (
         <>
           <div

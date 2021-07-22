@@ -81,17 +81,21 @@ export default function TransportComponent() {
       case 'ChangeProfileMode':
         if (Data.Mode == 'TransportProfile') {
           const NewProfile = { ...Profile };
-          ApiFetch(
-            `model/Vehicles/${SelectedKey}`,
-            'GET',
-            undefined,
-            (Response) => {
-              NewProfile.Profile.Equipments = Response.data.Equipments;
-              SetNewProfile(NewProfile);
-              SetNewProfileMode(Data);
-              SetNewTerminalIndex(Index);
-            }
-          );
+          if (SelectedKey != null) {
+            ApiFetch(
+              `model/Vehicles/${SelectedKey}`,
+              'GET',
+              undefined,
+              (Response) => {
+                NewProfile.Profile.Equipments = Response.data.Equipments;
+                SetNewProfile(NewProfile);
+                SetNewProfileMode(Data);
+                SetNewTerminalIndex(Index);
+              }
+            );
+          } else {
+            SetNewProfileMode(Data);
+          }
         } else {
           SetNewProfileMode(Data);
           SetNewTerminalIndex(Index);

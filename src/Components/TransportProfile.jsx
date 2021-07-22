@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { Input, Select, Button, Table, DatePicker, Modal } from 'antd';
+import { Input, Select, Button, Table, DatePicker, Modal, message } from 'antd';
 import {
   CaretDownOutlined,
   CaretUpOutlined,
@@ -481,11 +481,15 @@ export default function TransportPrfoile(props) {
             type="primary"
             style={{ margin: '5px' }}
             onClick={() => {
-              props.ProfileHandler(
-                'AddEquipment',
-                undefined,
-                props.Profile.Profile.Equipments.length
-              );
+              if (props.Profile.Profile.Caption.length != 0) {
+                props.ProfileHandler(
+                  'AddEquipment',
+                  undefined,
+                  props.Profile.Profile.Equipments.length
+                );
+              } else {
+                message.warning('Укажите наименование транспорта');
+              }
             }}
           >
             Добавить
