@@ -88,7 +88,7 @@ export default class App extends React.Component {
       caption: 'Действия',
       id: 'workplace',
       type: 'workplace',
-      items: [{ caption: 'Наряды экскаваторов', id: 'diggerOrder' }],
+      items: [{ caption: 'Наряды экскаваторов', id: 'DiggerOrders' }],
     });
   }
   GetComponent(ComponentID) {

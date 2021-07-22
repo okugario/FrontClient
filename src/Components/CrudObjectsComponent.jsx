@@ -1,14 +1,16 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { Table, Button, message, Input, Modal } from 'antd';
+import { Table, Button, message, Input, Modal, Select, DatePicker } from 'antd';
 import { ApiFetch } from '../Helpers/Helpers';
 import { inject, observer } from 'mobx-react';
+import Moment from 'moment';
 
 const ObjectsComponent = inject('ProviderStore')(
   observer((props) => {
     const InputRef = React.createRef();
     const [SelectedKey, SetNewSelectedKey] = useState(null);
     const [ObjectsTable, SetNewObjectsTable] = useState(null);
+    const [Columns, SetNewColumns] = useState([]);
 
     const RequestTable = () => {
       return ApiFetch(
@@ -23,8 +25,153 @@ const ObjectsComponent = inject('ProviderStore')(
               return Object;
             })
           );
+          GenerateColumns(Response.data).then((Columns) => {
+            SetNewColumns(Columns);
+          });
         }
       );
+    };
+    const GenerateColumns = (Table) => {
+      let PromiseArray = [];
+      Table != null
+        ? Object.keys(Table[0]).forEach((Key) => {
+            switch (Key) {
+              case 'Caption':
+                PromiseArray.push(
+                  new Promise((resolve, reject) => {
+                    resolve({
+                      title: 'Наименование',
+                      key: 'Caption',
+                      dataIndex: 'Caption',
+                      render: (Text, Record, Index) => {
+                        if (Record.Edit) {
+                          return (
+                            <>
+                              <Input
+                                defaultValue={Record['Caption']}
+                                size="small"
+                                style={{ width: '150px' }}
+                                ref={InputRef}
+                              />
+                              <Button
+                                onClick={() => {
+                                  ObjectsHandler('SaveObject', Index);
+                                }}
+                                size="small"
+                                type="primary"
+                                style={{ marginLeft: '10px' }}
+                              >
+                                Сохранить
+                              </Button>
+                              <Button
+                                onClick={() => {
+                                  ObjectsHandler('EditCancel', Index);
+                                }}
+                                size="small"
+                                style={{ marginLeft: '10px' }}
+                              >
+                                Отмена
+                              </Button>
+                            </>
+                          );
+                        } else {
+                          return (
+                            <div style={{ cursor: 'pointer' }}>{Text}</div>
+                          );
+                        }
+                      },
+                    });
+                  })
+                );
+
+                break;
+              case 'TS':
+                PromiseArray.push(
+                  new Promise((resolve, reject) => {
+                    resolve({
+                      title: 'Время',
+                      key: 'TS',
+                      dataIndex: 'TS',
+                      render: (Value, Record, index) => {
+                        return (
+                          <DatePicker
+                            size="small"
+                            format="DD.MM.YYYY HH:mm:ss"
+                            showTime={true}
+                            value={Moment(Value)}
+                          />
+                        );
+                      },
+                    });
+                  })
+                );
+
+                break;
+              case 'VehicleId':
+                PromiseArray.push(
+                  new Promise((resolve, reject) => {
+                    ApiFetch('model/Vehicles', 'GET', undefined, (Response) => {
+                      resolve({
+                        title: 'Транспортное средство',
+                        key: 'VehicleId',
+                        dataIndex: 'VehicleId',
+                        render: (Value, Record, Index) => {
+                          return (
+                            <Select
+                              size="small"
+                              value={Value}
+                              options={Response.data.map((Vehicle) => {
+                                return {
+                                  value: Vehicle.Id,
+                                  label: Vehicle.Caption,
+                                };
+                              })}
+                            />
+                          );
+                        },
+                      });
+                    });
+                  })
+                );
+
+                break;
+              case 'LoadTypeId':
+                PromiseArray.push(
+                  new Promise((resolve, reject) => {
+                    ApiFetch(
+                      'model/LoadTypes',
+                      'GET',
+                      undefined,
+                      (Response) => {
+                        resolve({
+                          title: 'Вид груза',
+                          key: 'LoadTypeId',
+                          dataIndex: 'LoadTypeId',
+                          render: (Value, Record, Index) => {
+                            return (
+                              <Select
+                                size="small"
+                                value={Value}
+                                options={Response.data.map((LoadType) => {
+                                  return {
+                                    value: LoadType.Id,
+                                    label: LoadType.Caption,
+                                  };
+                                })}
+                              />
+                            );
+                          },
+                        });
+                      }
+                    );
+                  })
+                );
+
+                break;
+            }
+          })
+        : [];
+      return Promise.all(PromiseArray);
     };
     const ObjectsHandler = (Action, Index) => {
       let NewObjectsTable = [...ObjectsTable];
@@ -205,48 +352,7 @@ const ObjectsComponent = inject('ProviderStore')(
           dataSource={ObjectsTable}
           rowKey="Index"
           size="small"
-          columns={[
-            {
-              title: 'Наименование',
-              key: 'Caption',
-              dataIndex: 'Caption',
-              render: (Text, Record, Index) => {
-                if (Record.Edit) {
-                  return (
-                    <>
-                      <Input
-                        defaultValue={Record['Caption']}
-                        size="small"
-                        style={{ width: '150px' }}
-                        ref={InputRef}
-                      />
-                      <Button
-                        onClick={() => {
-                          ObjectsHandler('SaveObject', Index);
-                        }}
-                        size="small"
-                        type="primary"
-                        style={{ marginLeft: '10px' }}
-                      >
-                        Сохранить
-                      </Button>
-                      <Button
-                        onClick={() => {
-                          ObjectsHandler('EditCancel', Index);
-                        }}
-                        size="small"
-                        style={{ marginLeft: '10px' }}
-                      >
-                        Отмена
-                      </Button>
-                    </>
-                  );
-                } else {
-                  return <div style={{ cursor: 'pointer' }}>{Text}</div>;
-                }
-              },
-            },
-          ]}
+          columns={Columns}
         />
       </div>
     );
