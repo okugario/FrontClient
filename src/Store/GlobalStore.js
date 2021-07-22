@@ -171,7 +171,7 @@ class Store {
         title: Group.Caption,
         key: Group.Id,
         children: Group.Vehicles.map((Transport) => {
-          return { title: Transport.caption, key: Transport.Id };
+          return { title: Transport.Caption, key: Transport.Id };
         }),
       };
     });
