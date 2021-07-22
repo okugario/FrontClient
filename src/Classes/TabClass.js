@@ -156,9 +156,8 @@ export class Tab {
         };
         this.Items = TabObject.items.map((Item) => {
           switch (Item.id) {
-            case 'DiggerOrders':
-              Item.Component = <CrudObjectsComponent />;
-
+            case 'diggerOrder':
+              Item.Component = <DiggerOrderComponent />;
               break;
           }
           return Item;
