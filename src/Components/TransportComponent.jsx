@@ -241,12 +241,7 @@ export default function TransportComponent() {
         break;
       case 'SaveProfile':
         if (ProfileMode.Mode == 'TransportProfile') {
-          if (
-            Profile.Profile.Caption != '' &&
-            TransportTable.every((Transport) => {
-              return Transport.Caption != Profile.Profile.Caption;
-            })
-          ) {
+          if (Profile.Profile.Caption != '') {
             ApiFetch(
               `model/Vehicles${
                 'Id' in NewProfile.Profile ? `/${NewProfile.Profile.Id}` : ''
@@ -258,7 +253,9 @@ export default function TransportComponent() {
                   SetNewShowProfile(false);
                 });
               }
-            );
+            ).catch(() => {
+              message.warning('Укажите другое наименование транспорта');
+            });
           } else {
             message.warning('Укажите корректное наименование');
           }
