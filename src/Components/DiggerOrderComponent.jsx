@@ -33,9 +33,18 @@ export default function DiggerOrderComponent(props) {
         SetNewDiggerOrdersTable(NewDiggerOrdersTable);
         break;
       case 'ChangeLoadType':
-        NewDiggerOrdersTable[Index].LoadTypeId = Data;
-        NewDiggerOrdersTable[Index].Edited = true;
-        SetNewDiggerOrdersTable(NewDiggerOrdersTable);
+        if (
+          NewDiggerOrdersTable.some((Order) => {
+            return Order.Edited;
+          })
+        ) {
+          message.warning('Сохраните предыдущий наряд');
+        } else {
+          NewDiggerOrdersTable[Index].LoadTypeId = Data;
+          NewDiggerOrdersTable[Index].Edited = true;
+          SetNewDiggerOrdersTable(NewDiggerOrdersTable);
+        }
+
         break;
       case 'ChangeDate':
         NewDiggerOrdersTable[Index].TS = Data.format();
