@@ -42,14 +42,23 @@ export default function DiggerOrderComponent(props) {
         SetNewDiggerOrdersTable(NewDiggerOrdersTable);
         break;
       case 'AddDiggerOrder':
-        NewDiggerOrdersTable.push({
-          TS: Moment('08:00:00', 'HH:mm:ss').format(),
-          VehicleId: DiggerList[0].value,
-          LoadTypeId: LoadTypesList[0].value,
-          Edited: true,
-          Options: {},
-        });
-        SetNewDiggerOrdersTable(NewDiggerOrdersTable);
+        if (
+          NewDiggerOrdersTable.some((Orders) => {
+            return Orders.Edited;
+          })
+        ) {
+          message.warning('Сохраните предыдущий объект');
+        } else {
+          NewDiggerOrdersTable.push({
+            TS: Moment('08:00:00', 'HH:mm:ss').format(),
+            VehicleId: DiggerList[0].value,
+            LoadTypeId: LoadTypesList[0].value,
+            Edited: true,
+            Options: {},
+          });
+          SetNewDiggerOrdersTable(NewDiggerOrdersTable);
+        }
+
         break;
       case 'Cancel':
         if ('Vehicle' in Data) {
@@ -149,7 +158,7 @@ export default function DiggerOrderComponent(props) {
           danger
           type="primary"
           onClick={() => {
-            if (SelectedKey != null) {
+            if (SelectedKey != null && DiggerOrdersTable.length > SelectedKey) {
               Modal.confirm({
                 title: 'Подтвердите действие',
                 content: 'Вы действитенльно хотите удалить объект?',
