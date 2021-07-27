@@ -13,8 +13,8 @@ export default class MapTooltipComponent extends React.Component {
         this.props.TooltipID
       )
     );
-    this.props.CurrentTab.GetVectorLayerSource().removeFeature(
-      this.props.CurrentTab.GetVectorLayerSource().getFeatureById(
+    this.props.CurrentTab.Options.GetVectorLayerSource().removeFeature(
+      this.props.CurrentTab.Options.GetVectorLayerSource().getFeatureById(
         this.props.TooltipID
       )
     );

@@ -32,6 +32,7 @@ export default class LoadsReportComponent extends React.Component {
       LoadsTableRows: [],
       LoadsTableColumns: [],
       LoadsChartData: [],
+      LoadsTableSummary: [],
     };
     this.ChartRef = React.createRef();
     this.Chart = null;
@@ -101,6 +102,7 @@ export default class LoadsReportComponent extends React.Component {
         undefined,
         (Response) => {
           this.setState({
+            LoadsTableSummary: Response.loadsTable.summary,
             LoadsChartData: Response.loadsPoints,
             InfoTableRows: GenerateTableData('Rows', Response.infoTable.rows),
             InfoTableColumns: GenerateTableData(
@@ -189,6 +191,26 @@ export default class LoadsReportComponent extends React.Component {
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr' }}>
           <Table
+            summary={() => {
+              return (
+                <Table.Summary fixed={true}>
+                  {this.state.LoadsTableSummary.map((Row, Index) => {
+                    return (
+                      <Table.Summary.Row key={Index}>
+                        {Row.map((Value, Index) => {
+                          return (
+                            <Table.Summary.Cell key={Index}>
+                              {Value}
+                            </Table.Summary.Cell>
+                          );
+                        })}
+                      </Table.Summary.Row>
+                    );
+                  })}
+                </Table.Summary>
+              );
+            }}
+            scroll={{ y: 170 }}
             size="small"
             columns={this.state.LoadsTableColumns}
             dataSource={this.state.LoadsTableRows}
@@ -204,7 +226,7 @@ export default class LoadsReportComponent extends React.Component {
         </div>
       </div>
     ) : (
-      <span>Отчет не может быть построен</span>
+      <div className="FullExtend">Отчет не может быть построен</div>
     );
   }
 }

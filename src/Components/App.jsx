@@ -58,6 +58,16 @@ export default class App extends React.Component {
 
   componentDidMount() {
     GlobalStore.AddTab({
+      id: 'reports',
+      type: 'report',
+      caption: 'Отчеты',
+      items: [
+        { id: 'map', caption: 'Карта' },
+        { id: 'tripsReport', caption: 'Отчет по рейсам' },
+        { id: 'loadsReport', caption: 'Отчет по погрузкам' },
+      ],
+    });
+    GlobalStore.AddTab({
       id: 'settings',
       type: 'setting',
       caption: 'Администрирование',
@@ -72,16 +82,6 @@ export default class App extends React.Component {
         { id: 'WorkConditions', caption: 'Условия работы' },
         { id: 'DiggerPassports', caption: 'Паспорта загрузки' },
         { id: 'LoadTypes', caption: 'Виды грузов' },
-      ],
-    });
-    GlobalStore.AddTab({
-      id: 'reports',
-      type: 'report',
-      caption: 'Отчеты',
-      items: [
-        { id: 'map', caption: 'Карта' },
-        { id: 'tripsReport', caption: 'Отчет по рейсам' },
-        { id: 'loadsReport', caption: 'Отчет по погрузкам' },
       ],
     });
     GlobalStore.AddTab({

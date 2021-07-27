@@ -114,33 +114,34 @@ export class Tab {
               zoom: 13,
             }),
           }),
+          GetVectorLayer: () => {
+            return this.Options.MapObject.getLayers().array_[1];
+          },
+          GetTransportMarks: () => {
+            return this.Options.MapObject.getLayers()
+              .array_[1].getSource()
+              .getFeatures()
+              .filter((Feature) => {
+                if (/MarkTrack/.test(Feature.getId())) {
+                  return true;
+                }
+              });
+          },
+          GetTrackFeaturies: () => {
+            return this.Options.MapObject.getLayers()
+              .array_[1].getSource()
+              .getFeatures()
+              .filter((Feature) => {
+                if (/^Track\w{1,}/.test(Feature.getId())) {
+                  return true;
+                }
+              });
+          },
+          GetVectorLayerSource: () => {
+            return this.Options.MapObject.getLayers().array_[1].getSource();
+          },
         };
-        this.GetVectorLayer = () => {
-          return this.Options.MapObject.getLayers().array_[1];
-        };
-        this.GetTransportMarks = () => {
-          return this.Options.MapObject.getLayers()
-            .array_[1].getSource()
-            .getFeatures()
-            .filter((Feature) => {
-              if (/MarkTrack/.test(Feature.getId())) {
-                return true;
-              }
-            });
-        };
-        this.GetTrackFeaturies = () => {
-          return this.Options.MapObject.getLayers()
-            .array_[1].getSource()
-            .getFeatures()
-            .filter((Feature) => {
-              if (/^Track\w{1,}/.test(Feature.getId())) {
-                return true;
-              }
-            });
-        };
-        this.GetVectorLayerSource = () => {
-          return this.Options.MapObject.getLayers().array_[1].getSource();
-        };
+
         break;
       case 'setting':
         this.Options = {

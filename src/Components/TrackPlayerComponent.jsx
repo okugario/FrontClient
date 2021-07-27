@@ -25,7 +25,7 @@ export default class TrackPlayerComponent extends React.Component {
           .getCoordinates()
           .forEach((Coordinates) => {
             PlayerDataMap.set(Coordinates[2], {
-              Mark: this.props.ProviderStore.CurrentTab.GetVectorLayerSource().getFeatureById(
+              Mark: this.props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().getFeatureById(
                 `Mark${TrackFeature.getId()}`
               ),
               Coordinates: Coordinates,
@@ -110,10 +110,10 @@ export default class TrackPlayerComponent extends React.Component {
     this.props.ProviderStore.SetNewCurrentTimeTrackPlayer(
       this.props.ProviderStore.CurrentTab.Options.StartDate.unix()
     );
-    this.props.ProviderStore.CurrentTab.GetVectorLayerSource().forEachFeature(
+    this.props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().forEachFeature(
       (Feature) => {
         if (/MarkTrack/.test(Feature.getId())) {
-          this.props.ProviderStore.CurrentTab.GetVectorLayerSource().removeFeature(
+          this.props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().removeFeature(
             Feature
           );
         }

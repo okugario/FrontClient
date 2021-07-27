@@ -83,28 +83,30 @@ class Store {
   };
   DeleteTrack(TransportID) {
     if (
-      this.CurrentTab.GetVectorLayerSource().getFeatureById(
+      this.CurrentTab.Options.GetVectorLayerSource().getFeatureById(
         `Track${TransportID}`
       ) != null
     ) {
-      this.CurrentTab.GetVectorLayerSource().removeFeature(
+      this.CurrentTab.Options.GetVectorLayerSource().removeFeature(
         this.CurrentTab.GetVectorLayerSource().getFeatureById(
           `Track${TransportID}`
         )
       );
     }
     if (
-      this.CurrentTab.GetVectorLayerSource().getFeatureById(
+      this.CurrentTab.Options.GetVectorLayerSource().getFeatureById(
         `MarkTrack${TransportID}`
       ) != null
     ) {
-      this.CurrentTab.GetVectorLayerSource().removeFeature(
+      this.CurrentTab.Options.GetVectorLayerSource().removeFeature(
         this.CurrentTab.GetVectorLayerSource().getFeatureById(
           `MarkTrack${TransportID}`
         )
       );
     }
-    if (this.CurrentTab.GetVectorLayerSource().getFeatures().length != 0) {
+    if (
+      this.CurrentTab.Options.GetVectorLayerSource().getFeatures().length != 0
+    ) {
       this.CurrentTab.Options.MapObject.getView().fit(
         this.CurrentTab.GetVectorLayerSource().getExtent()
       );
@@ -115,21 +117,21 @@ class Store {
     this.CurrentTab.Options.CurrentTrackPlayerTime = Moment.unix(NewTime);
   }
   UpdateCurrentData(NewTransportKeys) {
+    const NewFilteredTransportKeys = NewTransportKeys.filter((Key) => {
+      return this.TransportTree.reduce(
+        (CheckedTransportArray, CurrentGroup, Index, GroupArray) => {
+          return CheckedTransportArray.concat(
+            CurrentGroup.children.map((Children) => {
+              return Children.key;
+            })
+          );
+        },
+        []
+      ).includes(Key);
+    });
     switch (this.CurrentTab.Options.CurrentMenuItem.id) {
       case 'map':
         let PromiseArray = [];
-        const NewFilteredTransportKeys = NewTransportKeys.filter((Key) => {
-          return this.TransportTree.reduce(
-            (CheckedTransportArray, CurrentGroup, Index, GroupArray) => {
-              return CheckedTransportArray.concat(
-                CurrentGroup.children.map((Children) => {
-                  return Children.key;
-                })
-              );
-            },
-            []
-          ).includes(Key);
-        });
         NewFilteredTransportKeys.forEach((NewTransportKey) => {
           if (
             !this.CurrentTab.Options.CheckedTransportKeys.includes(
@@ -150,9 +152,19 @@ class Store {
         if (PromiseArray.length != 0) {
           Promise.all(PromiseArray).then(() => {
             this.CurrentTab.Options.MapObject.getView().fit(
-              this.CurrentTab.GetVectorLayerSource().getExtent()
+              this.CurrentTab.Options.GetVectorLayerSource().getExtent()
             );
           });
+        }
+
+        break;
+      case 'loadsReport':
+        if (NewFilteredTransportKeys.length > 0) {
+          this.CurrentTab.Options.CheckedTransportKeys = [
+            NewTransportKeys[NewFilteredTransportKeys.length - 1],
+          ];
+        } else {
+          this.CurrentTab.Options.CheckedTransportKeys = [];
         }
 
         break;

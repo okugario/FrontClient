@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { observer, inject } from 'mobx-react';
-import { Table } from 'antd';
+import { Table, message } from 'antd';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import 'chartjs-adapter-moment';
 import { ApiFetch, GenerateTableData } from '../Helpers/Helpers';
@@ -38,43 +38,51 @@ export default class TripsReportComponent extends React.Component {
   }
 
   RequestReport() {
-    if (
-      this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys.length !=
-      0
-    ) {
-      return ApiFetch(
-        `reports/TripsReport?id=${
-          this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys[0]
-        }&sts=${this.props.ProviderStore.CurrentTab.Options.StartDate.unix()}&fts=${this.props.ProviderStore.CurrentTab.Options.EndDate.unix()}`,
-        'GET',
-        undefined,
-        (Response) => {
-          this.setState({
-            TripsChartData: Response.tripsPoints,
-            LoadingChartData: Response.weightPoints,
-            LoadingCanChartData: Response.weightCANPoints,
-            GroupsTableColumns: GenerateTableData(
-              'Columns',
-              Response.groupsTable.columns
-            ),
-            GroupsTableRows: GenerateTableData(
-              'Rows',
-              Response.groupsTable.rows
-            ),
-            TripsTableRows: GenerateTableData('Rows', Response.tripsTable.rows),
-            TripsTableColumns: GenerateTableData(
-              'Columns',
-              Response.tripsTable.columns
-            ),
-            InfoTableColumns: GenerateTableData(
-              'NoColumns',
-              Response.infoTable.rows
-            ),
-            InfoTableRows: GenerateTableData('Rows', Response.infoTable.rows),
-          });
-        }
-      );
-    }
+    return new Promise((resolve, reject) => {
+      if (
+        this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys
+          .length != 0
+      ) {
+        ApiFetch(
+          `reports/TripsReport?id=${
+            this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys[0]
+          }&sts=${this.props.ProviderStore.CurrentTab.Options.StartDate.unix()}&fts=${this.props.ProviderStore.CurrentTab.Options.EndDate.unix()}`,
+          'GET',
+          undefined,
+          (Response) => {
+            this.setState({
+              TripsChartData: Response.tripsPoints,
+              LoadingChartData: Response.weightPoints,
+              LoadingCanChartData: Response.weightCANPoints,
+              GroupsTableColumns: GenerateTableData(
+                'Columns',
+                Response.groupsTable.columns
+              ),
+              GroupsTableRows: GenerateTableData(
+                'Rows',
+                Response.groupsTable.rows
+              ),
+              TripsTableRows: GenerateTableData(
+                'Rows',
+                Response.tripsTable.rows
+              ),
+              TripsTableColumns: GenerateTableData(
+                'Columns',
+                Response.tripsTable.columns
+              ),
+              InfoTableColumns: GenerateTableData(
+                'NoColumns',
+                Response.infoTable.rows
+              ),
+              InfoTableRows: GenerateTableData('Rows', Response.infoTable.rows),
+            });
+            resolve();
+          }
+        );
+      } else {
+        reject();
+      }
+    });
   }
   InitCharts() {
     this.ChartRef.current.getContext('2d');
@@ -162,9 +170,13 @@ export default class TripsReportComponent extends React.Component {
     return Result;
   }
   componentDidMount() {
-    this.RequestReport().then(() => {
-      this.InitCharts();
-    });
+    this.RequestReport()
+      .then(() => {
+        this.InitCharts();
+      })
+      .catch(() => {
+        message.warning('Нет данных для построения отчета.');
+      });
   }
   render() {
     return (
