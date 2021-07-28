@@ -34,7 +34,6 @@ const ComponentList = [
     Component: React.lazy(() => import('./JornalComponent')),
     Keys: ['journal'],
   },
-
 ];
 @observer
 export default class App extends React.Component {
@@ -55,11 +54,16 @@ export default class App extends React.Component {
       ],
     });
     GlobalStore.AddTab({
+      caption: 'Действия',
+      id: 'workplace',
+      type: 'workplace',
+      items: [{ caption: 'Наряды экскаваторов', id: 'DiggerOrders' }],
+    });
+    GlobalStore.AddTab({
       id: 'settings',
       type: 'setting',
       caption: 'Администрирование',
       items: [
-        { id: 'RetransTargets', caption: 'Ретрансляторы' },
         { id: 'statistic', caption: 'Статистика' },
         { id: 'Vehicles', caption: 'Транспорт' },
         { id: 'Regions', caption: 'Участки' },
@@ -69,13 +73,8 @@ export default class App extends React.Component {
         { id: 'WorkConditions', caption: 'Условия работы' },
         { id: 'DiggerPassports', caption: 'Паспорта загрузки' },
         { id: 'LoadTypes', caption: 'Виды грузов' },
+        { id: 'RetransTargets', caption: 'Ретрансляторы' },
       ],
-    });
-    GlobalStore.AddTab({
-      caption: 'Действия',
-      id: 'workplace',
-      type: 'workplace',
-      items: [{ caption: 'Наряды экскаваторов', id: 'DiggerOrders' }],
     });
   }
   GetComponent(ComponentID) {
