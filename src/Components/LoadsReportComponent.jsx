@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { observer, inject } from 'mobx-react';
 import { reaction } from 'mobx';
-import { Table } from 'antd';
+import { Table, message } from 'antd';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import { ApiFetch } from '../Helpers/Helpers';
 import 'chartjs-adapter-moment';
@@ -161,7 +161,9 @@ export default class LoadsReportComponent extends React.Component {
               }
             );
           }
-        );
+        ).catch(() => {
+          message.warn('Нет данных для построения отчета.');
+        });
       } else {
         this.Chart.update('hide');
         this.setState({
