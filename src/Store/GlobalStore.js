@@ -168,6 +168,15 @@ class Store {
         }
 
         break;
+        case"tripsReport":
+        if (NewFilteredTransportKeys.length > 0) {
+          this.CurrentTab.Options.CheckedTransportKeys = [
+            NewTransportKeys[NewFilteredTransportKeys.length - 1],
+          ];
+        } else {
+          this.CurrentTab.Options.CheckedTransportKeys = [];
+        }
+        break
     }
   }
   SetNewDateTimeInterval(NewStartDate, NewEndDate) {

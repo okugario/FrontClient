@@ -15,16 +15,6 @@ const ComponentList = [
   },
 
   {
-    Component: React.lazy(() => import('./MapComponent')),
-    Keys: ['map'],
-  },
-
-  { Component: React.lazy(() => import('./UsersComponent')), Keys: ['Users'] },
-  {
-    Component: React.lazy(() => import('./TyrespressReportComponent')),
-    Keys: ['tyrespressReport'],
-  },
-  {
     Component: React.lazy(() => import('./TransportTreeComponent')),
     Keys: ['TransportTree'],
   },
@@ -44,10 +34,7 @@ const ComponentList = [
     Component: React.lazy(() => import('./JornalComponent')),
     Keys: ['journal'],
   },
-  {
-    Component: React.lazy(() => import('./ExhaustTemperatureComponent')),
-    Keys: ['exhaustTemperature'],
-  },
+
 ];
 @observer
 export default class App extends React.Component {

@@ -75,17 +75,21 @@ export default class LoadsReportComponent extends React.Component {
           ],
         },
         options: {
+          responsive: true,
           plugins: {
             legend: { display: true, position: 'bottom' },
+            zoom: {
+              zoom: { wheel: { enabled: true }, mode: 'x' },
+              pan: {
+                enabled: true,
+                mode: 'x',
+              },
+            },
           },
-          responsive: true,
           scales: {
             x: {
               type: 'time',
-              time: {
-                unit: 'hour',
-                displayFormats: { hour: 'HH:MM:SS' },
-              },
+              time: { unit: 'hour', displayFormats: { hour: 'hh:mm:ss' } },
             },
           },
         },
@@ -93,7 +97,8 @@ export default class LoadsReportComponent extends React.Component {
     }
   };
   RequestReport() {
-    if (
+    if(this.props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id=="loadsReport"){
+          if (
       this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys.length !=
       0
     ) {
@@ -143,6 +148,8 @@ export default class LoadsReportComponent extends React.Component {
         LoadsTableSummary: [],
       });
     }
+    }
+
   }
   componentDidMount() {
     this.InitChart();
@@ -169,6 +176,7 @@ export default class LoadsReportComponent extends React.Component {
         style={{ display: 'grid', gridTemplateRows: '1fr 1fr' }}
       >
         <div>
+        <strong>{"Наименование"}</strong>
           <canvas
             ref={this.ChartRef}
             style={{ height: '200px', width: '700px' }}
