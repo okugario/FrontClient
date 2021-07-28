@@ -27,8 +27,7 @@ export default class LoadsReportComponent extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      InfoTableRows: [],
-      InfoTableColumns: [],
+      SummaryTables: [],
       LoadsTableRows: [],
       LoadsTableColumns: [],
       LoadsChartData: [],
@@ -138,14 +137,7 @@ export default class LoadsReportComponent extends React.Component {
               {
                 LoadsTableSummary: Response.loadsTable.summary,
                 LoadsChartData: Response.loadsPoints,
-                InfoTableRows: GenerateTableData(
-                  'Rows',
-                  Response.infoTable.rows
-                ),
-                InfoTableColumns: GenerateTableData(
-                  'NoColumns',
-                  Response.infoTable.rows
-                ),
+                SummaryTables: Response.summaryTables,
                 LoadsTableRows: GenerateTableData(
                   'Rows',
                   Response.loadsTable.rows
@@ -170,8 +162,7 @@ export default class LoadsReportComponent extends React.Component {
       } else {
         this.Chart.update('hide');
         this.setState({
-          InfoTableRows: [],
-          InfoTableColumns: [],
+          SummaryTables: [],
           LoadsTableRows: [],
           LoadsTableColumns: [],
           LoadsChartData: [],
@@ -202,53 +193,65 @@ export default class LoadsReportComponent extends React.Component {
     return (
       <div
         className="FullExtend"
-        style={{ display: 'grid', gridTemplateRows: '1fr 1fr' }}
+        style={{ display: 'grid', gridTemplateColumns: '3fr 1fr' }}
       >
-        <div>
-          <strong>{this.GetReportTitle()}</strong>
-          <canvas
-            onDoubleClick={() => {
-              this.Chart.resetZoom();
-            }}
-            ref={this.ChartRef}
-            style={{ height: '200px', width: '700px' }}
-          />
+        <div style={{ display: 'grid', gridTemplateRows: '1fr 1fr' }}>
+          <div style={{ height: '100%', width: '100%' }}>
+            <strong>{this.GetReportTitle()}</strong>
+            <canvas
+              onDoubleClick={() => {
+                this.Chart.resetZoom();
+              }}
+              ref={this.ChartRef}
+              style={{ height: '100%', width: '100%' }}
+            />
+          </div>
+          <div>
+            <Table
+              summary={() => {
+                return (
+                  <Table.Summary fixed={true}>
+                    {this.state.LoadsTableSummary.map((Row, Index) => {
+                      return (
+                        <Table.Summary.Row key={Index}>
+                          {Row.map((Value, Index) => {
+                            return (
+                              <Table.Summary.Cell key={Index}>
+                                {Value}
+                              </Table.Summary.Cell>
+                            );
+                          })}
+                        </Table.Summary.Row>
+                      );
+                    })}
+                  </Table.Summary>
+                );
+              }}
+              scroll={{ y: 170 }}
+              size="small"
+              columns={this.state.LoadsTableColumns}
+              dataSource={this.state.LoadsTableRows}
+              pagination={false}
+            />
+          </div>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr' }}>
-          <Table
-            summary={() => {
-              return (
-                <Table.Summary fixed={true}>
-                  {this.state.LoadsTableSummary.map((Row, Index) => {
-                    return (
-                      <Table.Summary.Row key={Index}>
-                        {Row.map((Value, Index) => {
-                          return (
-                            <Table.Summary.Cell key={Index}>
-                              {Value}
-                            </Table.Summary.Cell>
-                          );
-                        })}
-                      </Table.Summary.Row>
-                    );
-                  })}
-                </Table.Summary>
-              );
-            }}
-            scroll={{ y: 170 }}
-            size="small"
-            columns={this.state.LoadsTableColumns}
-            dataSource={this.state.LoadsTableRows}
-            pagination={false}
-          />
-          <Table
-            scroll={{ y: 200 }}
-            size="small"
-            showHeader={false}
-            columns={this.state.InfoTableColumns}
-            dataSource={this.state.InfoTableRows}
-            pagination={false}
-          />
+        <div style={{ overflowY: 'auto', height: '500px' }}>
+          {this.state.SummaryTables.map((ObjectTable, Index) => {
+            ObjectTable.table.rows.push(ObjectTable.table.summary[0]);
+            return (
+              <Table
+                pagination={false}
+                key={Index}
+                size="small"
+                title={() => <strong>{ObjectTable.caption}</strong>}
+                columns={GenerateTableData(
+                  'Columns',
+                  ObjectTable.table.columns
+                )}
+                dataSource={GenerateTableData('Rows', ObjectTable.table.rows)}
+              />
+            );
+          })}
         </div>
       </div>
     );

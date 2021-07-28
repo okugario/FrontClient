@@ -71,10 +71,14 @@ class Store {
                   }),
                 })
               );
-              this.CurrentTab.GetVectorLayerSource().addFeature(Feature);
+              this.CurrentTab.Options.GetVectorLayerSource().addFeature(
+                Feature
+              );
             }
 
-            this.CurrentTab.GetVectorLayerSource().addFeature(NewFeature);
+            this.CurrentTab.Options.GetVectorLayerSource().addFeature(
+              NewFeature
+            );
           }
           resolve();
         }
@@ -88,7 +92,7 @@ class Store {
       ) != null
     ) {
       this.CurrentTab.Options.GetVectorLayerSource().removeFeature(
-        this.CurrentTab.GetVectorLayerSource().getFeatureById(
+        this.CurrentTab.Options.GetVectorLayerSource().getFeatureById(
           `Track${TransportID}`
         )
       );
@@ -99,7 +103,7 @@ class Store {
       ) != null
     ) {
       this.CurrentTab.Options.GetVectorLayerSource().removeFeature(
-        this.CurrentTab.GetVectorLayerSource().getFeatureById(
+        this.CurrentTab.Options.GetVectorLayerSource().getFeatureById(
           `MarkTrack${TransportID}`
         )
       );
