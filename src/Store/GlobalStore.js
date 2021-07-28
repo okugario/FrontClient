@@ -168,7 +168,7 @@ class Store {
         }
 
         break;
-        case"tripsReport":
+      case 'tripsReport':
         if (NewFilteredTransportKeys.length > 0) {
           this.CurrentTab.Options.CheckedTransportKeys = [
             NewTransportKeys[NewFilteredTransportKeys.length - 1],
@@ -176,7 +176,7 @@ class Store {
         } else {
           this.CurrentTab.Options.CheckedTransportKeys = [];
         }
-        break
+        break;
     }
   }
   SetNewDateTimeInterval(NewStartDate, NewEndDate) {
@@ -188,6 +188,7 @@ class Store {
   SetNewTransportTree(TransportData) {
     this.TransportTree = TransportData.map((Group) => {
       return {
+        disableCheckbox: true,
         selectable: false,
         title: Group.Caption,
         key: Group.Id,

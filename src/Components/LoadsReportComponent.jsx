@@ -96,60 +96,89 @@ export default class LoadsReportComponent extends React.Component {
       });
     }
   };
-  RequestReport() {
-    if(this.props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id=="loadsReport"){
-          if (
+  GetReportTitle() {
+    let Result = null;
+    if (
       this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys.length !=
       0
     ) {
-      ApiFetch(
-        `reports/LoadsReport?id=${
-          this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys[0]
-        }&sts=${this.props.ProviderStore.CurrentTab.Options.StartDate.unix()}&fts=${this.props.ProviderStore.CurrentTab.Options.EndDate.unix()}`,
-        'GET',
-        undefined,
-        (Response) => {
-          this.setState(
-            {
-              LoadsTableSummary: Response.loadsTable.summary,
-              LoadsChartData: Response.loadsPoints,
-              InfoTableRows: GenerateTableData('Rows', Response.infoTable.rows),
-              InfoTableColumns: GenerateTableData(
-                'NoColumns',
-                Response.infoTable.rows
-              ),
-              LoadsTableRows: GenerateTableData(
-                'Rows',
-                Response.loadsTable.rows
-              ),
-              LoadsTableColumns: GenerateTableData(
-                'Columns',
-                Response.loadsTable.columns
-              ),
-            },
-            () => {
-              this.Chart.data.labels = this.state.LoadsChartData.map((Data) => {
-                return Data[0];
-              });
-              this.Chart.data.datasets[0].data = this.state.LoadsChartData;
-              this.Chart.update('show');
-            }
-          );
-        }
-      );
-    } else {
-      this.Chart.update('hide');
-      this.setState({
-        InfoTableRows: [],
-        InfoTableColumns: [],
-        LoadsTableRows: [],
-        LoadsTableColumns: [],
-        LoadsChartData: [],
-        LoadsTableSummary: [],
+      this.props.ProviderStore.TransportTree.forEach((TreeNode) => {
+        TreeNode.children.forEach((Transport) => {
+          if (
+            Transport.key ==
+            this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys[0]
+          ) {
+            Result = Transport.title;
+          }
+        });
       });
-    }
+    } else {
+      Result = 'Транспортное средство не выбрано';
     }
 
+    return Result;
+  }
+  RequestReport() {
+    if (
+      this.props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id ==
+      'loadsReport'
+    ) {
+      if (
+        this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys
+          .length != 0
+      ) {
+        ApiFetch(
+          `reports/LoadsReport?id=${
+            this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys[0]
+          }&sts=${this.props.ProviderStore.CurrentTab.Options.StartDate.unix()}&fts=${this.props.ProviderStore.CurrentTab.Options.EndDate.unix()}`,
+          'GET',
+          undefined,
+          (Response) => {
+            this.setState(
+              {
+                LoadsTableSummary: Response.loadsTable.summary,
+                LoadsChartData: Response.loadsPoints,
+                InfoTableRows: GenerateTableData(
+                  'Rows',
+                  Response.infoTable.rows
+                ),
+                InfoTableColumns: GenerateTableData(
+                  'NoColumns',
+                  Response.infoTable.rows
+                ),
+                LoadsTableRows: GenerateTableData(
+                  'Rows',
+                  Response.loadsTable.rows
+                ),
+                LoadsTableColumns: GenerateTableData(
+                  'Columns',
+                  Response.loadsTable.columns
+                ),
+              },
+              () => {
+                this.Chart.data.labels = this.state.LoadsChartData.map(
+                  (Data) => {
+                    return Data[0];
+                  }
+                );
+                this.Chart.data.datasets[0].data = this.state.LoadsChartData;
+                this.Chart.update('show');
+              }
+            );
+          }
+        );
+      } else {
+        this.Chart.update('hide');
+        this.setState({
+          InfoTableRows: [],
+          InfoTableColumns: [],
+          LoadsTableRows: [],
+          LoadsTableColumns: [],
+          LoadsChartData: [],
+          LoadsTableSummary: [],
+        });
+      }
+    }
   }
   componentDidMount() {
     this.InitChart();
@@ -176,8 +205,11 @@ export default class LoadsReportComponent extends React.Component {
         style={{ display: 'grid', gridTemplateRows: '1fr 1fr' }}
       >
         <div>
-        <strong>{"Наименование"}</strong>
+          <strong>{this.GetReportTitle()}</strong>
           <canvas
+            onDoubleClick={() => {
+              this.Chart.resetZoom();
+            }}
             ref={this.ChartRef}
             style={{ height: '200px', width: '700px' }}
           />
