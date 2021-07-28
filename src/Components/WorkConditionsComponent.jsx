@@ -6,7 +6,8 @@ import { ApiFetch, CheckUniqale } from '../Helpers/Helpers';
 import Moment from 'moment';
 import ProfilePageHandler from './ProfilePageHandler';
 import LoadsPassportProfile from './LoadsPassportProfile';
-export default function WorkConditionsComponent(props) {
+import { inject, observer } from 'mobx-react';
+const  WorkConditionsComponent=inject('ProviderStore')(observer((props) =>{
   const [ProfileMode, SetNewProfileMode] = useState({
     Title: 'Профиль условий работы',
     Mode: 'WorkConditions',
@@ -493,11 +494,13 @@ export default function WorkConditionsComponent(props) {
     });
   };
   const RequestTable = () => {
-    return ApiFetch('model/WorkConditions', 'GET', undefined, (Response) => {
+    if(props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id =="WorkConditions"){
+       return ApiFetch('model/WorkConditions', 'GET', undefined, (Response) => {
       SetNewWorkConditionsTable(Response.data);
     });
+    }
   };
-  useEffect(RequestTable, []);
+  useEffect(RequestTable, [props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id]);
   return (
     <>
       <Modal
@@ -618,4 +621,5 @@ export default function WorkConditionsComponent(props) {
       />
     </>
   );
-}
+}))
+export default WorkConditionsComponent

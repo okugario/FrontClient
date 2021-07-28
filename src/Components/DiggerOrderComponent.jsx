@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react';
 import { Table, DatePicker, Select, Button, Modal, message } from 'antd';
 import { ApiFetch } from '../Helpers/Helpers';
 import Moment from 'moment';
-export default function DiggerOrderComponent(props) {
+import { inject, observer } from 'mobx-react';
+const DiggerOrderComponent =inject('ProviderStore')(observer((props)=> {
   const [DiggerOrdersTable, SetNewDiggerOrdersTable] = useState([]);
   const [DiggerList, SetNewDiggerList] = useState(null);
   const [LoadTypesList, SetNewLoadTypesList] = useState(null);
@@ -104,7 +105,8 @@ export default function DiggerOrderComponent(props) {
     }
   };
   const RequestDiggerOrders = () => {
-    ApiFetch('model/DiggerOrders', 'GET', undefined, (Response) => {
+    if(props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id=="DiggerOrders"){
+          ApiFetch('model/DiggerOrders', 'GET', undefined, (Response) => {
       SetNewDiggerOrdersTable(
         Response.data.map((DiggerOrder) => {
           DiggerOrder.Edited = false;
@@ -141,8 +143,10 @@ export default function DiggerOrderComponent(props) {
     }).then((Digger) => {
       SetNewDiggerList(Digger);
     });
+    }
+
   };
-  useEffect(RequestDiggerOrders, []);
+  useEffect(RequestDiggerOrders, [props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id]);
   return (
     <>
       <div
@@ -302,4 +306,5 @@ export default function DiggerOrderComponent(props) {
       />
     </>
   );
-}
+}))
+export default DiggerOrderComponent

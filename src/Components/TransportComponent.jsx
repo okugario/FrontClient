@@ -6,8 +6,9 @@ import { ApiFetch } from '../Helpers/Helpers';
 import Moment from 'moment';
 import ProfilePageHandler from './ProfilePageHandler';
 import TerminalProfileComponent from './TerminalProfileComponent';
+import { inject, observer } from 'mobx-react';
 
-export default function TransportComponent() {
+const TransportComponent = inject('ProviderStore')(observer ((props)=> {
   const [TransportTable, SetNewTransportTable] = useState(null);
   const [ProfileMode, SetNewProfileMode] = useState({
     Mode: 'TransportProfile',
@@ -310,9 +311,12 @@ export default function TransportComponent() {
     }
   };
   const RequestTransportTable = () => {
-    return ApiFetch('model/Vehicles', 'GET', undefined, (Response) => {
+    if(props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id =="Vehicles"){
+         return ApiFetch('model/Vehicles', 'GET', undefined, (Response) => {
       SetNewTransportTable(Response.data);
     });
+    }
+ 
   };
   const RequestProfile = () => {
     let NewProfile = {};
@@ -352,7 +356,7 @@ export default function TransportComponent() {
       SetNewProfile(NewProfile);
     });
   };
-  useEffect(RequestTransportTable, []);
+  useEffect(RequestTransportTable, [props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id]);
   return (
     <div className="FullExtend">
       <Modal
@@ -500,4 +504,5 @@ export default function TransportComponent() {
       />
     </div>
   );
-}
+}))
+export default TransportComponent

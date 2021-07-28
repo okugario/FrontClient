@@ -4,7 +4,8 @@ import { Table, Modal, Button, message } from 'antd';
 import { TableSorter, ApiFetch } from '../Helpers/Helpers';
 import RetranslationProfile from './RetranslationProfile';
 import Moment from 'moment';
-export default function RetranslationComponent() {
+import { inject, observer } from 'mobx-react';
+const RetranslationComponent =inject('ProviderStore')(observer ((props) =>{
   const [RetranslationTable, SetNewTable] = useState(null);
   const [SelectedKey, SetNewSelectedKey] = useState(null);
   const [ShowProfile, SetNewShowProfile] = useState(false);
@@ -160,11 +161,14 @@ export default function RetranslationComponent() {
     }
   };
   const RequestTable = () => {
-    return ApiFetch('model/RetransTargets', 'GET', undefined, (Response) => {
+    if(props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id =="RetransTargets"){
+          return ApiFetch('model/RetransTargets', 'GET', undefined, (Response) => {
       SetNewTable(Response.data);
     });
+    }
+
   };
-  useEffect(RequestTable, []);
+  useEffect(RequestTable,[props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id]);
   return (
     <div className="FullExtend">
       <Modal
@@ -280,4 +284,6 @@ export default function RetranslationComponent() {
       />
     </div>
   );
-}
+}))
+export default RetranslationComponent
+

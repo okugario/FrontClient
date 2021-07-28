@@ -133,7 +133,7 @@ const ObjectsComponent = inject('ProviderStore')(
           break;
       }
     };
-    useEffect(RequestTable, []);
+    useEffect(RequestTable, [props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id]);
     return (
       <div className="FullExtend">
         <div

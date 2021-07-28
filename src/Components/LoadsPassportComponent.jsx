@@ -5,14 +5,16 @@ import { Button, Table, Modal, message } from 'antd';
 import { ApiFetch, CheckUniqale } from '../Helpers/Helpers';
 import Moment from 'moment';
 import LoadsPassportProfile from './LoadsPassportProfile';
+import { inject, observer } from 'mobx-react';
 
-export default function LoadsPassportComponent(props) {
+const LoadsPassportComponent =inject('ProviderStore')(observer((props)=> {
   const [PassportsTable, SetNewPassportsTable] = useState([]);
   const [SelectedKey, SetNewSelectedKey] = useState(null);
   const [ShowProfile, SetNewShowProfile] = useState(false);
   const [Profile, SetNewProfile] = useState(null);
   const RequestPassportsTable = () => {
-    return ApiFetch('model/DiggerPassports', 'GET', undefined, (Response) => {
+    if(props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id=="DiggerPassports"){
+          return ApiFetch('model/DiggerPassports', 'GET', undefined, (Response) => {
       SetNewPassportsTable(
         Response.data.map((Passport, Index) => {
           return {
@@ -26,6 +28,7 @@ export default function LoadsPassportComponent(props) {
         })
       );
     });
+    }
   };
 
   const LoadsPassportHandler = (Action, Data, Index) => {
@@ -196,7 +199,7 @@ export default function LoadsPassportComponent(props) {
       SetNewProfile(NewProfile);
     });
   };
-  useEffect(RequestPassportsTable, []);
+  useEffect(RequestPassportsTable, [props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id]);
   return (
     <>
       <Modal
@@ -318,3 +321,5 @@ export default function LoadsPassportComponent(props) {
     </>
   );
 }
+)) 
+export default LoadsPassportComponent
