@@ -133,7 +133,9 @@ const ObjectsComponent = inject('ProviderStore')(
           break;
       }
     };
-    useEffect(RequestTable, [props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id]);
+    useEffect(RequestTable, [
+      props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id,
+    ]);
     return (
       <div className="FullExtend">
         <div
@@ -182,7 +184,7 @@ const ObjectsComponent = inject('ProviderStore')(
           </Button>
         </div>
         <Table
-          scroll={{ scrollToFirstRowOnChange: true, y: 700 }}
+          scroll={{ y: 700 }}
           pagination={false}
           rowSelection={{
             columnWidth: 0,

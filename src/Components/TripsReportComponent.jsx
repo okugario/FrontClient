@@ -38,26 +38,29 @@ export default class TripsReportComponent extends React.Component {
     this.Chart = null;
   }
   GetReportTitle() {
-    let Result = null;
-    if (
-      this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys.length !=
-      0
-    ) {
-      this.props.ProviderStore.TransportTree.forEach((TreeNode) => {
-        TreeNode.children.forEach((Transport) => {
-          if (
-            Transport.key ==
-            this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys[0]
-          ) {
-            Result = Transport.title;
-          }
+    if (this.props.ProviderStore.CurrentTab.Id == 'reports') {
+      let Result = null;
+      if (
+        this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys
+          .length != 0
+      ) {
+        this.props.ProviderStore.TransportTree.forEach((TreeNode) => {
+          TreeNode.children.forEach((Transport) => {
+            if (
+              Transport.key ==
+              this.props.ProviderStore.CurrentTab.Options
+                .CheckedTransportKeys[0]
+            ) {
+              Result = Transport.title;
+            }
+          });
         });
-      });
-    } else {
-      Result = 'Транспортное средство не выбрано';
-    }
+      } else {
+        Result = 'Транспортное средство не выбрано';
+      }
 
-    return Result;
+      return Result;
+    }
   }
   RequestReport() {
     if (

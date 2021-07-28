@@ -100,7 +100,7 @@ export default class StatisticComponent extends React.Component {
           size="small"
           columns={this.state.Columns}
           dataSource={this.state.Table}
-          scroll={{ scrollToFirstRowOnChange: true, y: 700 }}
+          scroll={{ y: 700 }}
         />
       </>
     );
