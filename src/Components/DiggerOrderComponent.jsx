@@ -38,7 +38,8 @@ const DiggerOrderComponent = inject('ProviderStore')(
           if (
             NewDiggerOrdersTable.some((Order) => {
               return Order.Edited;
-            })
+            }) &&
+            NewDiggerOrdersTable[Index].Edited == false
           ) {
             message.warning('Сохраните предыдущий наряд');
           } else {
