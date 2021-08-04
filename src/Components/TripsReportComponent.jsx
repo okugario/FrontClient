@@ -41,7 +41,7 @@ export default class TripsReportComponent extends React.Component {
   }
   GetReportTitle() {
     if (this.props.ProviderStore.CurrentTab.Id == 'reports') {
-      let Result = null;
+      let Result = 'Транспортное средство не выбрано';
       if (
         this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys
           .length != 0
@@ -57,8 +57,6 @@ export default class TripsReportComponent extends React.Component {
             }
           });
         });
-      } else {
-        Result = 'Транспортное средство не выбрано';
       }
 
       return Result;
@@ -280,6 +278,7 @@ export default class TripsReportComponent extends React.Component {
                 enabled: true,
                 mode: 'x',
               },
+              limits: { x: { min: 'original', max: 'original' } },
             },
           },
           scales: {

@@ -80,6 +80,7 @@ export default class LoadsReportComponent extends React.Component {
           plugins: {
             legend: { display: true, position: 'bottom' },
             zoom: {
+              limits: { x: { min: 'original', max: 'original' } },
               zoom: { wheel: { enabled: true }, mode: 'x' },
               pan: {
                 enabled: true,
