@@ -36,7 +36,7 @@ export const ApiFetch = (Adress, Method, Body, Callback) => {
       });
   });
 };
-export function GenerateTableData(Mode, Data) {
+export function GenerateTableData(Mode, Data, Options) {
   let FormatData = null;
   switch (Mode) {
     case 'Rows':
@@ -50,20 +50,28 @@ export function GenerateTableData(Mode, Data) {
       break;
     case 'Columns':
       FormatData = Data.map((Column, Index) => {
-        return {
-          dataIndex: `${Index}`,
-          title: typeof Column == 'object' ? Column.caption : Column,
-          key: `${Index}`,
-        };
-      });
-      break;
-    case 'NoColumns':
-      FormatData = Data.map((Column, Index) => {
-        return {
-          dataIndex: `${Index}`,
-          title: '',
-          key: `${Index}`,
-        };
+        let NewColumn = {};
+        if (Options != undefined) {
+          Object.assign(NewColumn, Options, {
+            dataIndex: `${Index}`,
+            key: `${Index}`,
+          });
+          if ('TitleStyle' in Options) {
+            NewColumn.title = NewColumn.TitleStyle(
+              typeof Column == 'object' ? Column.caption : Column
+            );
+          } else {
+            NewColumn.title =
+              typeof Column == 'object' ? Column.caption : Column;
+          }
+        } else {
+          NewColumn = {
+            dataIndex: `${Index}`,
+            key: `${Index}`,
+            title: typeof Column == 'object' ? Column.caption : Column,
+          };
+        }
+        return NewColumn;
       });
       break;
   }

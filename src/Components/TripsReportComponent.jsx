@@ -87,7 +87,37 @@ export default class TripsReportComponent extends React.Component {
                 LoadingCanChartData: Response.weightCANPoints,
                 GroupsTableColumns: GenerateTableData(
                   'Columns',
-                  Response.groupsTable.columns
+                  Response.groupsTable.columns,
+                  {
+                    render: (Text, Record, Index) => {
+                      return (
+                        <div
+                          style={{
+                            fontSize: '10px',
+
+                            textAlign: 'center',
+                          }}
+                        >
+                          {Text}
+                        </div>
+                      );
+                    },
+                    TitleStyle: (Text) => {
+                      return (
+                        <div
+                          style={{
+                            fontSize: '10px',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            textAlign: 'center',
+                          }}
+                        >
+                          {Text}
+                        </div>
+                      );
+                    },
+                  }
                 ),
                 GroupsTableRows: GenerateTableData(
                   'Rows',
@@ -99,11 +129,53 @@ export default class TripsReportComponent extends React.Component {
                 ),
                 TripsTableColumns: GenerateTableData(
                   'Columns',
-                  Response.tripsTable.columns
+                  Response.tripsTable.columns,
+                  {
+                    render: (Text, Record, Index) => {
+                      return (
+                        <div
+                          style={{
+                            fontSize: '10px',
+                          }}
+                        >
+                          {Text}
+                        </div>
+                      );
+                    },
+                    TitleStyle: (Text) => {
+                      return (
+                        <div
+                          style={{
+                            fontSize: '10px',
+                            wordBreak: 'break-word',
+                            textAlign: 'center',
+                          }}
+                        >
+                          {Text}
+                        </div>
+                      );
+                    },
+                  }
                 ),
                 InfoTableColumns: GenerateTableData(
-                  'NoColumns',
-                  Response.infoTable.rows
+                  'Columns',
+                  Response.infoTable.rows,
+                  {
+                    render: (Text, Record, Index) => {
+                      return (
+                        <div
+                          style={{
+                            fontSize: '10px',
+                          }}
+                        >
+                          {Text}
+                        </div>
+                      );
+                    },
+                    TitleStyle: (Text) => {
+                      return '';
+                    },
+                  }
                 ),
                 InfoTableRows: GenerateTableData(
                   'Rows',
