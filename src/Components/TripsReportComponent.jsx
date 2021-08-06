@@ -25,7 +25,7 @@ export default class TripsReportComponent extends React.Component {
     super(props);
     this.ChartRef = React.createRef();
     this.UpdateInKeys = null;
-    this.UpdateInDate = null;
+
     this.state = {
       TripsChartData: [],
       LoadingChartData: [],
@@ -298,14 +298,7 @@ export default class TripsReportComponent extends React.Component {
   componentDidMount() {
     this.InitCharts();
     this.RequestReport();
-    this.UpdateInDate = reaction(
-      () =>
-        this.props.ProviderStore.CurrentTab.Options.StartDate ||
-        this.props.ProviderStore.CurrentTab.Options.EndDate,
-      () => {
-        this.RequestReport();
-      }
-    );
+
     this.UpdateInKeys = reaction(
       () => this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys,
       () => {
@@ -315,7 +308,6 @@ export default class TripsReportComponent extends React.Component {
   }
   componentWillUnmount() {
     this.UpdateInKeys();
-    this.UpdateInDate();
   }
 
   render() {

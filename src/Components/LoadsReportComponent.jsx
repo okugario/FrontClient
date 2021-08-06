@@ -26,7 +26,6 @@ import {
 export default class LoadsReportComponent extends React.Component {
   constructor(props) {
     super(props);
-    this.UpdateInDate = null;
     this.UpdateInKeys = null;
     this.state = {
       SummaryTables: [],
@@ -179,18 +178,11 @@ export default class LoadsReportComponent extends React.Component {
       }
     }
   }
-  Reactions() {}
+
   componentDidMount() {
     this.InitChart();
     this.RequestReport();
-    this.UpdateInDate = reaction(
-      () =>
-        this.props.ProviderStore.CurrentTab.Options.StartDate ||
-        this.props.ProviderStore.CurrentTab.Options.EndDate,
-      () => {
-        this.RequestReport();
-      }
-    );
+
     this.UpdateInKeys = reaction(
       () => this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys,
       () => {
@@ -200,7 +192,6 @@ export default class LoadsReportComponent extends React.Component {
   }
   componentWillUnmount() {
     this.UpdateInKeys();
-    this.UpdateInDate();
   }
   render() {
     return (

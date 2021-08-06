@@ -15,14 +15,13 @@ export default class IntervalComponent extends React.Component {
       EndDate: this.props.ProviderStore.CurrentTab.Options.EndDate.clone(),
     };
   }
-  RequestTransportTree(Callback) {
-    ApiFetch(
+  RequestTransportTree() {
+    return ApiFetch(
       `reports/VehicleTree?ts=${this.props.ProviderStore.CurrentTab.Options.StartDate.unix()}`,
       'GET',
       undefined,
       (Response) => {
         this.props.ProviderStore.SetNewTransportTree(Response.data);
-        Callback();
       }
     );
   }
@@ -61,7 +60,9 @@ export default class IntervalComponent extends React.Component {
           this.state.StartDate,
           this.state.EndDate
         );
-        this.RequestTransportTree(this.ModalHandler);
+        this.RequestTransportTree().then(() => {
+          this.ModalHandler(false);
+        });
         break;
       case 'Cancel':
         this.ModalHandler(false);
