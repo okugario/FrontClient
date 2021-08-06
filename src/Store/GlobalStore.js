@@ -7,6 +7,7 @@ import * as Moment from 'moment';
 import { Icon, Style, Text } from 'ol/style';
 import GeoJSON from 'ol/format/GeoJSON';
 import TruckSVG from '../Svg/Truck.svg';
+import { message } from 'antd';
 
 class Store {
   TransportTree = [];
@@ -23,7 +24,7 @@ class Store {
       }
     );
   }
-  AddTrack = (TransportId) => {
+  AddTrack(TransportId) {
     return new Promise((resolve, reject) => {
       ApiFetch(
         `reports/VehicleTrack?id=${TransportId}&sts=${this.CurrentTab.Options.StartDate.unix()}&fts=${this.CurrentTab.Options.EndDate.unix()}`,
@@ -82,9 +83,11 @@ class Store {
           }
           resolve();
         }
-      );
+      ).catch(() => {
+        message.warning('Нет данных для трека.');
+      });
     });
-  };
+  }
   DeleteTrack(TransportID) {
     if (
       this.CurrentTab.Options.GetVectorLayerSource().getFeatureById(
@@ -120,7 +123,13 @@ class Store {
   SetNewCurrentTimeTrackPlayer(NewTime) {
     this.CurrentTab.Options.CurrentTrackPlayerTime = Moment.unix(NewTime);
   }
-  UpdateCurrentData(NewTransportKeys) {
+
+  SetNewDateTimeInterval(NewStartDate, NewEndDate) {
+    this.CurrentTab.Options.CurrentTrackPlayerTime = NewStartDate;
+    this.CurrentTab.Options.StartDate = NewStartDate;
+    this.CurrentTab.Options.EndDate = NewEndDate;
+  }
+  SetNewCheckedTransportKeys(NewTransportKeys) {
     const NewFilteredTransportKeys = NewTransportKeys.filter((Key) => {
       return this.TransportTree.reduce(
         (CheckedTransportArray, CurrentGroup, Index, GroupArray) => {
@@ -133,61 +142,7 @@ class Store {
         []
       ).includes(Key);
     });
-    switch (this.CurrentTab.Options.CurrentMenuItem.id) {
-      case 'map':
-        let PromiseArray = [];
-        NewFilteredTransportKeys.forEach((NewTransportKey) => {
-          if (
-            !this.CurrentTab.Options.CheckedTransportKeys.includes(
-              NewFilteredTransportKeys
-            )
-          ) {
-            PromiseArray.push(this.AddTrack(NewTransportKey));
-          }
-        });
-        this.CurrentTab.Options.CheckedTransportKeys.forEach(
-          (OldTransportKey) => {
-            if (!NewFilteredTransportKeys.includes(OldTransportKey)) {
-              this.DeleteTrack(OldTransportKey);
-            }
-          }
-        );
-        this.CurrentTab.Options.CheckedTransportKeys = NewFilteredTransportKeys;
-        if (PromiseArray.length != 0) {
-          Promise.all(PromiseArray).then(() => {
-            this.CurrentTab.Options.MapObject.getView().fit(
-              this.CurrentTab.Options.GetVectorLayerSource().getExtent()
-            );
-          });
-        }
-
-        break;
-      case 'loadsReport':
-        if (NewFilteredTransportKeys.length > 0) {
-          this.CurrentTab.Options.CheckedTransportKeys = [
-            NewTransportKeys[NewFilteredTransportKeys.length - 1],
-          ];
-        } else {
-          this.CurrentTab.Options.CheckedTransportKeys = [];
-        }
-
-        break;
-      case 'tripsReport':
-        if (NewFilteredTransportKeys.length > 0) {
-          this.CurrentTab.Options.CheckedTransportKeys = [
-            NewTransportKeys[NewFilteredTransportKeys.length - 1],
-          ];
-        } else {
-          this.CurrentTab.Options.CheckedTransportKeys = [];
-        }
-        break;
-    }
-  }
-  SetNewDateTimeInterval(NewStartDate, NewEndDate) {
-    this.CurrentTab.Options.CurrentTrackPlayerTime = NewStartDate;
-    this.CurrentTab.Options.StartDate = NewStartDate;
-    this.CurrentTab.Options.EndDate = NewEndDate;
-    this.UpdateCurrentData(this.CurrentTab.Options.CheckedTransportKeys);
+    this.CurrentTab.Options.CheckedTransportKeys = NewFilteredTransportKeys;
   }
   SetNewTransportTree(TransportData) {
     this.TransportTree = TransportData.map((Group) => {

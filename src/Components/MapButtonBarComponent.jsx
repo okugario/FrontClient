@@ -28,14 +28,15 @@ export default class MapButtonBarComponent extends React.Component {
     if (
       this.props.ProviderStore.CurrentTab.Options.MapObject.getControls().array_
         .length == 1 &&
-      this.props.ProviderStore.CurrentTab.GetTrackFeaturies().length == 1
+      this.props.ProviderStore.CurrentTab.Options.GetTrackFeaturies().length ==
+        1
     ) {
       this.props.ProviderStore.CurrentTab.Options.MapObject.addControl(
         new Control({
           element: this.TrackPlayerElement,
         })
       );
-      this.props.ProviderStore.CurrentTab.GetTrackFeaturies().forEach(
+      this.props.ProviderStore.CurrentTab.Options.GetTrackFeaturies().forEach(
         (Track) => {
           const Feature = new GeoJSON().readFeature({
             type: 'Feature',

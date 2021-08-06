@@ -16,10 +16,11 @@ export default class TrackPlayerComponent extends React.Component {
     };
   }
   InitPlayerData() {
-    this.CurrentTraks = this.props.ProviderStore.CurrentTab.GetTrackFeaturies();
+    this.CurrentTraks =
+      this.props.ProviderStore.CurrentTab.Options.GetTrackFeaturies();
     let PlayerDataMap = new Map();
 
-    this.props.ProviderStore.CurrentTab.GetTrackFeaturies().forEach(
+    this.props.ProviderStore.CurrentTab.Options.GetTrackFeaturies().forEach(
       (TrackFeature) => {
         TrackFeature.getGeometry()
           .getCoordinates()
