@@ -20,6 +20,7 @@ import WorkConditionsComponent from '../Components/WorkConditionsComponent';
 import LoadsReportComponent from '../Components/LoadsReportComponent';
 import LoadsPassportComponent from '../Components/LoadsPassportComponent';
 import DiggerOrderComponent from '../Components/DiggerOrderComponent';
+import Control from 'ol/control/Control';
 export class Tab {
   constructor(TabObject, OpenTabs) {
     this.Id = TabObject.id;
@@ -73,7 +74,10 @@ export class Tab {
     }
     switch (TabObject.type) {
       case 'report':
+        const ButtonBar = document.createElement('div');
+        ButtonBar.className = 'MatteGlass';
         this.Options = {
+          ButtonBarElement: ButtonBar,
           CurrentMenuItem: TabObject.items[0],
           CheckedTransportKeys: [],
           LeftMenu: ['Interval', 'TransportTree', 'AdministrationMenu'],
@@ -93,7 +97,7 @@ export class Tab {
 
           MapObject: new MapObject({
             interactions: defaults({ doubleClickZoom: false }),
-            controls: [],
+            controls: [new Control({ element: ButtonBar })],
             layers: [
               new TileLayer({
                 preload: Infinity,

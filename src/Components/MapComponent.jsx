@@ -5,7 +5,6 @@ import { observer, inject } from 'mobx-react';
 import '../CSS/MapComponent.css';
 import MapButtonBarComponent from './MapButtonBarComponent';
 import 'ol/ol.css';
-import Control from 'ol/control/Control';
 import { reaction } from 'mobx';
 import { Icon, Style, Text } from 'ol/style';
 import GeoJSON from 'ol/format/GeoJSON';
@@ -19,20 +18,8 @@ const MapComponent = inject('ProviderStore')(
     const CurrentTab = props.ProviderStore.OpenTabs.find((Tab) => {
       return Tab.Key == props.ProviderStore.CurrentTabKey;
     });
-    const UpdateInKeys = reaction(
-      () => CurrentTab.Options.CheckedTransportKeys,
-      (NewTransportKeys, OldTransportKeys) => {
-        UpdateMapInKeys(NewTransportKeys, OldTransportKeys);
-      }
-    );
-    const UpdateInDate = reaction(
-      () => CurrentTab.Options.StartDate || CurrentTab.Options.EndDate,
-      () => {
-        UpdateMapInDate();
-      }
-    );
     const MapRef = React.createRef();
-    const ButtonBar = document.createElement('div');
+
     const DeleteTrack = (TransportID) => {
       if (
         CurrentTab.Options.GetVectorLayerSource().getFeatureById(
@@ -115,6 +102,8 @@ const MapComponent = inject('ProviderStore')(
               }
 
               CurrentTab.Options.GetVectorLayerSource().addFeature(NewFeature);
+            } else {
+              message.warning('Нет данных для трека.');
             }
             resolve();
           }
@@ -124,12 +113,23 @@ const MapComponent = inject('ProviderStore')(
       });
     };
     const InitMap = () => {
-      ButtonBar.className = 'MatteGlass';
-      CurrentTab.Options.MapObject.setTarget(MapRef.current);
-
-      CurrentTab.Options.MapObject.addControl(
-        new Control({ element: ButtonBar })
+      const UpdateInKeys = reaction(
+        () => CurrentTab.Options.CheckedTransportKeys,
+        (NewTransportKeys, OldTransportKeys) => {
+          UpdateMapInKeys(NewTransportKeys, OldTransportKeys);
+        }
       );
+      const UpdateInDate = reaction(
+        () => CurrentTab.Options.StartDate || CurrentTab.Options.EndDate,
+        () => {
+          UpdateMapInDate();
+        }
+      );
+      CurrentTab.Options.MapObject.setTarget(MapRef.current);
+      return () => {
+        UpdateInKeys();
+        UpdateInDate();
+      };
     };
     const UpdateMapInKeys = (NewTransportKeys, OldTransportKeys) => {
       let PromiseArray = [];
@@ -164,7 +164,10 @@ const MapComponent = inject('ProviderStore')(
       <>
         <div ref={MapRef} className="FullExtend" />
         {CurrentTab.Options.CurrentMenuItem.id == 'map'
-          ? ReactDOM.createPortal(<MapButtonBarComponent />, ButtonBar)
+          ? ReactDOM.createPortal(
+              <MapButtonBarComponent />,
+              CurrentTab.Options.ButtonBarElement
+            )
           : null}
       </>
     );
