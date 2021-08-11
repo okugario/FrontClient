@@ -105,6 +105,8 @@ export default class App extends React.Component {
               </Sider>
               <Content>
                 <Tabs
+                  destroyInactiveTabPane={true}
+                  activeKey={GlobalStore.CurrentTabKey}
                   size="small"
                   style={{ height: '100%', with: '100%' }}
                   hideAdd={true}

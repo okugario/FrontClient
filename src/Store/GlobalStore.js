@@ -7,6 +7,7 @@ class Store {
   TopMenu = [];
   OpenTabs = [];
   CurrentTab = null;
+  CurrentTabKey = null;
   constructor() {
     makeAutoObservable(this);
   }
@@ -56,6 +57,7 @@ class Store {
     });
   }
   SetNewCurrentTab(NewCurrentTabKey) {
+    this.CurrentTabKey = NewCurrentTabKey;
     this.CurrentTab = this.OpenTabs.find((Tab) => {
       return Tab.Key == NewCurrentTabKey;
     });
@@ -85,6 +87,7 @@ class Store {
     this.OpenTabs.push(new Tab(TabObject, this.OpenTabs));
     if (this.OpenTabs.length == 1) {
       this.CurrentTab = this.OpenTabs[0];
+      this.CurrentTabKey = this.OpenTabs[0].Key;
     }
   }
 }

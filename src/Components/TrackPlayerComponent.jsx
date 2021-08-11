@@ -10,30 +10,30 @@ export default class TrackPlayerComponent extends React.Component {
     super(props);
     this.PlayerDataMap = null;
     this.CurrentTraks = null;
+    this.CurrentTab = this.props.ProviderStore.OpenTabs.find((Tab) => {
+      return Tab.Key == this.props.ProviderStore.CurrentTabKey;
+    });
     this.state = {
       Speed: 10,
       PlayerInterval: null,
     };
   }
   InitPlayerData() {
-    this.CurrentTraks =
-      this.props.ProviderStore.CurrentTab.Options.GetTrackFeaturies();
+    this.CurrentTraks = this.CurrentTab.Options.GetTrackFeaturies();
     let PlayerDataMap = new Map();
 
-    this.props.ProviderStore.CurrentTab.Options.GetTrackFeaturies().forEach(
-      (TrackFeature) => {
-        TrackFeature.getGeometry()
-          .getCoordinates()
-          .forEach((Coordinates) => {
-            PlayerDataMap.set(Coordinates[2], {
-              Mark: this.props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().getFeatureById(
-                `Mark${TrackFeature.getId()}`
-              ),
-              Coordinates: Coordinates,
-            });
+    this.CurrentTab.Options.GetTrackFeaturies().forEach((TrackFeature) => {
+      TrackFeature.getGeometry()
+        .getCoordinates()
+        .forEach((Coordinates) => {
+          PlayerDataMap.set(Coordinates[2], {
+            Mark: this.CurrentTab.Options.GetVectorLayerSource().getFeatureById(
+              `Mark${TrackFeature.getId()}`
+            ),
+            Coordinates: Coordinates,
           });
-      }
-    );
+        });
+    });
     return PlayerDataMap;
   }
   PlayerHandler(Action) {
@@ -44,21 +44,21 @@ export default class TrackPlayerComponent extends React.Component {
           this.setState({
             PlayerInterval: setInterval(() => {
               if (
-                this.props.ProviderStore.CurrentTab.Options.CurrentTrackPlayerTime.unix() !=
-                this.props.ProviderStore.CurrentTab.Options.EndDate.unix()
+                this.CurrentTab.Options.CurrentTrackPlayerTime.unix() !=
+                this.CurrentTab.Options.EndDate.unix()
               ) {
                 this.props.ProviderStore.SetNewCurrentTimeTrackPlayer(
-                  this.props.ProviderStore.CurrentTab.Options.CurrentTrackPlayerTime.unix() +
+                  this.CurrentTab.Options.CurrentTrackPlayerTime.unix() +
                     (1 * this.state.Speed) / 10
                 );
               }
               if (
                 this.PlayerDataMap.has(
-                  this.props.ProviderStore.CurrentTab.Options.CurrentTrackPlayerTime.unix()
+                  this.CurrentTab.Options.CurrentTrackPlayerTime.unix()
                 )
               ) {
                 let Data = this.PlayerDataMap.get(
-                  this.props.ProviderStore.CurrentTab.Options.CurrentTrackPlayerTime.unix()
+                  this.CurrentTab.Options.CurrentTrackPlayerTime.unix()
                 );
                 Data.Mark.getGeometry().setCoordinates(Data.Coordinates);
               }
@@ -102,24 +102,19 @@ export default class TrackPlayerComponent extends React.Component {
     }
   }
   RemoveTrackPlayer = () => {
-    this.props.ProviderStore.CurrentTab.Options.MapObject.removeControl(
-      this.props.ProviderStore.CurrentTab.Options.MapObject.getControls()
-        .array_[1]
+    this.CurrentTab.Options.MapObject.removeControl(
+      this.CurrentTab.Options.MapObject.getControls().array_[1]
     );
     clearInterval(this.state.PlayerInterval);
     this.setState({ PlayerInterval: null });
     this.props.ProviderStore.SetNewCurrentTimeTrackPlayer(
-      this.props.ProviderStore.CurrentTab.Options.StartDate.unix()
+      this.CurrentTab.Options.StartDate.unix()
     );
-    this.props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().forEachFeature(
-      (Feature) => {
-        if (/MarkTrack/.test(Feature.getId())) {
-          this.props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().removeFeature(
-            Feature
-          );
-        }
+    this.CurrentTab.Options.GetVectorLayerSource().forEachFeature((Feature) => {
+      if (/MarkTrack/.test(Feature.getId())) {
+        this.CurrentTab.Options.GetVectorLayerSource().removeFeature(Feature);
       }
-    );
+    });
     this.PlayerDataMap = null;
   };
   render() {
@@ -158,9 +153,9 @@ export default class TrackPlayerComponent extends React.Component {
           onChange={(NewTime) => {
             this.ChangeTransportMarkPosition(NewTime);
           }}
-          min={this.props.ProviderStore.CurrentTab.Options.StartDate.unix()}
-          max={this.props.ProviderStore.CurrentTab.Options.EndDate.unix()}
-          value={this.props.ProviderStore.CurrentTab.Options.CurrentTrackPlayerTime.unix()}
+          min={this.CurrentTab.Options.StartDate.unix()}
+          max={this.CurrentTab.Options.EndDate.unix()}
+          value={this.CurrentTab.Options.CurrentTrackPlayerTime.unix()}
           style={{
             width: '350px',
           }}
@@ -168,7 +163,7 @@ export default class TrackPlayerComponent extends React.Component {
         <Input
           size="small"
           style={{ width: '70px' }}
-          value={this.props.ProviderStore.CurrentTab.Options.CurrentTrackPlayerTime.format(
+          value={this.CurrentTab.Options.CurrentTrackPlayerTime.format(
             'HH:mm:ss'
           )}
         />
