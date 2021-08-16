@@ -16,166 +16,155 @@ import Control from 'ol/control/Control';
 import GeoJSON from 'ol/format/GeoJSON';
 import TruckSVG from '../Svg/Truck.svg';
 
-@inject('ProviderStore')
-@observer
-export default class MapButtonBarComponent extends React.Component {
-  constructor(props) {
-    super(props);
-    this.TrackPlayerElement = document.createElement('div');
-    this.state = {};
-  }
-  TrackPlayer = () => {
-    if (
-      this.props.ProviderStore.CurrentTab.Options.MapObject.getControls().array_
-        .length == 1 &&
-      this.props.ProviderStore.CurrentTab.Options.GetTrackFeaturies().length ==
-        1
-    ) {
-      this.props.ProviderStore.CurrentTab.Options.MapObject.addControl(
-        new Control({
-          element: this.TrackPlayerElement,
-        })
-      );
-      this.props.ProviderStore.CurrentTab.Options.GetTrackFeaturies().forEach(
-        (Track) => {
-          const Feature = new GeoJSON().readFeature({
-            type: 'Feature',
-            id: `Mark${Track.getId()}`,
-            geometry: {
-              type: 'Point',
-              coordinates: Track.getGeometry().getCoordinateAt(0),
-            },
-          });
+const MapButtonBarComponent = inject('ProviderStore')(
+  observer((props) => {
+    const TrackPlayerElement = document.createElement('div');
+    const TrackPlayer = () => {
+      if (
+        props.ProviderStore.CurrentTab.Options.MapObject.getControls().array_
+          .length == 1 &&
+        props.ProviderStore.CurrentTab.Options.GetTrackFeaturies().length == 1
+      ) {
+        props.ProviderStore.CurrentTab.Options.MapObject.addControl(
+          new Control({
+            element: TrackPlayerElement,
+          })
+        );
+        props.ProviderStore.CurrentTab.Options.GetTrackFeaturies().forEach(
+          (Track) => {
+            const Feature = new GeoJSON().readFeature({
+              type: 'Feature',
+              id: `Mark${Track.getId()}`,
+              geometry: {
+                type: 'Point',
+                coordinates: Track.getGeometry().getCoordinateAt(0),
+              },
+            });
 
-          Feature.setStyle(
-            new Style({
-              text: new Text({
-                font: 'bold 10px sans-serif',
-                text: Track.values_.caption,
-                offsetX: 30,
-                offsetY: -10,
-              }),
-              image: new Icon({
-                anchor: [0.5, 1],
-                src: TruckSVG,
-                scale: [0.2, 0.2],
-              }),
-            })
-          );
-          this.props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().addFeature(
-            Feature
-          );
-        }
-      );
-    }
-  };
-  FormatLength = (Line) => {
-    if (getLength(Line) > 100) {
-      return `${Math.round((getLength(Line) / 1000) * 100) / 100} km`;
-    } else {
-      return `${Math.round(getLength(Line) * 100) / 100} m `;
-    }
-  };
-
-  CreateMapTooltip = (OverlayID) => {
-    let RulerTooltipElement = document.createElement('div');
-    RulerTooltipElement.id = `Ruler${
-      this.props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().getFeatures()
-        .length
-    }`;
-
-    let OverlayTooltip = new Overlay({
-      id: OverlayID,
-      element: RulerTooltipElement,
-      offset: [15, 0],
-      positioning: OverlayPositioning.CENTER_LEFT,
-    });
-    this.props.ProviderStore.CurrentTab.Options.MapObject.addOverlay(
-      OverlayTooltip
-    );
-    return OverlayTooltip;
-  };
-
-  Ruler = () => {
-    if (
-      this.props.ProviderStore.CurrentTab.Options.MapObject.getInteractions().getLength() ==
-      8
-    ) {
-      let DrawObject = new Draw({
-        source:
-          this.props.ProviderStore.CurrentTab.Options.GetVectorLayerSource(),
-        type: GeometryType.LINE_STRING,
-        style: new Style({
-          stroke: new Stroke({
-            color: 'rgb(24, 144, 255)',
-            lineDash: [10, 10],
-            width: 2,
-          }),
-        }),
-      });
-      let OverlayTooltip = null;
-
-      OverlayTooltip = this.CreateMapTooltip(
-        `Ruler${
-          this.props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().getFeatures()
-            .length
-        }`
-      );
-
-      this.props.ProviderStore.CurrentTab.Options.MapObject.addInteraction(
-        DrawObject
-      );
-      DrawObject.on('drawstart', (DrawEvent) => {
-        DrawEvent.feature.getGeometry().on('change', (MoveEvent) => {
-          if (MoveEvent.target instanceof LineString) {
-            ReactDOM.render(
-              <MapTooltipComponent
-                CurrentTab={this.props.ProviderStore.CurrentTab}
-                Distance={this.FormatLength(MoveEvent.target)}
-                TooltipID={`Ruler${
-                  this.props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().getFeatures()
-                    .length
-                }`}
-              />,
-              OverlayTooltip.getElement()
+            Feature.setStyle(
+              new Style({
+                text: new Text({
+                  font: 'bold 10px sans-serif',
+                  text: Track.values_.caption,
+                  offsetX: 30,
+                  offsetY: -10,
+                }),
+                image: new Icon({
+                  anchor: [0.5, 1],
+                  src: TruckSVG,
+                  scale: [0.2, 0.2],
+                }),
+              })
             );
-
-            OverlayTooltip.setPosition(MoveEvent.target.getLastCoordinate());
+            props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().addFeature(
+              Feature
+            );
           }
-        });
+        );
+      }
+    };
+    const FormatLength = (Line) => {
+      if (getLength(Line) > 100) {
+        return `${Math.round((getLength(Line) / 1000) * 100) / 100} km`;
+      } else {
+        return `${Math.round(getLength(Line) * 100) / 100} m `;
+      }
+    };
+    const CreateMapTooltip = (OverlayID) => {
+      let RulerTooltipElement = document.createElement('div');
+      RulerTooltipElement.id = `Ruler${
+        props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().getFeatures()
+          .length
+      }`;
+
+      let OverlayTooltip = new Overlay({
+        id: OverlayID,
+        element: RulerTooltipElement,
+        offset: [15, 0],
+        positioning: OverlayPositioning.CENTER_LEFT,
       });
-      DrawObject.on('drawend', (DrawEvent) => {
-        DrawEvent.feature.setStyle(
-          new Style({
+      props.ProviderStore.CurrentTab.Options.MapObject.addOverlay(
+        OverlayTooltip
+      );
+      return OverlayTooltip;
+    };
+    const Ruler = () => {
+      if (
+        props.ProviderStore.CurrentTab.Options.MapObject.getInteractions().getLength() ==
+        8
+      ) {
+        let DrawObject = new Draw({
+          source: props.ProviderStore.CurrentTab.Options.GetVectorLayerSource(),
+          type: GeometryType.LINE_STRING,
+          style: new Style({
             stroke: new Stroke({
               color: 'rgb(24, 144, 255)',
               lineDash: [10, 10],
               width: 2,
             }),
-          })
-        );
-        DrawEvent.feature.setId(
+          }),
+        });
+        let OverlayTooltip = null;
+
+        OverlayTooltip = CreateMapTooltip(
           `Ruler${
-            this.props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().getFeatures()
+            props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().getFeatures()
               .length
           }`
         );
-        this.props.ProviderStore.CurrentTab.Options.MapObject.removeInteraction(
+
+        props.ProviderStore.CurrentTab.Options.MapObject.addInteraction(
           DrawObject
         );
-      });
-    }
-  };
+        DrawObject.on('drawstart', (DrawEvent) => {
+          DrawEvent.feature.getGeometry().on('change', (MoveEvent) => {
+            if (MoveEvent.target instanceof LineString) {
+              ReactDOM.render(
+                <MapTooltipComponent
+                  CurrentTab={props.ProviderStore.CurrentTab}
+                  Distance={FormatLength(MoveEvent.target)}
+                  TooltipID={`Ruler${
+                    props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().getFeatures()
+                      .length
+                  }`}
+                />,
+                OverlayTooltip.getElement()
+              );
 
-  render() {
+              OverlayTooltip.setPosition(MoveEvent.target.getLastCoordinate());
+            }
+          });
+        });
+        DrawObject.on('drawend', (DrawEvent) => {
+          DrawEvent.feature.setStyle(
+            new Style({
+              stroke: new Stroke({
+                color: 'rgb(24, 144, 255)',
+                lineDash: [10, 10],
+                width: 2,
+              }),
+            })
+          );
+          DrawEvent.feature.setId(
+            `Ruler${
+              props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().getFeatures()
+                .length
+            }`
+          );
+          props.ProviderStore.CurrentTab.Options.MapObject.removeInteraction(
+            DrawObject
+          );
+        });
+      }
+    };
     return (
-      <React.Fragment>
+      <>
         <div style={{ padding: '5px' }}>
           <Button
             size="small"
             type="primary"
             onClick={() => {
-              this.Ruler();
+              Ruler();
             }}
           >
             Линейка
@@ -185,17 +174,15 @@ export default class MapButtonBarComponent extends React.Component {
             type="primary"
             style={{ marginLeft: '10px' }}
             onClick={() => {
-              this.TrackPlayer();
+              TrackPlayer();
             }}
           >
             Плеер треков
           </Button>
         </div>
-        {ReactDOM.createPortal(
-          <TrackPlayerComponent />,
-          this.TrackPlayerElement
-        )}
-      </React.Fragment>
+        {ReactDOM.createPortal(<TrackPlayerComponent />, TrackPlayerElement)}
+      </>
     );
-  }
-}
+  })
+);
+export default MapButtonBarComponent;
