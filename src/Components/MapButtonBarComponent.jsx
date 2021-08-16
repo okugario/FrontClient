@@ -63,6 +63,21 @@ const MapButtonBarComponent = inject('ProviderStore')(
         );
       }
     };
+    const DrawGeozone = () => {
+      let DrawObject = new Draw({
+        source: props.ProviderStore.CurrentTab.Options.GetVectorLayerSource(),
+        type: GeometryType.LINE_STRING,
+        style: new Style({
+          stroke: new Stroke({
+            color: 'rgb(24, 144, 255)',
+            width: 2,
+          }),
+        }),
+      });
+      props.ProviderStore.CurrentTab.Options.MapObject.addInteraction(
+        DrawObject
+      );
+    };
     const FormatLength = (Line) => {
       if (getLength(Line) > 100) {
         return `${Math.round((getLength(Line) / 1000) * 100) / 100} km`;
@@ -159,7 +174,14 @@ const MapButtonBarComponent = inject('ProviderStore')(
     };
     return (
       <>
-        <div style={{ padding: '5px' }}>
+        <div
+          style={{
+            display: 'flex',
+            width: '320px',
+            height: '30px',
+            justifyContent: 'space-evenly',
+          }}
+        >
           <Button
             size="small"
             type="primary"
@@ -172,12 +194,20 @@ const MapButtonBarComponent = inject('ProviderStore')(
           <Button
             size="small"
             type="primary"
-            style={{ marginLeft: '10px' }}
             onClick={() => {
               TrackPlayer();
             }}
           >
             Плеер треков
+          </Button>
+          <Button
+            size="small"
+            type="primary"
+            onClick={() => {
+              DrawGeozone();
+            }}
+          >
+            Редактор геозон
           </Button>
         </div>
         {ReactDOM.createPortal(<TrackPlayerComponent />, TrackPlayerElement)}
