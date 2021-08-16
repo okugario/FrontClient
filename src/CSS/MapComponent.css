@@ -22,3 +22,6 @@
   filter: blur(10px);
   margin: -20px;
 }
+.ButtonBar {
+  position: absolute;
+}

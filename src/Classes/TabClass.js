@@ -75,7 +75,7 @@ export class Tab {
     switch (TabObject.type) {
       case 'report':
         const ButtonBar = document.createElement('div');
-        ButtonBar.className = 'MatteGlass';
+        ButtonBar.className = 'ButtonBar';
         this.Options = {
           ButtonBarElement: ButtonBar,
           CurrentMenuItem: TabObject.items[0],

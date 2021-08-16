@@ -3,7 +3,8 @@ import { observer, inject } from 'mobx-react';
 import { Button } from 'antd';
 import { getLength } from 'ol/sphere';
 import * as ReactDOM from 'react-dom';
-import MapTooltipComponent from '../Components/MapTooltipComponent';
+import MapTooltipComponent from './MapTooltipComponent';
+import GeozoneEditorComponent from './GeozoneEditorComponent';
 import OverlayPositioning from 'ol/OverlayPositioning';
 import Draw from 'ol/interaction/Draw';
 import GeometryType from 'ol/geom/GeometryType';
@@ -18,6 +19,7 @@ import TruckSVG from '../Svg/Truck.svg';
 
 const MapButtonBarComponent = inject('ProviderStore')(
   observer((props) => {
+    const GeozoneEditorElement = document.createElement('div');
     const TrackPlayerElement = document.createElement('div');
     const TrackPlayer = () => {
       if (
@@ -63,7 +65,12 @@ const MapButtonBarComponent = inject('ProviderStore')(
         );
       }
     };
-    const DrawGeozone = () => {
+    const GeozoneEditor = () => {
+      props.ProviderStore.CurrentTab.Options.MapObject.addControl(
+        new Control({
+          element: GeozoneEditorElement,
+        })
+      );
       let DrawObject = new Draw({
         source: props.ProviderStore.CurrentTab.Options.GetVectorLayerSource(),
         type: GeometryType.LINE_STRING,
@@ -77,6 +84,11 @@ const MapButtonBarComponent = inject('ProviderStore')(
       props.ProviderStore.CurrentTab.Options.MapObject.addInteraction(
         DrawObject
       );
+      DrawObject.on('drawend', (DrawEvent) => {
+        props.ProviderStore.CurrentTab.Options.MapObject.removeInteraction(
+          DrawObject
+        );
+      });
     };
     const FormatLength = (Line) => {
       if (getLength(Line) > 100) {
@@ -175,6 +187,7 @@ const MapButtonBarComponent = inject('ProviderStore')(
     return (
       <>
         <div
+          className="MatteGlass"
           style={{
             display: 'flex',
             width: '320px',
@@ -204,13 +217,17 @@ const MapButtonBarComponent = inject('ProviderStore')(
             size="small"
             type="primary"
             onClick={() => {
-              DrawGeozone();
+              GeozoneEditor();
             }}
           >
             Редактор геозон
           </Button>
         </div>
         {ReactDOM.createPortal(<TrackPlayerComponent />, TrackPlayerElement)}
+        {ReactDOM.createPortal(
+          <GeozoneEditorComponent />,
+          GeozoneEditorElement
+        )}
       </>
     );
   })
