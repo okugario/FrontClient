@@ -19,12 +19,10 @@ import TruckSVG from '../Svg/Truck.svg';
 
 const MapButtonBarComponent = inject('ProviderStore')(
   observer((props) => {
-    const GeozoneEditorElement = document.createElement('div');
-    const TrackPlayerElement = document.createElement('div');
+    let GeozoneEditorElement = document.createElement('div');
+    let TrackPlayerElement = document.createElement('div');
     const TrackPlayer = () => {
       if (
-        props.ProviderStore.CurrentTab.Options.MapObject.getControls().array_
-          .length == 1 &&
         props.ProviderStore.CurrentTab.Options.GetTrackFeaturies().length == 1
       ) {
         let TrackPlayerControl = new Control({
@@ -34,65 +32,95 @@ const MapButtonBarComponent = inject('ProviderStore')(
         props.ProviderStore.CurrentTab.Options.MapObject.addControl(
           TrackPlayerControl
         );
-        props.ProviderStore.CurrentTab.Options.GetTrackFeaturies().forEach(
-          (Track) => {
-            const Feature = new GeoJSON().readFeature({
-              type: 'Feature',
-              id: `Mark${Track.getId()}`,
-              geometry: {
-                type: 'Point',
-                coordinates: Track.getGeometry().getCoordinateAt(0),
-              },
-            });
+        if (
+          props.ProviderStore.CurrentTab.Options.MapObject.getControls().array_.find(
+            (Control) => {
+              return Control.get('Id') == 'TrackPlayer';
+            }
+          ) != undefined
+        ) {
+          props.ProviderStore.CurrentTab.Options.GetTrackFeaturies().forEach(
+            (Track) => {
+              const Feature = new GeoJSON().readFeature({
+                type: 'Feature',
+                id: `Mark${Track.getId()}`,
+                geometry: {
+                  type: 'Point',
+                  coordinates: Track.getGeometry().getCoordinateAt(0),
+                },
+              });
 
-            Feature.setStyle(
-              new Style({
-                text: new Text({
-                  font: 'bold 10px sans-serif',
-                  text: Track.values_.caption,
-                  offsetX: 30,
-                  offsetY: -10,
-                }),
-                image: new Icon({
-                  anchor: [0.5, 1],
-                  src: TruckSVG,
-                  scale: [0.2, 0.2],
-                }),
-              })
-            );
-            props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().addFeature(
-              Feature
-            );
-          }
-        );
+              Feature.setStyle(
+                new Style({
+                  text: new Text({
+                    font: 'bold 10px sans-serif',
+                    text: Track.values_.caption,
+                    offsetX: 30,
+                    offsetY: -10,
+                  }),
+                  image: new Icon({
+                    anchor: [0.5, 1],
+                    src: TruckSVG,
+                    scale: [0.2, 0.2],
+                  }),
+                })
+              );
+              props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().addFeature(
+                Feature
+              );
+            }
+          );
+        }
+      }
+    };
+    const GeozoneEditorHandler = (Action) => {
+      switch (Action) {
+        case 'Close':
+          props.ProviderStore.CurrentTab.Options.MapObject.removeControl(
+            props.ProviderStore.CurrentTab.Options.MapObject.getControls().array_.find(
+              (Control) => {
+                return Control.get('Id') == 'GeozoneEditor';
+              }
+            )
+          );
+
+          break;
       }
     };
     const GeozoneEditor = () => {
-      let GeozoneControl = new Control({
-        element: GeozoneEditorElement,
-      });
-      GeozoneControl.set('Id', 'GeozoneEditor');
-      props.ProviderStore.CurrentTab.Options.MapObject.addControl(
-        GeozoneControl
-      );
-      let DrawObject = new Draw({
-        source: props.ProviderStore.CurrentTab.Options.GetVectorLayerSource(),
-        type: GeometryType.LINE_STRING,
-        style: new Style({
-          stroke: new Stroke({
-            color: 'rgb(24, 144, 255)',
-            width: 2,
+      if (
+        props.ProviderStore.CurrentTab.Options.MapObject.getControls().array_.find(
+          (Control) => {
+            return Control.get('Id') == 'GeozoneEditor';
+          }
+        ) == undefined
+      ) {
+        let GeozoneControl = new Control({
+          element: GeozoneEditorElement,
+        });
+        GeozoneControl.set('Id', 'GeozoneEditor');
+        props.ProviderStore.CurrentTab.Options.MapObject.addControl(
+          GeozoneControl
+        );
+        let DrawObject = new Draw({
+          source: props.ProviderStore.CurrentTab.Options.GetVectorLayerSource(),
+          type: GeometryType.LINE_STRING,
+          style: new Style({
+            stroke: new Stroke({
+              color: 'rgb(24, 144, 255)',
+              width: 2,
+            }),
           }),
-        }),
-      });
-      props.ProviderStore.CurrentTab.Options.MapObject.addInteraction(
-        DrawObject
-      );
-      DrawObject.on('drawend', (DrawEvent) => {
-        props.ProviderStore.CurrentTab.Options.MapObject.removeInteraction(
+        });
+        props.ProviderStore.CurrentTab.Options.MapObject.addInteraction(
           DrawObject
         );
-      });
+        DrawObject.on('drawend', (DrawEvent) => {
+          props.ProviderStore.CurrentTab.Options.MapObject.removeInteraction(
+            DrawObject
+          );
+        });
+      }
     };
     const FormatLength = (Line) => {
       if (getLength(Line) > 100) {
@@ -229,7 +257,9 @@ const MapButtonBarComponent = inject('ProviderStore')(
         </div>
         {ReactDOM.createPortal(<TrackPlayerComponent />, TrackPlayerElement)}
         {ReactDOM.createPortal(
-          <GeozoneEditorComponent />,
+          <GeozoneEditorComponent
+            GeozoneEditorHandler={GeozoneEditorHandler}
+          />,
           GeozoneEditorElement
         )}
       </>

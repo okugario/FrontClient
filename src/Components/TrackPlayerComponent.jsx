@@ -103,7 +103,9 @@ export default class TrackPlayerComponent extends React.Component {
   }
   RemoveTrackPlayer = () => {
     this.CurrentTab.Options.MapObject.removeControl(
-      this.CurrentTab.Options.MapObject.getControls().array_[1]
+      this.CurrentTab.Options.MapObject.getControls().array_.find((Control) => {
+        return Control.get('Id') == 'TrackPlayer';
+      })
     );
     clearInterval(this.state.PlayerInterval);
     this.setState({ PlayerInterval: null });
@@ -121,6 +123,7 @@ export default class TrackPlayerComponent extends React.Component {
     return (
       <div
         style={{
+          position: 'absolute',
           marginTop: '42%',
           marginLeft: '30%',
           width: '600px',

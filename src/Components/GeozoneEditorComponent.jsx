@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Button, Card, Input, Select } from 'antd';
-export default function GeozoneEditor() {
+export default function GeozoneEditor(props) {
   return (
     <div style={{ marginLeft: '80%' }}>
       <Card
@@ -10,7 +10,14 @@ export default function GeozoneEditor() {
           <Button size="small" type="primary">
             Сохранить
           </Button>,
-          <Button size="small">Отмена</Button>,
+          <Button
+            size="small"
+            onClick={() => {
+              props.GeozoneEditorHandler('Close');
+            }}
+          >
+            Отмена
+          </Button>,
         ]}
       >
         <div style={{ display: 'flex', flexDirection: 'column' }}>
