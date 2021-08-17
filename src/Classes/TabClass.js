@@ -75,6 +75,8 @@ export class Tab {
     switch (TabObject.type) {
       case 'report':
         const ButtonBar = document.createElement('div');
+        let MapButtonBarControl = new Control({ element: ButtonBar });
+        MapButtonBarControl.set('Id', 'MapButtonBar');
         ButtonBar.className = 'ButtonBar';
         this.Options = {
           ButtonBarElement: ButtonBar,
@@ -97,7 +99,7 @@ export class Tab {
 
           MapObject: new MapObject({
             interactions: defaults({ doubleClickZoom: false }),
-            controls: [new Control({ element: ButtonBar })],
+            controls: [MapButtonBarControl],
             layers: [
               new TileLayer({
                 preload: Infinity,

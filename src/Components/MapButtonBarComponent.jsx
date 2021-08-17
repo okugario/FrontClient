@@ -27,10 +27,12 @@ const MapButtonBarComponent = inject('ProviderStore')(
           .length == 1 &&
         props.ProviderStore.CurrentTab.Options.GetTrackFeaturies().length == 1
       ) {
+        let TrackPlayerControl = new Control({
+          element: TrackPlayerElement,
+        });
+        TrackPlayerControl.set('Id', 'TrackPlayer');
         props.ProviderStore.CurrentTab.Options.MapObject.addControl(
-          new Control({
-            element: TrackPlayerElement,
-          })
+          TrackPlayerControl
         );
         props.ProviderStore.CurrentTab.Options.GetTrackFeaturies().forEach(
           (Track) => {
@@ -66,10 +68,12 @@ const MapButtonBarComponent = inject('ProviderStore')(
       }
     };
     const GeozoneEditor = () => {
+      let GeozoneControl = new Control({
+        element: GeozoneEditorElement,
+      });
+      GeozoneControl.set('Id', 'GeozoneEditor');
       props.ProviderStore.CurrentTab.Options.MapObject.addControl(
-        new Control({
-          element: GeozoneEditorElement,
-        })
+        GeozoneControl
       );
       let DrawObject = new Draw({
         source: props.ProviderStore.CurrentTab.Options.GetVectorLayerSource(),
