@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Button, Card, Input, Select } from 'antd';
 export default function GeozoneEditor(props) {
   return (
-    <div style={{ marginLeft: '80%' }}>
+    <div>
       <Card
         title="Геозона"
         size="small"

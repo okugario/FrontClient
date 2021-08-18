@@ -22,6 +22,16 @@
   filter: blur(10px);
   margin: -20px;
 }
-.ButtonBar {
+#TrackPlayer {
   position: absolute;
+  bottom: 0%;
+  padding-bottom: 20px;
+  margin-left: 30%;
+}
+#MapButtonBar {
+  position: absolute;
+}
+#GeozoneEditor {
+  position: absolute;
+  right: 0%;
 }

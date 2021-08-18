@@ -74,10 +74,10 @@ export class Tab {
     }
     switch (TabObject.type) {
       case 'report':
-        const ButtonBar = document.createElement('div');
+        let ButtonBar = document.createElement('div');
         let MapButtonBarControl = new Control({ element: ButtonBar });
         MapButtonBarControl.set('Id', 'MapButtonBar');
-        ButtonBar.className = 'ButtonBar';
+        ButtonBar.id = 'MapButtonBar';
         this.Options = {
           ButtonBarElement: ButtonBar,
           CurrentMenuItem: TabObject.items[0],

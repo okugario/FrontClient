@@ -122,17 +122,14 @@ export default class TrackPlayerComponent extends React.Component {
   render() {
     return (
       <div
+        className="MatteGlass"
         style={{
-          position: 'absolute',
-          marginTop: '42%',
-          marginLeft: '30%',
           width: '600px',
           height: '30px',
           display: 'flex',
           justifyContent: 'space-evenly',
           alignItems: 'center',
         }}
-        className="MatteGlass"
       >
         <Button
           size="small"

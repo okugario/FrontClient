@@ -20,7 +20,9 @@ import TruckSVG from '../Svg/Truck.svg';
 const MapButtonBarComponent = inject('ProviderStore')(
   observer((props) => {
     let GeozoneEditorElement = document.createElement('div');
+    GeozoneEditorElement.id = 'GeozoneEditor';
     let TrackPlayerElement = document.createElement('div');
+    TrackPlayerElement.id = 'TrackPlayer';
     const TrackPlayer = () => {
       if (
         props.ProviderStore.CurrentTab.Options.GetTrackFeaturies().length == 1
