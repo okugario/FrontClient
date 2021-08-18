@@ -10,8 +10,8 @@ import 'antd/dist/antd.css';
 import '../CSS/AppComponent.css';
 const ComponentList = [
   {
-    Component: React.lazy(() => import('./TransportTreeComponent')),
-    Keys: ['TransportTree'],
+    Component: React.lazy(() => import('./TabTreeComponent.')),
+    Keys: ['TabTreeComponent'],
   },
   {
     Component: React.lazy(() => import('./IntervalComponent')),
@@ -22,7 +22,7 @@ const ComponentList = [
     Keys: ['AdministrationMenu'],
   },
   {
-    Component: React.lazy(() => import('./TransportTreeComponent')),
+    Component: React.lazy(() => import('./TabTreeComponent.')),
     Keys: ['TreeComponent'],
   },
 ];

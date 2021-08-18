@@ -82,7 +82,8 @@ export class Tab {
           ButtonBarElement: ButtonBar,
           CurrentMenuItem: TabObject.items[0],
           CheckedTransportKeys: [],
-          LeftMenu: ['Interval', 'TransportTree', 'AdministrationMenu'],
+          CheckedGeozonesKeys: [],
+          LeftMenu: ['Interval', 'TabTreeComponent', 'AdministrationMenu'],
           StartDate:
             Moment().hours() < 20
               ? Moment('08:00:00', 'HH:mm:ss')

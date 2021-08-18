@@ -224,9 +224,10 @@ const MapButtonBarComponent = inject('ProviderStore')(
           className="MatteGlass"
           style={{
             display: 'flex',
-            width: '320px',
+            alignItems: 'center',
             height: '30px',
-            justifyContent: 'space-evenly',
+            gap: '10px',
+            padding: '5px',
           }}
         >
           <Button
@@ -246,15 +247,6 @@ const MapButtonBarComponent = inject('ProviderStore')(
             }}
           >
             Плеер треков
-          </Button>
-          <Button
-            size="small"
-            type="primary"
-            onClick={() => {
-              GeozoneEditor();
-            }}
-          >
-            Редактор геозон
           </Button>
         </div>
         {ReactDOM.createPortal(<TrackPlayerComponent />, TrackPlayerElement)}
