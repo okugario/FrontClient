@@ -83,7 +83,14 @@ export class Tab {
           CurrentMenuItem: TabObject.items[0],
           CheckedTransportKeys: [],
           CheckedGeozonesKeys: [],
-          LeftMenu: ['Interval', 'TabTreeComponent', 'AdministrationMenu'],
+          LeftMenu: [
+            React.lazy(() => import('../Components/IntervalComponent')),
+
+            React.lazy(() => import('../Components/TabTreeComponent.')),
+            React.lazy(() =>
+              import('../Components/AdministrationMenuComponent')
+            ),
+          ],
           StartDate:
             Moment().hours() < 20
               ? Moment('08:00:00', 'HH:mm:ss')
@@ -153,13 +160,21 @@ export class Tab {
       case 'setting':
         this.Options = {
           CurrentMenuItem: TabObject.items[0],
-          LeftMenu: ['AdministrationMenu'],
+          LeftMenu: [
+            React.lazy(() =>
+              import('../Components/AdministrationMenuComponent')
+            ),
+          ],
         };
 
         break;
       case 'workplace':
         this.Options = {
-          LeftMenu: ['AdministrationMenu'],
+          LeftMenu: [
+            React.lazy(() =>
+              import('../Components/AdministrationMenuComponent')
+            ),
+          ],
           CurrentMenuItem: TabObject.items[0],
         };
         this.Items = TabObject.items.map((Item) => {

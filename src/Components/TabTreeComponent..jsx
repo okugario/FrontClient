@@ -84,6 +84,9 @@ const TabTreeComponent = inject('ProviderStore')(
         {props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id == 'map' ? (
           <TabPane tab="Геозоны" key="GeoZones">
             <Tree
+              defaultExpandedKeys={
+                props.ProviderStore.CurrentTab.Options.CheckedGeozonesKeys
+              }
               treeData={GeozonesTree}
               height={400}
               onSelect={(SelectedKeys) => {

@@ -8,24 +8,7 @@ const { Header, Sider, Content } = Layout;
 const { TabPane } = Tabs;
 import 'antd/dist/antd.css';
 import '../CSS/AppComponent.css';
-const ComponentList = [
-  {
-    Component: React.lazy(() => import('./TabTreeComponent.')),
-    Keys: ['TabTreeComponent'],
-  },
-  {
-    Component: React.lazy(() => import('./IntervalComponent')),
-    Keys: ['Interval'],
-  },
-  {
-    Component: React.lazy(() => import('./AdministrationMenuComponent')),
-    Keys: ['AdministrationMenu'],
-  },
-  {
-    Component: React.lazy(() => import('./TabTreeComponent.')),
-    Keys: ['TreeComponent'],
-  },
-];
+
 @observer
 export default class App extends React.Component {
   constructor(props) {
@@ -93,15 +76,21 @@ export default class App extends React.Component {
             </Header>
             <Layout>
               <Sider theme="light">
-                <React.Suspense
-                  fallback={<Spin tip="Загрузка компонента" size="large" />}
-                >
-                  {GlobalStore.CurrentTab != null
-                    ? GlobalStore.CurrentTab.Options.LeftMenu.map((Key) => {
-                        return this.GetComponent(Key);
-                      })
-                    : null}
-                </React.Suspense>
+                {GlobalStore.CurrentTab != null
+                  ? GlobalStore.CurrentTab.Options.LeftMenu.map(
+                      (Component, Index) => {
+                        return (
+                          <React.Suspense
+                            fallback={
+                              <Spin tip="Загрузка компонента" size="large" />
+                            }
+                          >
+                            <Component key={Index} />
+                          </React.Suspense>
+                        );
+                      }
+                    )
+                  : null}
               </Sider>
               <Content>
                 <Tabs
