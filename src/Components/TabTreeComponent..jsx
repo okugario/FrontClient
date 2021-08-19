@@ -2,10 +2,21 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { observer, inject } from 'mobx-react';
 import { ApiFetch } from '../Helpers/Helpers';
-import { Tabs, Tree } from 'antd';
+import { Tabs, Tree, Dropdown, Menu } from 'antd';
 const { TabPane } = Tabs;
 const TabTreeComponent = inject('ProviderStore')(
   observer((props) => {
+    const GeozonesContextMenu = (
+      <Menu>
+        <Menu.Item key="EditGeozone">Редактировать</Menu.Item>
+        <Menu.Item key="DeleteGeozone">Удалить</Menu.Item>
+      </Menu>
+    );
+    const GeozonesGroupContextMenu = (
+      <Menu>
+        <Menu.Item key="AddGeozone">Добавить геозону</Menu.Item>
+      </Menu>
+    );
     const [GeozonesTree, SetNewGeozonesTree] = useState([]);
     const RequestTrees = () => {
       ApiFetch(
@@ -20,10 +31,31 @@ const TabTreeComponent = inject('ProviderStore')(
         SetNewGeozonesTree(
           Response.data.map((Group) => {
             return {
-              title: Group.Caption,
+              title: () => {
+                return (
+                  <Dropdown
+                    trigger={['contextMenu']}
+                    overlay={GeozonesGroupContextMenu}
+                  >
+                    <div>{Group.Caption}</div>
+                  </Dropdown>
+                );
+              },
               key: Group.Id,
               children: Group.Geofences.map((Geozone) => {
-                return { title: Geozone.Caption, key: Geozone.Id };
+                return {
+                  title: () => {
+                    return (
+                      <Dropdown
+                        trigger={['contextMenu']}
+                        overlay={GeozonesContextMenu}
+                      >
+                        <div>{Geozone.Caption}</div>
+                      </Dropdown>
+                    );
+                  },
+                  key: Geozone.Id,
+                };
               }),
             };
           })
@@ -48,9 +80,11 @@ const TabTreeComponent = inject('ProviderStore')(
             }
           />
         </TabPane>
-        <TabPane tab="Геозоны" key="GeoZones">
-          <Tree treeData={GeozonesTree} height={400} />
-        </TabPane>
+        {props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id == 'map' ? (
+          <TabPane tab="Геозоны" key="GeoZones">
+            <Tree treeData={GeozonesTree} height={400} />
+          </TabPane>
+        ) : null}
       </Tabs>
     );
   })
