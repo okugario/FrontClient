@@ -43,6 +43,9 @@ class Store {
     });
     this.CurrentTab.Options.CheckedTransportKeys = NewFilteredTransportKeys;
   }
+  SetNewCheckedGeozonesKeys(NewCheckedKeys) {
+    this.CurrentTab.Options.CheckedGeozonesKeys = NewCheckedKeys;
+  }
   SetNewTransportTree(TransportData) {
     this.TransportTree = TransportData.map((Group) => {
       return {

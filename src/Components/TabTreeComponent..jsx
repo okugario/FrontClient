@@ -31,6 +31,7 @@ const TabTreeComponent = inject('ProviderStore')(
         SetNewGeozonesTree(
           Response.data.map((Group) => {
             return {
+              selectable: false,
               title: () => {
                 return (
                   <Dropdown
@@ -82,7 +83,13 @@ const TabTreeComponent = inject('ProviderStore')(
         </TabPane>
         {props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id == 'map' ? (
           <TabPane tab="Геозоны" key="GeoZones">
-            <Tree treeData={GeozonesTree} height={400} />
+            <Tree
+              treeData={GeozonesTree}
+              height={400}
+              onSelect={(SelectedKeys) => {
+                props.ProviderStore.SetNewCheckedGeozonesKeys(SelectedKeys);
+              }}
+            />
           </TabPane>
         ) : null}
       </Tabs>

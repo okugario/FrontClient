@@ -49,7 +49,18 @@ const MapComponent = inject('ProviderStore')(
         );
       }
     };
-
+    const AddGeozone = (GeozoneId) => {
+      return new Promise((resolve, reject) => {
+        ApiFetch(
+          `model/Geofences/${GeozoneId}`,
+          'GET',
+          undefined,
+          (Response) => {
+            console.log(Response);
+          }
+        );
+      });
+    };
     const AddTrack = (TransportId) => {
       return new Promise((resolve, reject) => {
         ApiFetch(
@@ -113,10 +124,16 @@ const MapComponent = inject('ProviderStore')(
       });
     };
     const InitMap = () => {
-      const UpdateInKeys = reaction(
+      const UpdateInGeozonesKeys = reaction(
+        () => CurrentTab.Options.CheckedGeozonesKeys,
+        (NewGeozonesKeys, OldGeozonesKeys) => {
+          UpdateMapInGeozonesKeys(NewGeozonesKeys, OldGeozonesKeys);
+        }
+      );
+      const UpdateInTransportKeys = reaction(
         () => CurrentTab.Options.CheckedTransportKeys,
         (NewTransportKeys, OldTransportKeys) => {
-          UpdateMapInKeys(NewTransportKeys, OldTransportKeys);
+          UpdateMapInTransportKeys(NewTransportKeys, OldTransportKeys);
         }
       );
       const UpdateInDate = reaction(
@@ -127,11 +144,32 @@ const MapComponent = inject('ProviderStore')(
       );
       CurrentTab.Options.MapObject.setTarget(MapRef.current);
       return () => {
-        UpdateInKeys();
+        UpdateInTransportKeys();
         UpdateInDate();
+        UpdateInGeozonesKeys();
       };
     };
-    const UpdateMapInKeys = (NewTransportKeys, OldTransportKeys) => {
+    const UpdateMapInGeozonesKeys = (NewGeozonesKeys, OldGeozonesKeys) => {
+      let PromiseArray = [];
+      NewGeozonesKeys.forEach((NewGeozoneKey) => {
+        if (!CurrentTab.Options.CheckedTransportKeys.includes(NewGeozoneKey)) {
+          PromiseArray.push(AddGeozone(NewGeozoneKey));
+        }
+      });
+      OldGeozonesKeys.forEach((OldGeozoneKey) => {
+        if (!NewGeozonesKeys.includes(OldGeozoneKey)) {
+          /*DeleteGeozone*/
+        }
+      });
+      if (PromiseArray.length != 0) {
+        Promise.all(PromiseArray).then(() => {
+          CurrentTab.Options.MapObject.getView().fit(
+            CurrentTab.Options.GetVectorLayerSource().getExtent()
+          );
+        });
+      }
+    };
+    const UpdateMapInTransportKeys = (NewTransportKeys, OldTransportKeys) => {
       let PromiseArray = [];
       NewTransportKeys.forEach((NewTransportKey) => {
         if (
@@ -147,7 +185,7 @@ const MapComponent = inject('ProviderStore')(
       });
       if (PromiseArray.length != 0) {
         Promise.all(PromiseArray).then(() => {
-          props.ProviderStore.CurrentTab.Options.MapObject.getView().fit(
+          CurrentTab.Options.MapObject.getView().fit(
             CurrentTab.Options.GetVectorLayerSource().getExtent()
           );
         });
