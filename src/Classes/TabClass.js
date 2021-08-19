@@ -30,43 +30,69 @@ export class Tab {
       this.Items = TabObject.items.map((Item) => {
         switch (Item.id) {
           case 'map':
-            Item.Component = <MapComponent />;
+            Item.Component = React.lazy(() =>
+              import('../Components/MapComponent')
+            );
             break;
           case 'RetransTargets':
-            Item.Component = <RetranslationComponent />;
+            Item.Component = React.lazy(() =>
+              import('../Components/RetranslationComponent')
+            );
             break;
           case 'statistic':
-            Item.Component = <StatisticComponent />;
+            Item.Component = React.lazy(() =>
+              import('../Components/StatisticComponent')
+            );
             break;
           case 'Vehicles':
-            Item.Component = <TransportComponent />;
+            Item.Component = React.lazy(() =>
+              import('../Components/TransportComponent')
+            );
             break;
           case 'Regions':
-            Item.Component = <CrudObjectsComponent />;
+            Item.Component = React.lazy(() =>
+              import('../Components/CrudObjectsComponent')
+            );
             break;
           case 'tripsReport':
-            Item.Component = <TripsReportComponent />;
+            Item.Component = React.lazy(() =>
+              import('../Components/TripsReportComponent')
+            );
             break;
           case 'loadsReport':
-            Item.Component = <LoadsReportComponent />;
+            Item.Component = React.lazy(() =>
+              import('../Components/LoadsReportComponent')
+            );
             break;
           case 'VehicleTypes':
-            Item.Component = <CrudObjectsComponent />;
+            Item.Component = React.lazy(() =>
+              import('../Components/CrudObjectsComponent')
+            );
             break;
           case 'Manufacturers':
-            Item.Component = <CrudObjectsComponent />;
+            Item.Component = React.lazy(() =>
+              import('../Components/CrudObjectsComponent')
+            );
             break;
           case 'Firms':
-            Item.Component = <CrudObjectsComponent />;
+            Item.Component = React.lazy(() =>
+              import('../Components/CrudObjectsComponent')
+            );
             break;
           case 'LoadTypes':
-            Item.Component = <CrudObjectsComponent />;
+            Item.Component = React.lazy(() =>
+              import('../Components/CrudObjectsComponent')
+            );
             break;
           case 'WorkConditions':
-            Item.Component = <WorkConditionsComponent />;
+            Item.Component = React.lazy(() =>
+              import('../Components/WorkConditionsComponent')
+            );
             break;
           case 'DiggerPassports':
-            Item.Component = <LoadsPassportComponent />;
+            Item.Component = React.lazy(() =>
+              import('../Components/LoadsPassportComponent')
+            );
             break;
         }
         return Item;
@@ -180,7 +206,9 @@ export class Tab {
         this.Items = TabObject.items.map((Item) => {
           switch (Item.id) {
             case 'DiggerOrders':
-              Item.Component = <DiggerOrderComponent />;
+              Item.Component = React.lazy(() =>
+                import('../Components/DiggerOrderComponent')
+              );
               break;
           }
           return Item;

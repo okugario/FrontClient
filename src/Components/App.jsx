@@ -51,11 +51,9 @@ export default class App extends React.Component {
       ],
     });
   }
-  GetComponent(ComponentID) {
-    const CurrentItem = ComponentList.find((Item) => {
-      return Item.Keys.includes(ComponentID);
-    });
-    return <CurrentItem.Component key={ComponentID} />;
+  GetComponent(Tab) {
+    const Component = Tab.Options.CurrentMenuItem.Component;
+    return <Component key={Tab.Key} />;
   }
 
   render() {
@@ -116,9 +114,15 @@ export default class App extends React.Component {
                         key={Tab.Key}
                         className="FullExtend"
                       >
-                        {GlobalStore.CurrentTab != null
-                          ? Tab.Options.CurrentMenuItem.Component
-                          : null}
+                        {GlobalStore.CurrentTab != null ? (
+                          <React.Suspense
+                            fallback={
+                              <Spin tip="Загрузка компонента" size="large" />
+                            }
+                          >
+                            {this.GetComponent(Tab)}
+                          </React.Suspense>
+                        ) : null}
                       </TabPane>
                     );
                   })}
