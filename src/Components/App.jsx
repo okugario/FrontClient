@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import { useEffect } from 'react';
 import { Layout, Tabs, ConfigProvider, Spin, Button } from 'antd';
 import ru_RU from 'antd/lib/locale/ru_RU';
 import { observer, Provider } from 'mobx-react';
@@ -9,14 +10,12 @@ const { TabPane } = Tabs;
 import 'antd/dist/antd.css';
 import '../CSS/AppComponent.css';
 
-@observer
-export default class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
-  componentDidMount() {
+const App = observer(() => {
+  const GetComponent = (Tab) => {
+    const Component = Tab.Options.CurrentMenuItem.Component;
+    return <Component key={Tab.Key} />;
+  };
+  useEffect(() => {
     GlobalStore.AddTab({
       id: 'reports',
       type: 'report',
@@ -50,89 +49,84 @@ export default class App extends React.Component {
         { id: 'RetransTargets', caption: 'Ретрансляторы' },
       ],
     });
-  }
-  GetComponent(Tab) {
-    const Component = Tab.Options.CurrentMenuItem.Component;
-    return <Component key={Tab.Key} />;
-  }
-
-  render() {
-    return (
-      <Provider ProviderStore={GlobalStore}>
-        <ConfigProvider locale={ru_RU}>
-          <Layout className="FullExtend">
-            <Header
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-end',
-              }}
-            >
-              <Button size="small">
-                <a href="/logout">Выход</a>
-              </Button>
-            </Header>
-            <Layout>
-              <Sider theme="light">
-                {GlobalStore.CurrentTab != null
-                  ? GlobalStore.CurrentTab.Options.LeftMenu.map(
-                      (Component, Index) => {
-                        return (
-                          <React.Suspense
-                            fallback={
-                              <Spin tip="Загрузка компонента" size="large" />
-                            }
-                          >
-                            <Component key={Index} />
-                          </React.Suspense>
-                        );
-                      }
-                    )
-                  : null}
-              </Sider>
-              <Content>
-                <Tabs
-                  destroyInactiveTabPane={true}
-                  activeKey={GlobalStore.CurrentTabKey}
-                  size="small"
-                  style={{ height: '100%', with: '100%' }}
-                  hideAdd={true}
-                  type="card"
-                  onChange={(TabKey) => {
-                    GlobalStore.SetNewCurrentTab(TabKey);
-                  }}
-                  onEdit={(TabKey, Action) => {
-                    if (Action == 'remove') {
-                      GlobalStore.DeleteTab(TabKey);
+  }, []);
+  return (
+    <Provider ProviderStore={GlobalStore}>
+      <ConfigProvider locale={ru_RU}>
+        <Layout className="FullExtend">
+          <Header
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+            }}
+          >
+            <Button size="small">
+              <a href="/logout">Выход</a>
+            </Button>
+          </Header>
+          <Layout>
+            <Sider theme="light">
+              {GlobalStore.CurrentTab != null
+                ? GlobalStore.CurrentTab.Options.LeftMenu.map(
+                    (Component, Index) => {
+                      return (
+                        <React.Suspense
+                          key={Index}
+                          fallback={
+                            <Spin tip="Загрузка компонента" size="large" />
+                          }
+                        >
+                          <Component />
+                        </React.Suspense>
+                      );
                     }
-                  }}
-                >
-                  {GlobalStore.OpenTabs.map((Tab) => {
-                    return (
-                      <TabPane
-                        tab={Tab.Caption}
-                        key={Tab.Key}
-                        className="FullExtend"
-                      >
-                        {GlobalStore.CurrentTab != null ? (
-                          <React.Suspense
-                            fallback={
-                              <Spin tip="Загрузка компонента" size="large" />
-                            }
-                          >
-                            {this.GetComponent(Tab)}
-                          </React.Suspense>
-                        ) : null}
-                      </TabPane>
-                    );
-                  })}
-                </Tabs>
-              </Content>
-            </Layout>
+                  )
+                : null}
+            </Sider>
+            <Content>
+              <Tabs
+                destroyInactiveTabPane={true}
+                activeKey={GlobalStore.CurrentTabKey}
+                size="small"
+                style={{ height: '100%', with: '100%' }}
+                hideAdd={true}
+                type="card"
+                onChange={(TabKey) => {
+                  GlobalStore.SetNewCurrentTab(TabKey);
+                }}
+                onEdit={(TabKey, Action) => {
+                  if (Action == 'remove') {
+                    GlobalStore.DeleteTab(TabKey);
+                  }
+                }}
+              >
+                {GlobalStore.OpenTabs.map((Tab) => {
+                  return (
+                    <TabPane
+                      tab={Tab.Caption}
+                      key={Tab.Key}
+                      className="FullExtend"
+                    >
+                      {GlobalStore.CurrentTab != null ? (
+                        <React.Suspense
+                          fallback={
+                            <Spin tip="Загрузка компонента" size="large" />
+                          }
+                        >
+                          {GetComponent(Tab)}
+                        </React.Suspense>
+                      ) : null}
+                    </TabPane>
+                  );
+                })}
+              </Tabs>
+            </Content>
           </Layout>
-        </ConfigProvider>
-      </Provider>
-    );
-  }
-}
+        </Layout>
+      </ConfigProvider>
+    </Provider>
+  );
+});
+
 ReactDOM.render(<App />, document.getElementById('App'));
