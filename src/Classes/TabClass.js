@@ -10,16 +10,6 @@ import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import View from 'ol/View';
 import { makeAutoObservable } from 'mobx';
-import TripsReportComponent from '../Components/TripsReportComponent';
-import MapComponent from '../Components/MapComponent';
-import RetranslationComponent from '../Components/RetranslationComponent';
-import StatisticComponent from '../Components/StatisticComponent';
-import TransportComponent from '../Components/TransportComponent';
-import CrudObjectsComponent from '../Components/CrudObjectsComponent';
-import WorkConditionsComponent from '../Components/WorkConditionsComponent';
-import LoadsReportComponent from '../Components/LoadsReportComponent';
-import LoadsPassportComponent from '../Components/LoadsPassportComponent';
-import DiggerOrderComponent from '../Components/DiggerOrderComponent';
 import Control from 'ol/control/Control';
 export class Tab {
   constructor(TabObject, OpenTabs) {
