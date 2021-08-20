@@ -49,6 +49,24 @@ const MapComponent = inject('ProviderStore')(
         );
       }
     };
+    const DeleteGeozone = (GeozoneId) => {
+      if (
+        CurrentTab.Options.GetVectorLayerSource().getFeatureById(
+          `Geozone${GeozoneId}`
+        ) != null
+      ) {
+        CurrentTab.Options.GetVectorLayerSource().removeFeature(
+          CurrentTab.Options.GetVectorLayerSource().getFeatureById(
+            `Geozone${GeozoneId}`
+          )
+        );
+      }
+      if (CurrentTab.Options.GetVectorLayerSource().getFeatures().length != 0) {
+        CurrentTab.Options.MapObject.getView().fit(
+          CurrentTab.GetVectorLayerSource().getExtent()
+        );
+      }
+    };
     const AddGeozone = (GeozoneId) => {
       return new Promise((resolve, reject) => {
         ApiFetch(
@@ -56,7 +74,25 @@ const MapComponent = inject('ProviderStore')(
           'GET',
           undefined,
           (Response) => {
-            console.log(Response);
+            let NewFeature = new GeoJSON().readFeature(
+              Response.data.Geometries[Response.data.Geometries.length - 1]
+                .Feature,
+              {
+                dataProjection: 'EPSG:4326',
+                featureProjection: 'EPSG:3857',
+              }
+            );
+            NewFeature.setId(`Geozone${GeozoneId}`);
+            NewFeature.setStyle(
+              new Style({
+                stroke: new Stroke({
+                  color: Response.data.Options.color,
+                  width: 3,
+                }),
+              })
+            );
+            CurrentTab.Options.GetVectorLayerSource().addFeature(NewFeature);
+            resolve();
           }
         );
       });
@@ -158,7 +194,7 @@ const MapComponent = inject('ProviderStore')(
       });
       OldGeozonesKeys.forEach((OldGeozoneKey) => {
         if (!NewGeozonesKeys.includes(OldGeozoneKey)) {
-          /*DeleteGeozone*/
+          DeleteGeozone(OldGeozoneKey);
         }
       });
       if (PromiseArray.length != 0) {
