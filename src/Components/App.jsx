@@ -42,6 +42,7 @@ const App = observer(() => {
         { id: 'Regions', caption: 'Участки' },
         { id: 'VehicleTypes', caption: 'Типы ТС' },
         { id: 'Manufacturers', caption: 'Производители' },
+        { id: 'AccessRoles', caption: 'Роли' },
         { id: 'Firms', caption: 'Организации' },
         { id: 'WorkConditions', caption: 'Условия работы' },
         { id: 'DiggerPassports', caption: 'Паспорта загрузки' },

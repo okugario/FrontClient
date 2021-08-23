@@ -84,6 +84,11 @@ export class Tab {
               import('../Components/LoadsPassportComponent')
             );
             break;
+          case 'AccessRoles':
+            Item.Component = React.lazy(() =>
+              import('../Components/AccessRolesComponent')
+            );
+            break;
         }
         return Item;
       });
