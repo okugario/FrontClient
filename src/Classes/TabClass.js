@@ -89,6 +89,11 @@ export class Tab {
               import('../Components/AccessRolesComponent')
             );
             break;
+          case 'ConfigSchemes':
+            Item.Component = React.lazy(() =>
+              import('../Components/ConfigSchemesComponent')
+            );
+            break;
         }
         return Item;
       });

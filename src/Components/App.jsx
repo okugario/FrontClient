@@ -48,6 +48,7 @@ const App = observer(() => {
         { id: 'DiggerPassports', caption: 'Паспорта загрузки' },
         { id: 'LoadTypes', caption: 'Виды грузов' },
         { id: 'RetransTargets', caption: 'Ретрансляторы' },
+        { id: 'ConfigSchemes', caption: 'Схемы настроек' },
       ],
     });
   }, []);

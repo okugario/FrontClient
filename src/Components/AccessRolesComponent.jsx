@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { ApiFetch } from '../Helpers/Helpers';
 import { Button, Table } from 'antd';
