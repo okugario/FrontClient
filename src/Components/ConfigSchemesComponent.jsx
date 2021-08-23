@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { ApiFetch } from '../Helpers/Helpers';
-import { Table, Modal } from 'antd';
+import { Table, Modal, Button } from 'antd';
 import ConfigSchemesProfile from './ConfigSchemesProfile';
 export default function ConfigSchemesComponent() {
   const [SchemesTable, SetNewSchemesTable] = useState(null);
@@ -38,6 +38,21 @@ export default function ConfigSchemesComponent() {
       >
         <ConfigSchemesProfile Scheme={Scheme} />
       </Modal>
+      <div
+        style={{
+          width: '200px',
+          display: 'flex',
+          justifyContent: 'space-evenly',
+          marginBottom: '5px',
+        }}
+      >
+        <Button size="small" type="primary" onClick={() => {}}>
+          Добавить
+        </Button>
+        <Button size="small" danger type="primary" onClick={() => {}}>
+          Удалить
+        </Button>
+      </div>
       <Table
         onRow={(Record) => {
           return {
