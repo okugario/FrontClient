@@ -45,7 +45,7 @@ export default function ConfigSchemesComponent() {
         }
         break;
       case 'SaveScheme':
-        if (OptionsValid) {
+        if (OptionsValid && !Array.isArray(Scheme.Options)) {
           ApiFetch(
             `model/ConfigSchemes${'Id' in Scheme ? `/${Scheme.Id}` : ''}`,
             'Id' in Scheme ? 'PATCH' : 'POST',
