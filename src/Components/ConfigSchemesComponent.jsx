@@ -63,17 +63,16 @@ export default function ConfigSchemesComponent() {
         }
         break;
       case 'DeleteScheme':
-        if (SelectedKey != null) {
-          Modal.confirm({
-            title: 'Подтвердите действие',
-            content: 'Удалить выбранный объект?',
-            okButtonProps: { type: 'primary', size: 'small', danger: true },
-            cancelButtonProps: { size: 'small' },
-            okText: 'Удалить',
-            cancelText: 'Отмена',
-          });
-        }
-
+        ApiFetch(
+          `model/ConfigSchemes/${SelectedKey}`,
+          'DELETE',
+          undefined,
+          (Response) => {
+            RequestSchemesTable().then(() => {
+              SetNewShowProfile(false);
+            });
+          }
+        );
         break;
     }
   };
@@ -123,7 +122,19 @@ export default function ConfigSchemesComponent() {
           danger
           type="primary"
           onClick={() => {
-            SchemeHandler('DeleteScheme');
+            if (SelectedKey != null) {
+              Modal.confirm({
+                title: 'Подтвердите действие',
+                content: 'Удалить выбранный объект?',
+                okButtonProps: { type: 'primary', size: 'small', danger: true },
+                cancelButtonProps: { size: 'small' },
+                okText: 'Удалить',
+                cancelText: 'Отмена',
+                onOk: () => {
+                  SchemeHandler('DeleteScheme');
+                },
+              });
+            }
           }}
         >
           Удалить

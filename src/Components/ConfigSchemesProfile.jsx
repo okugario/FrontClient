@@ -29,7 +29,6 @@ export default function ConfigSchemesProfile(props) {
         onChange={(Event) => {
           props.SchemeHandler('ChangeOptions', Event.target.value);
         }}
-        ref={props.SchemeRef}
         rows={7}
         defaultValue={JSON.stringify(props.Scheme.Options)}
       />
