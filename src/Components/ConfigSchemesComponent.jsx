@@ -1,13 +1,14 @@
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, createRef } from 'react';
 import { ApiFetch } from '../Helpers/Helpers';
-import { Table, Modal, Button } from 'antd';
+import { Table, Modal, Button, message } from 'antd';
 import ConfigSchemesProfile from './ConfigSchemesProfile';
 export default function ConfigSchemesComponent() {
   const [SchemesTable, SetNewSchemesTable] = useState(null);
   const [SelectedKey, SetNewSelectedKey] = useState(null);
   const [ShowProfile, SetNewShowProfile] = useState(false);
   const [Scheme, SetNewScheme] = useState(null);
+  const [OptionsValid, SetNewOptionsValid] = useState(true);
   const RequestScheme = (SchemeId) => {
     return ApiFetch(
       `model/ConfigSchemes/${SchemeId}`,
@@ -18,8 +19,66 @@ export default function ConfigSchemesComponent() {
       }
     );
   };
+  const SchemeHandler = (Action, Data) => {
+    let NewScheme = Scheme != null ? Scheme : { Caption: '', Options: {} };
+    switch (Action) {
+      case 'CloseScheme':
+        SetNewScheme(null);
+        SetNewShowProfile(false);
+
+        break;
+      case 'AddScheme':
+        SetNewScheme(NewScheme);
+        SetNewShowProfile(true);
+        break;
+      case 'ChangeCaption':
+        NewScheme.Caption = Data;
+        SetNewScheme(NewScheme);
+        break;
+      case 'ChangeOptions':
+        try {
+          NewScheme.Options = JSON.parse(Data);
+          SetNewScheme(NewScheme);
+          SetNewOptionsValid(true);
+        } catch (Error) {
+          SetNewOptionsValid(false);
+        }
+        break;
+      case 'SaveScheme':
+        if (OptionsValid) {
+          ApiFetch(
+            `model/ConfigSchemes${'Id' in Scheme ? `/${Scheme.Id}` : ''}`,
+            'Id' in Scheme ? 'PATCH' : 'POST',
+            Scheme,
+            (Response) => {
+              RequestSchemesTable().then(() => {
+                SetNewShowProfile(false);
+              });
+            }
+          ).catch(() => {
+            message.warning('Укажите корректное наименование');
+          });
+        } else {
+          message.warning('Некорректная схема');
+        }
+        break;
+      case 'DeleteScheme':
+        if (SelectedKey != null) {
+          Modal.confirm({
+            title: 'Подтвердите действие',
+            content: 'Удалить выбранный объект?',
+            okButtonProps: { type: 'primary', size: 'small', danger: true },
+            cancelButtonProps: { size: 'small' },
+            okText: 'Удалить',
+            cancelText: 'Отмена',
+          });
+        }
+
+        break;
+    }
+  };
   const RequestSchemesTable = () => {
-    ApiFetch('model/ConfigSchemes', 'GET', undefined, (Response) => {
+    return ApiFetch('model/ConfigSchemes', 'GET', undefined, (Response) => {
       SetNewSchemesTable(Response.data);
     });
   };
@@ -27,16 +86,20 @@ export default function ConfigSchemesComponent() {
   return (
     <>
       <Modal
+        destroyOnClose={true}
+        onOk={() => {
+          SchemeHandler('SaveScheme');
+        }}
         okText="Сохранить"
         onCancel={() => {
-          SetNewShowProfile(false);
+          SchemeHandler('CloseScheme');
         }}
         title="Схема настроек"
         visible={ShowProfile}
         cancelButtonProps={{ size: 'small' }}
         okButtonProps={{ size: 'small' }}
       >
-        <ConfigSchemesProfile Scheme={Scheme} />
+        <ConfigSchemesProfile SchemeHandler={SchemeHandler} Scheme={Scheme} />
       </Modal>
       <div
         style={{
@@ -46,10 +109,23 @@ export default function ConfigSchemesComponent() {
           marginBottom: '5px',
         }}
       >
-        <Button size="small" type="primary" onClick={() => {}}>
+        <Button
+          size="small"
+          type="primary"
+          onClick={() => {
+            SchemeHandler('AddScheme');
+          }}
+        >
           Добавить
         </Button>
-        <Button size="small" danger type="primary" onClick={() => {}}>
+        <Button
+          size="small"
+          danger
+          type="primary"
+          onClick={() => {
+            SchemeHandler('DeleteScheme');
+          }}
+        >
           Удалить
         </Button>
       </div>

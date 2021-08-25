@@ -16,13 +16,23 @@ export default function ConfigSchemesProfile(props) {
         </div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Input
+            onChange={(Event) => {
+              props.SchemeHandler('ChangeCaption', Event.target.value);
+            }}
             size="small"
             style={{ width: '160px' }}
-            value={props.Scheme.Caption}
+            defaultValue={props.Scheme.Caption}
           />
         </div>
       </div>
-      <TextArea rows={7} defaultValue={JSON.stringify(props.Scheme.Options)} />
+      <TextArea
+        onChange={(Event) => {
+          props.SchemeHandler('ChangeOptions', Event.target.value);
+        }}
+        ref={props.SchemeRef}
+        rows={7}
+        defaultValue={JSON.stringify(props.Scheme.Options)}
+      />
     </>
   );
 }
