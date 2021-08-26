@@ -1,11 +1,13 @@
 import * as React from 'react';
+import AccessRoleProfile from './AccessRoleProfileComponent';
 import { useEffect, useState } from 'react';
 import { ApiFetch } from '../Helpers/Helpers';
-import { Button, Table } from 'antd';
+import { Button, Table, Modal } from 'antd';
 export default function AccessRolesComponent(props) {
   const [RolesTable, SetNewRolesTable] = useState(null);
   const [SelectedKey, SetNewSelectedKey] = useState(null);
-  const RequestRoles = () => {
+  const [ShowProfile, SetNewShowProfile] = useState(false);
+  const RequestRolesTable = () => {
     return ApiFetch('model/AccessRoles', 'GET', undefined, (Response) => {
       SetNewRolesTable(
         Response.data.map((Role) => {
@@ -18,9 +20,28 @@ export default function AccessRolesComponent(props) {
       );
     });
   };
-  useEffect(RequestRoles, []);
+  const RequestRole = () => {
+    return ApiFetch(
+      `model/AccessRoles/${SelectedKey}`,
+      'GET',
+      undefined,
+      (Response) => {
+        console.log(Response.data);
+      }
+    );
+  };
+  useEffect(RequestRolesTable, []);
   return (
     <>
+      <Modal
+        title="Профиль роли"
+        cancelButtonProps={{ size: 'small' }}
+        okButtonProps={{ size: 'small', type: 'primary' }}
+        visible={ShowProfile}
+        okText="Сохранить"
+      >
+        <AccessRoleProfile />
+      </Modal>
       <div
         style={{
           width: '200px',
@@ -42,6 +63,11 @@ export default function AccessRolesComponent(props) {
             onClick: () => {
               SetNewSelectedKey(Record.Rolename);
             },
+            onDoubleClick: () => {
+              RequestRole().then(() => {
+                SetNewShowProfile(true);
+              });
+            },
           };
         }}
         rowSelection={{
@@ -58,8 +84,22 @@ export default function AccessRolesComponent(props) {
         dataSource={RolesTable}
         size="small"
         columns={[
-          { title: 'Роль', dataIndex: 'Rolename', key: 'Rolename' },
-          { title: 'Описание', dataIndex: 'Comment', key: 'Comment' },
+          {
+            title: 'Роль',
+            dataIndex: 'Rolename',
+            key: 'Rolename',
+            render: (Value, Record, index) => {
+              return <div style={{ cursor: 'pointer' }}>{Value}</div>;
+            },
+          },
+          {
+            title: 'Описание',
+            dataIndex: 'Comment',
+            key: 'Comment',
+            render: (Value, Record, index) => {
+              return <div style={{ cursor: 'pointer' }}>{Value}</div>;
+            },
+          },
         ]}
       />
     </>
