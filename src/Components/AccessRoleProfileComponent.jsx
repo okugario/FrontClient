@@ -3,6 +3,7 @@ import { Input, Collapse, Tree } from 'antd';
 const { TextArea } = Input;
 const { Panel } = Collapse;
 export default function AccessRoleProfile(props) {
+  console.log(props);
   return (
     <>
       <div
@@ -36,7 +37,11 @@ export default function AccessRoleProfile(props) {
       </div>
       <Collapse>
         <Panel header="Меню пользователя" key="UserMenu">
-          <Tree />
+          <Tree
+            treeData={props.Profile.ConfigCategoriesAll}
+            checkable={true}
+            selectable={false}
+          />
         </Panel>
       </Collapse>
       <Collapse>

@@ -22,17 +22,36 @@ export default function AccessRolesComponent(props) {
     });
   };
   const RequestRole = () => {
-    return ApiFetch(
-      `model/AccessRoles/${SelectedKey}`,
-      'GET',
-      undefined,
-      (Response) => {
-        if (!('config_categories' in Response.data.options)) {
-          Response.data.options.config_categories = { items: [] };
+    let Profile = {};
+    let PromiseArray = [];
+    PromiseArray.push(
+      ApiFetch(
+        `model/AccessRoles/${SelectedKey}`,
+        'GET',
+        undefined,
+        (Response) => {
+          if (!('config_categories' in Response.data.options)) {
+            Response.data.options.config_categories = [];
+          }
+          Profile.Profile = Response.data;
         }
-        SetNewAccessRoleProfile(Response.data);
-      }
+      )
     );
+    PromiseArray.push(
+      ApiFetch('model/ConfigSchemes', 'GET', undefined, (Response) => {
+        Profile.ConfigCategoriesAll = Response.data
+          .find((Scheme) => {
+            return Scheme.Caption == 'ApplicationMenu';
+          })
+          .Options.items.map((Element) => {
+            return { title: Element.caption, key: Element.id };
+          });
+      })
+    );
+
+    return Promise.all(PromiseArray).then(() => {
+      SetNewAccessRoleProfile(Profile);
+    });
   };
   useEffect(RequestRolesTable, []);
   return (
