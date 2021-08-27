@@ -1,5 +1,5 @@
 import * as React from 'react';
-import AccessRoleProfile from './AccessRoleProfileComponent';
+import AccessRoleProfileComponent from './AccessRoleProfileComponent';
 import { useEffect, useState } from 'react';
 import { ApiFetch } from '../Helpers/Helpers';
 import { Button, Table, Modal } from 'antd';
@@ -7,6 +7,7 @@ export default function AccessRolesComponent(props) {
   const [RolesTable, SetNewRolesTable] = useState(null);
   const [SelectedKey, SetNewSelectedKey] = useState(null);
   const [ShowProfile, SetNewShowProfile] = useState(false);
+  const [AccessRoleProfile, SetNewAccessRoleProfile] = useState(null);
   const RequestRolesTable = () => {
     return ApiFetch('model/AccessRoles', 'GET', undefined, (Response) => {
       SetNewRolesTable(
@@ -26,7 +27,10 @@ export default function AccessRolesComponent(props) {
       'GET',
       undefined,
       (Response) => {
-        console.log(Response.data);
+        if (!('config_categories' in Response.data.options)) {
+          Response.data.options.config_categories = { items: [] };
+        }
+        SetNewAccessRoleProfile(Response.data);
       }
     );
   };
@@ -34,13 +38,17 @@ export default function AccessRolesComponent(props) {
   return (
     <>
       <Modal
+        onCancel={() => {
+          SetNewShowProfile(false);
+        }}
+        destroyOnClose={true}
         title="Профиль роли"
         cancelButtonProps={{ size: 'small' }}
         okButtonProps={{ size: 'small', type: 'primary' }}
         visible={ShowProfile}
         okText="Сохранить"
       >
-        <AccessRoleProfile />
+        <AccessRoleProfileComponent Profile={AccessRoleProfile} />
       </Modal>
       <div
         style={{
