@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { observer, inject } from 'mobx-react';
-import { reaction } from 'mobx';
+import { useState, useEffect } from 'react';
 import { Table, message } from 'antd';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import { ApiFetch } from '../Helpers/Helpers';
@@ -8,7 +8,7 @@ import 'chartjs-adapter-moment';
 
 import { GenerateTableData } from '../Helpers/Helpers';
 import {
-  Chart,
+  Chart as ChartClass,
   LineController,
   LineElement,
   PointElement,
@@ -20,96 +20,84 @@ import {
   Legend,
   Filler,
 } from 'chart.js';
+const LoadsReportComponent = inject('ProviderStore')(
+  observer((props) => {
+    const [SummaryTables, SetNewSummaryTables] = useState([]);
+    const [LoadsTableRows, SetNewLoadsTableRows] = useState([]);
+    const [LoadsTableColumns, SetNewLoadsTableColumns] = useState([]);
+    const [LoadsChartData, SetNewLoadsChartData] = useState([]);
+    const [LoadsTableSummary, SetNewLoadsTableSummary] = useState([]);
+    const ChartRef = React.createRef();
+    let Chart = null;
+    const InitChart = () => {
+      if (Chart != null) {
+        Chart.data.datasets[0].data = LoadsChartData;
+        Chart.data.labels = LoadsChartData.map((Data) => {
+          return Data[0];
+        });
 
-@inject('ProviderStore')
-@observer
-export default class LoadsReportComponent extends React.Component {
-  constructor(props) {
-    super(props);
-    this.UpdateInKeys = null;
-    this.state = {
-      SummaryTables: [],
-      LoadsTableRows: [],
-      LoadsTableColumns: [],
-      LoadsChartData: [],
-      LoadsTableSummary: [],
-    };
-    this.ChartRef = React.createRef();
-    this.Chart = null;
-  }
-
-  InitChart = () => {
-    if (this.Chart != null) {
-      this.Chart.data.datasets[0].data = this.state.LoadsChartData;
-      this.Chart.data.labels = this.state.LoadsChartData.map((Data) => {
-        return Data[0];
-      });
-
-      this.Chart.update('reset');
-    } else {
-      this.ChartRef.current.getContext('2d');
-      Chart.register(
-        LineController,
-        LinearScale,
-        CategoryScale,
-        PointElement,
-        LineElement,
-        TimeSeriesScale,
-        BarController,
-        BarElement,
-        zoomPlugin,
-        Legend,
-        Filler
-      );
-      this.Chart = new Chart(this.ChartRef.current, {
-        data: {
-          labels: [],
-          datasets: [
-            {
-              type: 'line',
-              label: 'Погрузки',
-              backgroundColor: 'rgb(88,160,160)',
-              fill: true,
-              data: [],
+        Chart.update('reset');
+      } else {
+        ChartRef.current.getContext('2d');
+        ChartClass.register(
+          LineController,
+          LinearScale,
+          CategoryScale,
+          PointElement,
+          LineElement,
+          TimeSeriesScale,
+          BarController,
+          BarElement,
+          zoomPlugin,
+          Legend,
+          Filler
+        );
+        Chart = new ChartClass(ChartRef.current, {
+          data: {
+            labels: [],
+            datasets: [
+              {
+                type: 'line',
+                label: 'Погрузки',
+                backgroundColor: 'rgb(88,160,160)',
+                fill: true,
+                data: [],
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { display: true, position: 'bottom' },
+              zoom: {
+                limits: { x: { min: 'original', max: 'original' } },
+                zoom: { wheel: { enabled: true }, mode: 'x' },
+                pan: {
+                  enabled: true,
+                  mode: 'x',
+                },
+              },
             },
-          ],
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: { display: true, position: 'bottom' },
-            zoom: {
-              limits: { x: { min: 'original', max: 'original' } },
-              zoom: { wheel: { enabled: true }, mode: 'x' },
-              pan: {
-                enabled: true,
-                mode: 'x',
+            scales: {
+              x: {
+                type: 'time',
+                time: { unit: 'hour', displayFormats: { hour: 'hh:mm:ss' } },
               },
             },
           },
-          scales: {
-            x: {
-              type: 'time',
-              time: { unit: 'hour', displayFormats: { hour: 'hh:mm:ss' } },
-            },
-          },
-        },
-      });
-    }
-  };
-  GetReportTitle() {
-    if (this.props.ProviderStore.CurrentTab.Id == 'reports') {
+        });
+      }
+    };
+    const GetReportTitle = () => {
       let Result = null;
       if (
-        this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys
-          .length != 0
+        props.ProviderStore.CurrentTab.Options.CheckedTransportKeys.length != 0
       ) {
-        this.props.ProviderStore.TransportTree.forEach((TreeNode) => {
+        props.ProviderStore.TransportTree.forEach((TreeNode) => {
           TreeNode.children.forEach((Transport) => {
             if (
               Transport.key ==
-              this.props.ProviderStore.CurrentTab.Options
-                .CheckedTransportKeys[0]
+              props.ProviderStore.CurrentTab.Options.CheckedTransportKeys[0]
             ) {
               Result = Transport.title;
             }
@@ -120,80 +108,49 @@ export default class LoadsReportComponent extends React.Component {
       }
 
       return Result;
-    }
-  }
-  RequestReport() {
-    if (
-      this.props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id ==
-      'loadsReport'
-    ) {
+    };
+    const RequestReport = () => {
       if (
-        this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys
-          .length != 0
+        props.ProviderStore.CurrentTab.Options.CheckedTransportKeys.length != 0
       ) {
         ApiFetch(
           `reports/LoadsReport?id=${
-            this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys[0]
-          }&sts=${this.props.ProviderStore.CurrentTab.Options.StartDate.unix()}&fts=${this.props.ProviderStore.CurrentTab.Options.EndDate.unix()}`,
+            props.ProviderStore.CurrentTab.Options.CheckedTransportKeys[0]
+          }&sts=${props.ProviderStore.CurrentTab.Options.StartDate.unix()}&fts=${props.ProviderStore.CurrentTab.Options.EndDate.unix()}`,
           'GET',
           undefined,
           (Response) => {
-            this.setState(
-              {
-                LoadsTableSummary: Response.loadsTable.summary,
-                LoadsChartData: Response.loadsPoints,
-                SummaryTables: Response.summaryTables,
-                LoadsTableRows: GenerateTableData(
-                  'Rows',
-                  Response.loadsTable.rows
-                ),
-                LoadsTableColumns: GenerateTableData(
-                  'Columns',
-                  Response.loadsTable.columns
-                ),
-              },
-              () => {
-                this.Chart.data.labels = this.state.LoadsChartData.map(
-                  (Data) => {
-                    return Data[0];
-                  }
-                );
-                this.Chart.data.datasets[0].data = this.state.LoadsChartData;
-                this.Chart.update('show');
-              }
+            SetNewLoadsTableSummary(Response.loadsTable.summary);
+            SetNewLoadsChartData(Response.loadsPoints);
+            SetNewSummaryTables(Response.summaryTables);
+            SetNewLoadsTableRows(
+              GenerateTableData('Rows', Response.loadsTable.rows)
             );
+            SetNewLoadsTableColumns(
+              GenerateTableData('Columns', Response.loadsTable.columns)
+            );
+            Chart.data.labels = Response.loadsPoints.map((Data) => {
+              return Data[0];
+            });
+            Chart.data.datasets[0].data = Response.loadsPoints;
+            Chart.update('show');
           }
         ).catch(() => {
           message.warn('Нет данных для построения отчета.');
         });
       } else {
-        this.Chart.update('hide');
-        this.setState({
-          SummaryTables: [],
-          LoadsTableRows: [],
-          LoadsTableColumns: [],
-          LoadsChartData: [],
-          LoadsTableSummary: [],
-        });
+        Chart.update('hide');
+        SetNewSummaryTables([]);
+        SetNewLoadsTableRows([]);
+        SetNewLoadsTableColumns([]);
+        SetNewLoadsChartData([]);
+        SetNewLoadsTableSummary([]);
       }
-    }
-  }
-
-  componentDidMount() {
-    this.InitChart();
-    this.RequestReport();
-
-    this.UpdateInKeys = reaction(
-      () => this.props.ProviderStore.CurrentTab.Options.CheckedTransportKeys,
-      () => {
-        this.RequestReport();
-      }
-    );
-  }
-  componentWillUnmount() {
-    this.UpdateInKeys();
-  }
-  render() {
+    };
+    useEffect(() => {
+      InitChart();
+      RequestReport();
+    }, []);
     return (
       <div
         className="FullExtend"
@@ -201,12 +158,12 @@ export default class LoadsReportComponent extends React.Component {
       >
         <div style={{ display: 'grid', gridTemplateRows: '1fr 1fr' }}>
           <div style={{ height: '100%', width: '100%' }}>
-            <strong>{this.GetReportTitle()}</strong>
+            <strong>{GetReportTitle()}</strong>
             <canvas
               onDoubleClick={() => {
-                this.Chart.resetZoom();
+                Chart.resetZoom();
               }}
-              ref={this.ChartRef}
+              ref={ChartRef}
               style={{ height: '100%', width: '100%' }}
             />
           </div>
@@ -215,7 +172,7 @@ export default class LoadsReportComponent extends React.Component {
               summary={() => {
                 return (
                   <Table.Summary fixed={true}>
-                    {this.state.LoadsTableSummary.map((Row, Index) => {
+                    {LoadsTableSummary.map((Row, Index) => {
                       return (
                         <Table.Summary.Row key={Index}>
                           {Row.map((Value, Index) => {
@@ -233,14 +190,14 @@ export default class LoadsReportComponent extends React.Component {
               }}
               scroll={{ y: 170 }}
               size="small"
-              columns={this.state.LoadsTableColumns}
-              dataSource={this.state.LoadsTableRows}
+              columns={LoadsTableColumns}
+              dataSource={LoadsTableRows}
               pagination={false}
             />
           </div>
         </div>
         <div style={{ overflowY: 'auto', height: '500px' }}>
-          {this.state.SummaryTables.map((ObjectTable, Index) => {
+          {SummaryTables.map((ObjectTable, Index) => {
             ObjectTable.table.rows.push(ObjectTable.table.summary[0]);
             return (
               <Table
@@ -259,5 +216,6 @@ export default class LoadsReportComponent extends React.Component {
         </div>
       </div>
     );
-  }
-}
+  })
+);
+export default LoadsReportComponent;
