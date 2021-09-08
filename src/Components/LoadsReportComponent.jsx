@@ -42,21 +42,25 @@ const LoadsReportComponent = inject('ProviderStore')(
       Legend,
       Filler
     );
-
+    const UpdateChart = (LoadsChartData, Labels) => {
+      Chart.data.datasets[0].data = LoadsChartData;
+      Chart.data.labels = Labels;
+      Chart.update('show');
+    };
     const InitChart = (LoadsChartData, Labels) => {
-      if (LoadsChartData == undefined && Labels == undefined) {
+      if (Chart == null) {
         ChartRef.current.getContext('2d');
         SetNewChart(
           new ChartClass(ChartRef.current, {
             data: {
-              labels: [],
+              labels: Labels == undefined ? [] : Labels,
               datasets: [
                 {
                   type: 'line',
                   label: 'Погрузки',
                   backgroundColor: 'rgb(88,160,160)',
                   fill: true,
-                  data: [],
+                  data: LoadsChartData == undefined ? [] : LoadsChartData,
                 },
               ],
             },
@@ -83,10 +87,9 @@ const LoadsReportComponent = inject('ProviderStore')(
           })
         );
       } else {
-        Chart.data.datasets[0].data = LoadsChartData;
-        Chart.data.labels = Labels;
-
-        Chart.update('reset');
+        if (LoadsChartData != undefined && Labels != undefined) {
+          UpdateChart(LoadsChartData, Labels);
+        }
       }
     };
 
@@ -137,7 +140,6 @@ const LoadsReportComponent = inject('ProviderStore')(
                 return Data[0];
               })
             );
-            Chart.update('show');
           }
         ).catch(() => {
           message.warn('Нет данных для построения отчета.');
@@ -149,8 +151,6 @@ const LoadsReportComponent = inject('ProviderStore')(
           SetNewLoadsTableRows([]);
           SetNewLoadsTableColumns([]);
           SetNewLoadsTableSummary([]);
-        } else {
-          InitChart();
         }
       }
     };
