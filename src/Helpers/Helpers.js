@@ -1,3 +1,4 @@
+import { message } from 'antd';
 import Moment from 'moment';
 export const CheckUniqale = (Trucks) => {
   let Count = 0;
@@ -28,7 +29,7 @@ export const ApiFetch = (Adress, Method, Body, Callback) => {
             }
           })
           .catch((JsonError) => {
-            console.log(JsonError);
+            message.error(`Ошибка форматирования JSON`);
           });
       })
       .catch((FetchError) => {
