@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { observer, inject } from 'mobx-react';
 import { useState, useEffect, createRef } from 'react';
-import { Table, message } from 'antd';
+import { Table, message, Button } from 'antd';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import { ApiFetch } from '../Helpers/Helpers';
 import 'chartjs-adapter-moment';
@@ -146,7 +146,7 @@ const LoadsReportComponent = inject('ProviderStore')(
         });
       } else {
         if (Chart != null) {
-          Chart.update('hide');
+          UpdateChart([], []);
           SetNewSummaryTables([]);
           SetNewLoadsTableRows([]);
           SetNewLoadsTableColumns([]);
@@ -168,7 +168,14 @@ const LoadsReportComponent = inject('ProviderStore')(
       >
         <div style={{ display: 'grid', gridTemplateRows: '1fr 1fr' }}>
           <div style={{ height: '100%', width: '100%' }}>
-            <strong>{GetReportTitle()}</strong>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <strong>{GetReportTitle()}</strong>
+              {LoadsTableRows.length != 0 ? (
+                <Button size="small" type="primary">
+                  Выгрузка в CSV
+                </Button>
+              ) : null}
+            </div>
             <canvas
               onDoubleClick={() => {
                 Chart.resetZoom();
