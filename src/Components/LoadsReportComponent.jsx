@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { observer, inject } from 'mobx-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, createRef } from 'react';
 import { Table, message } from 'antd';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import { ApiFetch } from '../Helpers/Helpers';
@@ -25,69 +25,71 @@ const LoadsReportComponent = inject('ProviderStore')(
     const [SummaryTables, SetNewSummaryTables] = useState([]);
     const [LoadsTableRows, SetNewLoadsTableRows] = useState([]);
     const [LoadsTableColumns, SetNewLoadsTableColumns] = useState([]);
-    const [LoadsChartData, SetNewLoadsChartData] = useState([]);
     const [LoadsTableSummary, SetNewLoadsTableSummary] = useState([]);
-    const ChartRef = React.createRef();
-    let Chart = null;
-    const InitChart = () => {
-      if (Chart != null) {
-        Chart.data.datasets[0].data = LoadsChartData;
-        Chart.data.labels = LoadsChartData.map((Data) => {
-          return Data[0];
-        });
+    const [Chart, SetNewChart] = useState(null);
+    const [ChartRef, SetNewChartRef] = useState(createRef());
 
-        Chart.update('reset');
-      } else {
+    ChartClass.register(
+      LineController,
+      LinearScale,
+      CategoryScale,
+      PointElement,
+      LineElement,
+      TimeSeriesScale,
+      BarController,
+      BarElement,
+      zoomPlugin,
+      Legend,
+      Filler
+    );
+
+    const InitChart = (LoadsChartData, Labels) => {
+      if (LoadsChartData == undefined && Labels == undefined) {
         ChartRef.current.getContext('2d');
-        ChartClass.register(
-          LineController,
-          LinearScale,
-          CategoryScale,
-          PointElement,
-          LineElement,
-          TimeSeriesScale,
-          BarController,
-          BarElement,
-          zoomPlugin,
-          Legend,
-          Filler
-        );
-        Chart = new ChartClass(ChartRef.current, {
-          data: {
-            labels: [],
-            datasets: [
-              {
-                type: 'line',
-                label: 'Погрузки',
-                backgroundColor: 'rgb(88,160,160)',
-                fill: true,
-                data: [],
+        SetNewChart(
+          new ChartClass(ChartRef.current, {
+            data: {
+              labels: [],
+              datasets: [
+                {
+                  type: 'line',
+                  label: 'Погрузки',
+                  backgroundColor: 'rgb(88,160,160)',
+                  fill: true,
+                  data: [],
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: { display: true, position: 'bottom' },
+                zoom: {
+                  limits: { x: { min: 'original', max: 'original' } },
+                  zoom: { wheel: { enabled: true }, mode: 'x' },
+                  pan: {
+                    enabled: true,
+                    mode: 'x',
+                  },
+                },
               },
-            ],
-          },
-          options: {
-            responsive: true,
-            plugins: {
-              legend: { display: true, position: 'bottom' },
-              zoom: {
-                limits: { x: { min: 'original', max: 'original' } },
-                zoom: { wheel: { enabled: true }, mode: 'x' },
-                pan: {
-                  enabled: true,
-                  mode: 'x',
+              scales: {
+                x: {
+                  type: 'time',
+                  time: { unit: 'hour', displayFormats: { hour: 'hh:mm:ss' } },
                 },
               },
             },
-            scales: {
-              x: {
-                type: 'time',
-                time: { unit: 'hour', displayFormats: { hour: 'hh:mm:ss' } },
-              },
-            },
-          },
-        });
+          })
+        );
+      } else {
+        Chart.data.datasets[0].data = LoadsChartData;
+        Chart.data.labels = Labels;
+
+        Chart.update('reset');
       }
     };
+
     const GetReportTitle = () => {
       let Result = null;
       if (
@@ -121,7 +123,6 @@ const LoadsReportComponent = inject('ProviderStore')(
           undefined,
           (Response) => {
             SetNewLoadsTableSummary(Response.loadsTable.summary);
-            SetNewLoadsChartData(Response.loadsPoints);
             SetNewSummaryTables(Response.summaryTables);
             SetNewLoadsTableRows(
               GenerateTableData('Rows', Response.loadsTable.rows)
@@ -129,28 +130,37 @@ const LoadsReportComponent = inject('ProviderStore')(
             SetNewLoadsTableColumns(
               GenerateTableData('Columns', Response.loadsTable.columns)
             );
-            Chart.data.labels = Response.loadsPoints.map((Data) => {
-              return Data[0];
-            });
-            Chart.data.datasets[0].data = Response.loadsPoints;
+
+            InitChart(
+              Response.loadsPoints,
+              Response.loadsPoints.map((Data) => {
+                return Data[0];
+              })
+            );
             Chart.update('show');
           }
         ).catch(() => {
           message.warn('Нет данных для построения отчета.');
         });
       } else {
-        Chart.update('hide');
-        SetNewSummaryTables([]);
-        SetNewLoadsTableRows([]);
-        SetNewLoadsTableColumns([]);
-        SetNewLoadsChartData([]);
-        SetNewLoadsTableSummary([]);
+        if (Chart != null) {
+          Chart.update('hide');
+          SetNewSummaryTables([]);
+          SetNewLoadsTableRows([]);
+          SetNewLoadsTableColumns([]);
+          SetNewLoadsTableSummary([]);
+        } else {
+          InitChart();
+        }
       }
     };
-    useEffect(() => {
-      InitChart();
-      RequestReport();
-    }, []);
+
+    useEffect(RequestReport, [
+      props.ProviderStore.CurrentTab.Options.CheckedTransportKeys,
+      props.ProviderStore.CurrentTab.Options.StartDate,
+      props.ProviderStore.CurrentTab.Options.EndDate,
+    ]);
+
     return (
       <div
         className="FullExtend"
