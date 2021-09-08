@@ -28,7 +28,9 @@ const LoadsReportComponent = inject('ProviderStore')(
     const [LoadsTableSummary, SetNewLoadsTableSummary] = useState([]);
     const [Chart, SetNewChart] = useState(null);
     const [ChartRef, SetNewChartRef] = useState(createRef());
-
+    const CurrentTab = props.ProviderStore.OpenTabs.find((Tab) => {
+      return Tab.Key == props.ProviderStore.CurrentTabKey;
+    });
     ChartClass.register(
       LineController,
       LinearScale,
@@ -94,71 +96,68 @@ const LoadsReportComponent = inject('ProviderStore')(
     };
 
     const GetReportTitle = () => {
-      let Result = null;
-      if (
-        props.ProviderStore.CurrentTab.Options.CheckedTransportKeys.length != 0
-      ) {
-        props.ProviderStore.TransportTree.forEach((TreeNode) => {
-          TreeNode.children.forEach((Transport) => {
-            if (
-              Transport.key ==
-              props.ProviderStore.CurrentTab.Options.CheckedTransportKeys[0]
-            ) {
-              Result = Transport.title;
-            }
+      if (CurrentTab.Options.CurrentMenuItem.id == 'loadsReport') {
+        let Result = null;
+        if (CurrentTab.Options.CheckedTransportKeys.length != 0) {
+          props.ProviderStore.TransportTree.forEach((TreeNode) => {
+            TreeNode.children.forEach((Transport) => {
+              if (Transport.key == CurrentTab.Options.CheckedTransportKeys[0]) {
+                Result = Transport.title;
+              }
+            });
           });
-        });
-      } else {
-        Result = 'Транспортное средство не выбрано';
-      }
+        } else {
+          Result = 'Транспортное средство не выбрано';
+        }
 
-      return Result;
+        return Result;
+      }
     };
     const RequestReport = () => {
-      if (
-        props.ProviderStore.CurrentTab.Options.CheckedTransportKeys.length != 0
-      ) {
-        ApiFetch(
-          `reports/LoadsReport?id=${
-            props.ProviderStore.CurrentTab.Options.CheckedTransportKeys[0]
-          }&sts=${props.ProviderStore.CurrentTab.Options.StartDate.unix()}&fts=${props.ProviderStore.CurrentTab.Options.EndDate.unix()}`,
-          'GET',
-          undefined,
-          (Response) => {
-            SetNewLoadsTableSummary(Response.loadsTable.summary);
-            SetNewSummaryTables(Response.summaryTables);
-            SetNewLoadsTableRows(
-              GenerateTableData('Rows', Response.loadsTable.rows)
-            );
-            SetNewLoadsTableColumns(
-              GenerateTableData('Columns', Response.loadsTable.columns)
-            );
+      if (CurrentTab.Options.CurrentMenuItem.id == 'loadsReport') {
+        if (CurrentTab.Options.CheckedTransportKeys.length != 0) {
+          ApiFetch(
+            `reports/LoadsReport?id=${
+              CurrentTab.Options.CheckedTransportKeys[0]
+            }&sts=${CurrentTab.Options.StartDate.unix()}&fts=${CurrentTab.Options.EndDate.unix()}`,
+            'GET',
+            undefined,
+            (Response) => {
+              SetNewLoadsTableSummary(Response.loadsTable.summary);
+              SetNewSummaryTables(Response.summaryTables);
+              SetNewLoadsTableRows(
+                GenerateTableData('Rows', Response.loadsTable.rows)
+              );
+              SetNewLoadsTableColumns(
+                GenerateTableData('Columns', Response.loadsTable.columns)
+              );
 
-            InitChart(
-              Response.loadsPoints,
-              Response.loadsPoints.map((Data) => {
-                return Data[0];
-              })
-            );
+              InitChart(
+                Response.loadsPoints,
+                Response.loadsPoints.map((Data) => {
+                  return Data[0];
+                })
+              );
+            }
+          ).catch(() => {
+            message.warn('Нет данных для построения отчета.');
+          });
+        } else {
+          if (Chart != null) {
+            UpdateChart([], []);
+            SetNewSummaryTables([]);
+            SetNewLoadsTableRows([]);
+            SetNewLoadsTableColumns([]);
+            SetNewLoadsTableSummary([]);
           }
-        ).catch(() => {
-          message.warn('Нет данных для построения отчета.');
-        });
-      } else {
-        if (Chart != null) {
-          UpdateChart([], []);
-          SetNewSummaryTables([]);
-          SetNewLoadsTableRows([]);
-          SetNewLoadsTableColumns([]);
-          SetNewLoadsTableSummary([]);
         }
       }
     };
 
     useEffect(RequestReport, [
-      props.ProviderStore.CurrentTab.Options.CheckedTransportKeys,
-      props.ProviderStore.CurrentTab.Options.StartDate,
-      props.ProviderStore.CurrentTab.Options.EndDate,
+      CurrentTab.Options.CheckedTransportKeys,
+      CurrentTab.Options.StartDate,
+      CurrentTab.Options.EndDate,
     ]);
 
     return (
