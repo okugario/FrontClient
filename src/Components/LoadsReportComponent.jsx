@@ -28,9 +28,7 @@ const LoadsReportComponent = inject('ProviderStore')(
     const [LoadsTableSummary, SetNewLoadsTableSummary] = useState([]);
     const [Chart, SetNewChart] = useState(null);
     const [ChartRef, SetNewChartRef] = useState(createRef());
-    const CurrentTab = props.ProviderStore.OpenTabs.find((Tab) => {
-      return Tab.Key == props.ProviderStore.CurrentTabKey;
-    });
+
     ChartClass.register(
       LineController,
       LinearScale,
@@ -96,12 +94,21 @@ const LoadsReportComponent = inject('ProviderStore')(
     };
 
     const GetReportTitle = () => {
-      if (CurrentTab.Options.CurrentMenuItem.id == 'loadsReport') {
+      if (
+        props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id ==
+        'loadsReport'
+      ) {
         let Result = null;
-        if (CurrentTab.Options.CheckedTransportKeys.length != 0) {
+        if (
+          props.ProviderStore.CurrentTab.Options.CheckedTransportKeys.length !=
+          0
+        ) {
           props.ProviderStore.TransportTree.forEach((TreeNode) => {
             TreeNode.children.forEach((Transport) => {
-              if (Transport.key == CurrentTab.Options.CheckedTransportKeys[0]) {
+              if (
+                Transport.key ==
+                props.ProviderStore.CurrentTab.Options.CheckedTransportKeys[0]
+              ) {
                 Result = Transport.title;
               }
             });
@@ -114,12 +121,18 @@ const LoadsReportComponent = inject('ProviderStore')(
       }
     };
     const RequestReport = () => {
-      if (CurrentTab.Options.CurrentMenuItem.id == 'loadsReport') {
-        if (CurrentTab.Options.CheckedTransportKeys.length != 0) {
+      if (
+        props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id ==
+        'loadsReport'
+      ) {
+        if (
+          props.ProviderStore.CurrentTab.Options.CheckedTransportKeys.length !=
+          0
+        ) {
           ApiFetch(
             `reports/LoadsReport?id=${
-              CurrentTab.Options.CheckedTransportKeys[0]
-            }&sts=${CurrentTab.Options.StartDate.unix()}&fts=${CurrentTab.Options.EndDate.unix()}`,
+              props.ProviderStore.CurrentTab.Options.CheckedTransportKeys[0]
+            }&sts=${props.ProviderStore.CurrentTab.Options.StartDate.unix()}&fts=${props.ProviderStore.CurrentTab.Options.EndDate.unix()}&type=json`,
             'GET',
             undefined,
             (Response) => {
@@ -155,9 +168,9 @@ const LoadsReportComponent = inject('ProviderStore')(
     };
 
     useEffect(RequestReport, [
-      CurrentTab.Options.CheckedTransportKeys,
-      CurrentTab.Options.StartDate,
-      CurrentTab.Options.EndDate,
+      props.ProviderStore.CurrentTab.Options.CheckedTransportKeys,
+      props.ProviderStore.CurrentTab.Options.StartDate,
+      props.ProviderStore.CurrentTab.Options.EndDate,
     ]);
 
     return (
@@ -169,8 +182,17 @@ const LoadsReportComponent = inject('ProviderStore')(
           <div style={{ height: '100%', width: '100%' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <strong>{GetReportTitle()}</strong>
-              {LoadsTableRows.length != 0 ? (
-                <Button size="small" type="primary">
+              {props.ProviderStore.CurrentTab.Options.CheckedTransportKeys
+                .length != 0 ? (
+                <Button
+                  size="small"
+                  type="primary"
+                  download="LoadsReport.csv"
+                  href={`reports/LoadsReport?id=${
+                    props.ProviderStore.CurrentTab.Options
+                      .CheckedTransportKeys[0]
+                  }&sts=${props.ProviderStore.CurrentTab.Options.StartDate.unix()}&fts=${props.ProviderStore.CurrentTab.Options.EndDate.unix()}&type=csv`}
+                >
                   Выгрузка в CSV
                 </Button>
               ) : null}
