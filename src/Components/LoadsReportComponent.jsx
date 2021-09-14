@@ -154,6 +154,11 @@ const LoadsReportComponent = inject('ProviderStore')(
             }
           ).catch(() => {
             message.warn('Нет данных для построения отчета.');
+            UpdateChart([], []);
+            SetNewSummaryTables([]);
+            SetNewLoadsTableRows([]);
+            SetNewLoadsTableColumns([]);
+            SetNewLoadsTableSummary([]);
           });
         } else {
           if (Chart != null) {
@@ -182,8 +187,7 @@ const LoadsReportComponent = inject('ProviderStore')(
           <div style={{ height: '100%', width: '100%' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <strong>{GetReportTitle()}</strong>
-              {props.ProviderStore.CurrentTab.Options.CheckedTransportKeys
-                .length != 0 ? (
+              {LoadsTableRows.length != 0 ? (
                 <Button
                   size="small"
                   type="primary"
