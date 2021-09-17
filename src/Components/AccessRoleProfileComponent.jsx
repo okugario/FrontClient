@@ -38,6 +38,7 @@ export default function AccessRoleProfile(props) {
       <Collapse>
         <Panel header="Меню пользователя" key="UserMenu">
           <Tree
+            height={200}
             treeData={props.Profile.ConfigCategoriesAll}
             checkable={true}
             selectable={false}
@@ -45,7 +46,14 @@ export default function AccessRoleProfile(props) {
         </Panel>
       </Collapse>
       <Collapse>
-        <Panel header="Участки" key="Regions"></Panel>
+        <Panel header="Участки" key="Regions">
+          <Tree
+            height={200}
+            treeData={props.Profile.AllRegions}
+            checkable={true}
+            selectable={false}
+          />
+        </Panel>
       </Collapse>
     </>
   );

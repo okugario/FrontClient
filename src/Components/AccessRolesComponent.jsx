@@ -51,7 +51,14 @@ export default function AccessRolesComponent(props) {
         );
       })
     );
-
+    PromiseArray.push(
+      ApiFetch('model/Regions', 'GET', undefined, (Response) => {
+        Profile.AllRegions = AntDGenerateTreeData(Response.data, {
+          TitleName: 'Caption',
+          KeyName: 'Id',
+        });
+      })
+    );
     return Promise.all(PromiseArray).then(() => {
       SetNewAccessRoleProfile(Profile);
     });
@@ -60,6 +67,7 @@ export default function AccessRolesComponent(props) {
   return (
     <>
       <Modal
+        maskClosable={false}
         onCancel={() => {
           SetNewShowProfile(false);
         }}
