@@ -21,11 +21,15 @@ export function AntDGenerateTreeData(Objects, Options) {
       key: TreeNode[Options.KeyName],
     };
     if (Options.ChildrensName in TreeNode) {
-      NewTreeNode.children = AntDGenerateTreeData(TreeNode.items, Options);
+      NewTreeNode.children = AntDGenerateTreeData(
+        TreeNode[Options.ChildrensName],
+        Options
+      );
     }
     if ('TreeNodeOptions' in Options) {
       NewTreeNode = Object.assign(NewTreeNode, Options.TreeNodeOptions);
     }
+
     return NewTreeNode;
   });
 }

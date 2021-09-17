@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { observer, inject } from 'mobx-react';
-import { ApiFetch } from '../Helpers/Helpers';
+import { AntDGenerateTreeData, ApiFetch } from '../Helpers/Helpers';
 import { Tabs, Tree, Dropdown, Menu } from 'antd';
 const { TabPane } = Tabs;
 const TabTreeComponent = inject('ProviderStore')(
@@ -24,7 +24,14 @@ const TabTreeComponent = inject('ProviderStore')(
         'GET',
         undefined,
         (Response) => {
-          props.ProviderStore.SetNewTransportTree(Response.data);
+          props.ProviderStore.SetNewTransportTree(
+            AntDGenerateTreeData(Response.data, {
+              TitleName: 'Caption',
+              KeyName: 'Id',
+              ChildrensName: 'Vehicles',
+              TreeNodeOptions: { disableCheckbox: true },
+            })
+          );
         }
       );
       ApiFetch('reports/GeofenceTree', 'GET', undefined, (Response) => {

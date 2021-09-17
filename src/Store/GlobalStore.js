@@ -46,18 +46,8 @@ class Store {
   SetNewCheckedGeozonesKeys(NewCheckedKeys) {
     this.CurrentTab.Options.CheckedGeozonesKeys = NewCheckedKeys;
   }
-  SetNewTransportTree(TransportData) {
-    this.TransportTree = TransportData.map((Group) => {
-      return {
-        disableCheckbox: true,
-        selectable: false,
-        title: Group.Caption,
-        key: Group.Id,
-        children: Group.Vehicles.map((Transport) => {
-          return { title: Transport.Caption, key: Transport.Id };
-        }),
-      };
-    });
+  SetNewTransportTree(NewTransportTree) {
+    this.TransportTree = NewTransportTree;
   }
   SetNewCurrentTab(NewCurrentTabKey) {
     this.CurrentTabKey = NewCurrentTabKey;
