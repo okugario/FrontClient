@@ -16,7 +16,7 @@ export default function AccessRoleProfile(props) {
         <div style={{ display: 'flex', alignItems: 'center' }}>Роль:</div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Input
-            value={props.Profile.rolename}
+            value={props.Profile.Profile.rolename}
             onChange={(Event) => {}}
             size="small"
             style={{ width: '160px' }}
@@ -32,7 +32,7 @@ export default function AccessRoleProfile(props) {
       >
         <div style={{ display: 'flex', alignItems: 'center' }}>Пояснение:</div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <TextArea size="small" value={props.Profile.comment} />
+          <TextArea size="small" value={props.Profile.Profile.comment} />
         </div>
       </div>
       <Collapse>
@@ -43,9 +43,6 @@ export default function AccessRoleProfile(props) {
             selectable={false}
           />
         </Panel>
-      </Collapse>
-      <Collapse>
-        <Panel header="Справочники" key="ConfigCategories"></Panel>
       </Collapse>
       <Collapse>
         <Panel header="Участки" key="Regions"></Panel>

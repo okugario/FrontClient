@@ -1,7 +1,7 @@
 import * as React from 'react';
 import AccessRoleProfileComponent from './AccessRoleProfileComponent';
 import { useEffect, useState } from 'react';
-import { ApiFetch } from '../Helpers/Helpers';
+import { ApiFetch, AntDGenerateTreeData } from '../Helpers/Helpers';
 import { Button, Table, Modal } from 'antd';
 export default function AccessRolesComponent(props) {
   const [RolesTable, SetNewRolesTable] = useState(null);
@@ -39,13 +39,16 @@ export default function AccessRolesComponent(props) {
     );
     PromiseArray.push(
       ApiFetch('model/ConfigSchemes', 'GET', undefined, (Response) => {
-        Profile.ConfigCategoriesAll = Response.data
-          .find((Scheme) => {
+        Profile.ConfigCategoriesAll = AntDGenerateTreeData(
+          Response.data.find((Scheme) => {
             return Scheme.Caption == 'ApplicationMenu';
-          })
-          .Options.items.map((Element) => {
-            return { title: Element.caption, key: Element.id };
-          });
+          }).Options.items,
+          {
+            ChildrensName: 'items',
+            TitleName: 'caption',
+            KeyName: 'id',
+          }
+        );
       })
     );
 

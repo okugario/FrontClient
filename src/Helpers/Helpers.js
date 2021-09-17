@@ -14,6 +14,21 @@ export const CheckUniqale = (Trucks) => {
   });
   return Count <= 1;
 };
+export function AntDGenerateTreeData(Objects, Options) {
+  return Objects.map((TreeNode) => {
+    let NewTreeNode = {
+      title: TreeNode[Options.TitleName],
+      key: TreeNode[Options.KeyName],
+    };
+    if (Options.ChildrensName in TreeNode) {
+      NewTreeNode.children = AntDGenerateTreeData(TreeNode.items, Options);
+    }
+    if ('TreeNodeOptions' in Options) {
+      NewTreeNode = Object.assign(NewTreeNode, Options.TreeNodeOptions);
+    }
+    return NewTreeNode;
+  });
+}
 export const ApiFetch = (Adress, Method, Body, Callback) => {
   return new Promise((resolve, reject) => {
     fetch(Adress, { body: JSON.stringify(Body), method: Method })
