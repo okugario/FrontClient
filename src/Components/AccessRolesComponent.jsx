@@ -63,6 +63,28 @@ export default function AccessRolesComponent(props) {
       SetNewAccessRoleProfile(Profile);
     });
   };
+  const RoleProfileHandler = (Action, Data) => {
+    let NewAccessRoleProfile = { ...AccessRoleProfile };
+
+    switch (Action) {
+      case 'ChangeCaption':
+        NewAccessRoleProfile.Profile.rolename = Data;
+        SetNewAccessRoleProfile(NewAccessRoleProfile);
+        break;
+      case 'ChangeComment':
+        NewAccessRoleProfile.Profile.comment = Data;
+        SetNewAccessRoleProfile(NewAccessRoleProfile);
+        break;
+      case 'ChangeCategories':
+        NewAccessRoleProfile.Profile.options.config_categories = Data;
+        SetNewAccessRoleProfile(NewAccessRoleProfile);
+        break;
+      case 'ChangeRegions':
+        NewAccessRoleProfile.Profile.options.config_regions = Data;
+        SetNewAccessRoleProfile(NewAccessRoleProfile);
+        break;
+    }
+  };
   useEffect(RequestRolesTable, []);
   return (
     <>
@@ -78,7 +100,10 @@ export default function AccessRolesComponent(props) {
         visible={ShowProfile}
         okText="Сохранить"
       >
-        <AccessRoleProfileComponent Profile={AccessRoleProfile} />
+        <AccessRoleProfileComponent
+          Profile={AccessRoleProfile}
+          RoleProfileHandler={RoleProfileHandler}
+        />
       </Modal>
       <div
         style={{

@@ -16,8 +16,10 @@ export default function AccessRoleProfile(props) {
         <div style={{ display: 'flex', alignItems: 'center' }}>Роль:</div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Input
+            onChange={(Event) => {
+              props.RoleProfileHandler('ChangeCaption', Event.target.value);
+            }}
             value={props.Profile.Profile.rolename}
-            onChange={(Event) => {}}
             size="small"
             style={{ width: '160px' }}
           />
@@ -32,16 +34,26 @@ export default function AccessRoleProfile(props) {
       >
         <div style={{ display: 'flex', alignItems: 'center' }}>Пояснение:</div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <TextArea size="small" value={props.Profile.Profile.comment} />
+          <TextArea
+            size="small"
+            value={props.Profile.Profile.comment}
+            onChange={(Event) => {
+              props.RoleProfileHandler('ChangeComment', Event.target.value);
+            }}
+          />
         </div>
       </div>
       <Collapse>
         <Panel header="Меню пользователя" key="UserMenu">
           <Tree
+            onCheck={(Checked) => {
+              props.RoleProfileHandler('ChangeCategories', Checked);
+            }}
             height={200}
             treeData={props.Profile.ConfigCategoriesAll}
             checkable={true}
             selectable={false}
+            checkedKeys={props.Profile.Profile.options.config_categories}
           />
         </Panel>
       </Collapse>
@@ -52,6 +64,10 @@ export default function AccessRoleProfile(props) {
             treeData={props.Profile.AllRegions}
             checkable={true}
             selectable={false}
+            checkedKeys={props.Profile.Profile.options.config_regions}
+            onCheck={(Checked) => {
+              props.RoleProfileHandler('ChangeRegions', Checked);
+            }}
           />
         </Panel>
       </Collapse>
