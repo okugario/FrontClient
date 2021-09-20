@@ -64,7 +64,21 @@ export default function AccessRolesComponent(props) {
     });
   };
   const RoleProfileHandler = (Action, Data) => {
-    let NewAccessRoleProfile = { ...AccessRoleProfile };
+    let PromiseArray = [];
+    let NewAccessRoleProfile =
+      AccessRoleProfile != null
+        ? { ...AccessRoleProfile }
+        : {
+            Profile: {
+              rolename: '',
+              comment: '',
+              options: {
+                access: 'user',
+                config_categories: [],
+                config_regions: [],
+              },
+            },
+          };
 
     switch (Action) {
       case 'ChangeCaption':
@@ -83,6 +97,37 @@ export default function AccessRolesComponent(props) {
         NewAccessRoleProfile.Profile.options.config_regions = Data;
         SetNewAccessRoleProfile(NewAccessRoleProfile);
         break;
+      case 'AddRole':
+        PromiseArray.push(
+          ApiFetch('model/ConfigSchemes', 'GET', undefined, (Response) => {
+            NewAccessRoleProfile.ConfigCategoriesAll = AntDGenerateTreeData(
+              Response.data.find((Scheme) => {
+                return Scheme.Caption == 'ApplicationMenu';
+              }).Options.items,
+              {
+                ChildrensName: 'items',
+                TitleName: 'caption',
+                KeyName: 'id',
+              }
+            );
+          })
+        );
+        PromiseArray.push(
+          ApiFetch('model/Regions', 'GET', undefined, (Response) => {
+            NewAccessRoleProfile.AllRegions = AntDGenerateTreeData(
+              Response.data,
+              {
+                TitleName: 'Caption',
+                KeyName: 'Id',
+              }
+            );
+          })
+        );
+        Promise.all(PromiseArray).then(() => {
+          SetNewAccessRoleProfile(NewAccessRoleProfile);
+          SetNewShowProfile(true);
+        });
+        break;
     }
   };
   useEffect(RequestRolesTable, []);
@@ -91,6 +136,7 @@ export default function AccessRolesComponent(props) {
       <Modal
         maskClosable={false}
         onCancel={() => {
+          SetNewAccessRoleProfile(null);
           SetNewShowProfile(false);
         }}
         destroyOnClose={true}
@@ -113,7 +159,13 @@ export default function AccessRolesComponent(props) {
           marginBottom: '5px',
         }}
       >
-        <Button size="small" type="primary">
+        <Button
+          size="small"
+          type="primary"
+          onClick={() => {
+            RoleProfileHandler('AddRole');
+          }}
+        >
           Добавить
         </Button>
         <Button size="small" danger type="primary">
