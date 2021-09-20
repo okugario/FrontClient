@@ -3,6 +3,7 @@ import AccessRoleProfileComponent from './AccessRoleProfileComponent';
 import { useEffect, useState } from 'react';
 import { ApiFetch, AntDGenerateTreeData } from '../Helpers/Helpers';
 import { Button, Table, Modal } from 'antd';
+
 export default function AccessRolesComponent(props) {
   const [RolesTable, SetNewRolesTable] = useState(null);
   const [SelectedKey, SetNewSelectedKey] = useState(null);
@@ -15,7 +16,6 @@ export default function AccessRolesComponent(props) {
           return {
             Rolename: Role.rolename,
             Comment: Role.comment,
-            Key: Role.rolename,
           };
         })
       );
@@ -34,6 +34,7 @@ export default function AccessRolesComponent(props) {
             Response.data.options.config_categories = [];
           }
           Profile.Profile = Response.data;
+          Profile.Profile.new = false;
         }
       )
     );
@@ -70,6 +71,7 @@ export default function AccessRolesComponent(props) {
         ? { ...AccessRoleProfile }
         : {
             Profile: {
+              new: true,
               rolename: '',
               comment: '',
               options: {
@@ -128,12 +130,43 @@ export default function AccessRolesComponent(props) {
           SetNewShowProfile(true);
         });
         break;
+      case 'SaveRoleProfile':
+        ApiFetch(
+          `model/AccessRoles${
+            AccessRoleProfile.Profile.new
+              ? ``
+              : `/${AccessRoleProfile.Profile.rolename}`
+          } `,
+          AccessRoleProfile.Profile.new ? 'POST' : 'PATCH',
+          AccessRoleProfile.Profile,
+          (Response) => {
+            RequestRolesTable().then(() => {
+              SetNewShowProfile(false);
+              SetNewAccessRoleProfile(null);
+            });
+          }
+        );
+        break;
+      case 'DeleteRoles':
+        ApiFetch(
+          `model/AccessRoles/${SelectedKey}`,
+          'DELETE',
+          undefined,
+          (Response) => {
+            SetNewSelectedKey(null);
+            RequestRolesTable();
+          }
+        );
+        break;
     }
   };
   useEffect(RequestRolesTable, []);
   return (
     <>
       <Modal
+        onOk={() => {
+          RoleProfileHandler('SaveRoleProfile');
+        }}
         maskClosable={false}
         onCancel={() => {
           SetNewAccessRoleProfile(null);
@@ -168,7 +201,26 @@ export default function AccessRolesComponent(props) {
         >
           Добавить
         </Button>
-        <Button size="small" danger type="primary">
+        <Button
+          size="small"
+          danger
+          type="primary"
+          onClick={() => {
+            if (SelectedKey != null) {
+              Modal.confirm({
+                okText: 'Удалить',
+                onOk: () => {
+                  RoleProfileHandler('DeleteRoles');
+                },
+                cancelText: 'Отмена',
+                okButtonProps: { size: 'small', danger: true, type: 'primary' },
+                cancelButtonProps: { size: 'small' },
+                title: 'Подтвердите действие',
+                content: 'Вы действительно хотите удалить объект',
+              });
+            }
+          }}
+        >
           Удалить
         </Button>
       </div>
@@ -195,7 +247,7 @@ export default function AccessRolesComponent(props) {
         }}
         scroll={{ y: 700 }}
         pagination={false}
-        rowKey="Key"
+        rowKey="Rolename"
         dataSource={RolesTable}
         size="small"
         columns={[

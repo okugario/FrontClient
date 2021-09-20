@@ -3,7 +3,6 @@ import { Input, Collapse, Tree } from 'antd';
 const { TextArea } = Input;
 const { Panel } = Collapse;
 export default function AccessRoleProfile(props) {
-  console.log(props);
   return (
     <>
       <div
@@ -16,6 +15,7 @@ export default function AccessRoleProfile(props) {
         <div style={{ display: 'flex', alignItems: 'center' }}>Роль:</div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Input
+            disabled={!props.Profile.Profile.new}
             onChange={(Event) => {
               props.RoleProfileHandler('ChangeCaption', Event.target.value);
             }}
