@@ -16,15 +16,16 @@ export default class StatisticComponent extends React.Component {
       SearchString: null,
       Table: null,
       Columns: null,
+      SearchColumn: null,
     };
   }
 
-  ChangeSearchString = (Value) => {
-    this.setState({ SearchString: Value });
+  ChangeSearchString = (Value, ColumnKey) => {
+    this.setState({ SearchString: Value, SearchColumn: ColumnKey });
   };
   ClearSearch = (Event) => {
     if (Event.key == 'Escape') {
-      this.setState({ SearchString: null });
+      this.setState({ SearchString: null, SearchColumn: null });
       this.SearchRef.current.setValue();
     }
   };
@@ -38,16 +39,37 @@ export default class StatisticComponent extends React.Component {
       this.setState({
         Table: Response.dataSource,
         Columns: Response.columns.map((Column) => {
+          Column.filterIcon = <SearchOutlined />;
+          Column.filterDropdown = () => {
+            return (
+              <Input
+                size="small"
+                ref={this.SearchRef}
+                onPressEnter={(Event) => {
+                  this.ChangeSearchString(Event.target.value, Column.key);
+                }}
+              />
+            );
+          };
           Column.onFilter = (value, record) => {
-            if (this.state.SearchString != null) {
-              return record[value].toString().includes(this.state.SearchString);
+            if (
+              this.state.SearchString != null &&
+              this.state.SearchColumn == Column.key
+            ) {
+              return record[value]
+                .toString()
+                .toLowerCase()
+                .includes(this.state.SearchString);
             } else {
               return true;
             }
           };
           Column.sorter = TableSorter(Column.dataIndex);
-          Column.render = (value, record, index) => {
-            if (this.state.SearchString != null) {
+          Column.render = (value) => {
+            if (
+              this.state.SearchString != null &&
+              this.state.SearchColumn == Column.key
+            ) {
               return (
                 <Highlighter
                   highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
@@ -60,13 +82,8 @@ export default class StatisticComponent extends React.Component {
               return value;
             }
           };
-          Column.filteredValue = [
-            'object_id',
-            'caption',
-            'last_time',
-            'groups',
-            'retrans',
-          ];
+
+          Column.filteredValue = [Column.key];
 
           return Column;
         }),
@@ -86,14 +103,6 @@ export default class StatisticComponent extends React.Component {
   render() {
     return (
       <>
-        <Input
-          placeholder="Поиск"
-          ref={this.SearchRef}
-          onPressEnter={(Event) => {
-            this.ChangeSearchString(Event.target.value);
-          }}
-          style={{ width: '400px' }}
-        />
         <Table
           pagination={false}
           rowKey="key"
