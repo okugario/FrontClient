@@ -19,21 +19,24 @@ export default class TrackPlayerComponent extends React.Component {
     };
   }
   InitPlayerData() {
-    this.CurrentTraks = this.CurrentTab.Options.GetTrackFeaturies();
+    this.CurrentTraks =
+      this.CurrentTab.Options.GetNamedFeatures(/^Track\w{1,}/);
     let PlayerDataMap = new Map();
 
-    this.CurrentTab.Options.GetTrackFeaturies().forEach((TrackFeature) => {
-      TrackFeature.getGeometry()
-        .getCoordinates()
-        .forEach((Coordinates) => {
-          PlayerDataMap.set(Coordinates[2], {
-            Mark: this.CurrentTab.Options.GetVectorLayerSource().getFeatureById(
-              `Mark${TrackFeature.getId()}`
-            ),
-            Coordinates: Coordinates,
+    this.CurrentTab.Options.GetNamedFeatures(/^Track\w{1,}/).forEach(
+      (TrackFeature) => {
+        TrackFeature.getGeometry()
+          .getCoordinates()
+          .forEach((Coordinates) => {
+            PlayerDataMap.set(Coordinates[2], {
+              Mark: this.CurrentTab.Options.GetVectorLayerSource().getFeatureById(
+                `Mark${TrackFeature.getId()}`
+              ),
+              Coordinates: Coordinates,
+            });
           });
-        });
-    });
+      }
+    );
     return PlayerDataMap;
   }
   PlayerHandler(Action) {

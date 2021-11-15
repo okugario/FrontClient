@@ -9,7 +9,7 @@ import OverlayPositioning from 'ol/OverlayPositioning';
 import Draw from 'ol/interaction/Draw';
 import GeometryType from 'ol/geom/GeometryType';
 import Stroke from 'ol/style/Stroke';
-import { Icon, Style, Text } from 'ol/style';
+import { Fill, Icon, Style, Text } from 'ol/style';
 import Overlay from 'ol/Overlay';
 import LineString from 'ol/geom/LineString';
 import TrackPlayerComponent from './TrackPlayerComponent';
@@ -25,7 +25,8 @@ const MapButtonBarComponent = inject('ProviderStore')(
     TrackPlayerElement.id = 'TrackPlayer';
     const TrackPlayer = () => {
       if (
-        props.ProviderStore.CurrentTab.Options.GetTrackFeaturies().length == 1
+        props.ProviderStore.CurrentTab.Options.GetNamedFeatures(/^Track\w{1,}/)
+          .length == 1
       ) {
         let TrackPlayerControl = new Control({
           element: TrackPlayerElement,
@@ -41,37 +42,37 @@ const MapButtonBarComponent = inject('ProviderStore')(
             }
           ) != undefined
         ) {
-          props.ProviderStore.CurrentTab.Options.GetTrackFeaturies().forEach(
-            (Track) => {
-              const Feature = new GeoJSON().readFeature({
-                type: 'Feature',
-                id: `Mark${Track.getId()}`,
-                geometry: {
-                  type: 'Point',
-                  coordinates: Track.getGeometry().getCoordinateAt(0),
-                },
-              });
+          props.ProviderStore.CurrentTab.Options.GetNamedFeatures(
+            /^Track\w{1,}/
+          ).forEach((Track) => {
+            const Feature = new GeoJSON().readFeature({
+              type: 'Feature',
+              id: `Mark${Track.getId()}`,
+              geometry: {
+                type: 'Point',
+                coordinates: Track.getGeometry().getCoordinateAt(0),
+              },
+            });
 
-              Feature.setStyle(
-                new Style({
-                  text: new Text({
-                    font: 'bold 10px sans-serif',
-                    text: Track.values_.caption,
-                    offsetX: 30,
-                    offsetY: -10,
-                  }),
-                  image: new Icon({
-                    anchor: [0.5, 1],
-                    src: TruckSVG,
-                    scale: [0.2, 0.2],
-                  }),
-                })
-              );
-              props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().addFeature(
-                Feature
-              );
-            }
-          );
+            Feature.setStyle(
+              new Style({
+                text: new Text({
+                  font: 'bold 10px sans-serif',
+                  text: Track.values_.caption,
+                  offsetX: 30,
+                  offsetY: -10,
+                }),
+                image: new Icon({
+                  anchor: [0.5, 1],
+                  src: TruckSVG,
+                  scale: [0.2, 0.2],
+                }),
+              })
+            );
+            props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().addFeature(
+              Feature
+            );
+          });
         }
       }
     };
@@ -106,11 +107,14 @@ const MapButtonBarComponent = inject('ProviderStore')(
         );
         let DrawObject = new Draw({
           source: props.ProviderStore.CurrentTab.Options.GetVectorLayerSource(),
-          type: GeometryType.LINE_STRING,
+          type: GeometryType.POLYGON,
           style: new Style({
             stroke: new Stroke({
               color: 'rgb(24, 144, 255)',
               width: 2,
+            }),
+            fill: new Fill({
+              color: 'rgba(24, 144, 255,0.3)',
             }),
           }),
         });
@@ -118,6 +122,29 @@ const MapButtonBarComponent = inject('ProviderStore')(
           DrawObject
         );
         DrawObject.on('drawend', (DrawEvent) => {
+          DrawEvent.feature.setId(
+            `Geozone${
+              props.ProviderStore.CurrentTab.Options.GetNamedFeatures(
+                /^Geozone\d{1,}/
+              ).length
+            }`
+          );
+          DrawEvent.feature.setStyle(
+            new Style({
+              text: new Text({
+                font: 'bold 20px sans-serif',
+                text: 'Геозона',
+              }),
+              stroke: new Stroke({
+                color: 'rgb(24, 144, 255)',
+                width: 2,
+              }),
+              fill: new Fill({
+                color: 'rgba(24, 144, 255,0.3)',
+              }),
+            })
+          );
+
           props.ProviderStore.CurrentTab.Options.MapObject.removeInteraction(
             DrawObject
           );
@@ -247,6 +274,15 @@ const MapButtonBarComponent = inject('ProviderStore')(
             }}
           >
             Плеер треков
+          </Button>
+          <Button
+            size="small"
+            type="primary"
+            onClick={() => {
+              GeozoneEditor();
+            }}
+          >
+            Геозона
           </Button>
         </div>
         {ReactDOM.createPortal(<TrackPlayerComponent />, TrackPlayerElement)}

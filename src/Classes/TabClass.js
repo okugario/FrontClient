@@ -157,26 +157,17 @@ export class Tab {
           GetVectorLayer: () => {
             return this.Options.MapObject.getLayers().array_[1];
           },
-          GetTransportMarks: () => {
+          GetNamedFeatures: (RegExp) => {
             return this.Options.MapObject.getLayers()
               .array_[1].getSource()
               .getFeatures()
               .filter((Feature) => {
-                if (/MarkTrack/.test(Feature.getId())) {
+                if (RegExp.test(Feature.getId())) {
                   return true;
                 }
               });
           },
-          GetTrackFeaturies: () => {
-            return this.Options.MapObject.getLayers()
-              .array_[1].getSource()
-              .getFeatures()
-              .filter((Feature) => {
-                if (/^Track\w{1,}/.test(Feature.getId())) {
-                  return true;
-                }
-              });
-          },
+
           GetVectorLayerSource: () => {
             return this.Options.MapObject.getLayers().array_[1].getSource();
           },

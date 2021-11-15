@@ -5,10 +5,10 @@ import reactCSS from 'reactcss';
 import { useState } from 'react';
 export default function GeozoneEditor(props) {
   const [PickerColor, SetNewPickerColor] = useState({
-    r: '241',
-    g: '112',
-    b: '19',
-    a: '1',
+    r: '24',
+    g: '144',
+    b: '255',
+    a: '0.3',
   });
   const [ShowColorPicker, SetNewShowColorPicker] = useState(false);
   const Styles = reactCSS({
