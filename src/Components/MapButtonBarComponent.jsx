@@ -133,7 +133,6 @@ const MapButtonBarComponent = inject('ProviderStore')(
             new Style({
               text: new Text({
                 font: 'bold 20px sans-serif',
-                text: 'Геозона',
               }),
               stroke: new Stroke({
                 color: 'rgb(24, 144, 255)',
@@ -144,7 +143,7 @@ const MapButtonBarComponent = inject('ProviderStore')(
               }),
             })
           );
-
+          props.ProviderStore.SetNewCurentFeature(DrawEvent.feature);
           props.ProviderStore.CurrentTab.Options.MapObject.removeInteraction(
             DrawObject
           );

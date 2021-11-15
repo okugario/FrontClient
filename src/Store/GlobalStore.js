@@ -18,7 +18,9 @@ class Store {
       }
     );
   }
-
+  SetNewCurentFeature(NewFeature) {
+    this.CurrentTab.Options.CurrentFeature = NewFeature;
+  }
   SetNewCurrentTimeTrackPlayer(NewTime) {
     this.CurrentTab.Options.CurrentTrackPlayerTime = Moment.unix(NewTime);
   }

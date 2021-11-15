@@ -109,6 +109,7 @@ export class Tab {
           CurrentMenuItem: TabObject.items[0],
           CheckedTransportKeys: [],
           CheckedGeozonesKeys: [],
+          CurrentFeature: null,
           LeftMenu: [
             React.lazy(() => import('../Components/IntervalComponent')),
 
