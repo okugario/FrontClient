@@ -6,11 +6,11 @@ import '../CSS/MapComponent.css';
 import MapButtonBarComponent from './MapButtonBarComponent';
 import 'ol/ol.css';
 import { reaction } from 'mobx';
-import { Icon, Style, Text } from 'ol/style';
+import { Fill, Icon, Style, Text } from 'ol/style';
 import GeoJSON from 'ol/format/GeoJSON';
 import TruckSVG from '../Svg/Truck.svg';
 import { message } from 'antd';
-import { ApiFetch } from '../Helpers/Helpers';
+import { ApiFetch, HexToRgbA } from '../Helpers/Helpers';
 import { RandomColor } from '../Helpers/Helpers';
 import Stroke from 'ol/style/Stroke';
 const MapComponent = inject('ProviderStore')(
@@ -88,6 +88,9 @@ const MapComponent = inject('ProviderStore')(
                 stroke: new Stroke({
                   color: Response.data.Options.color,
                   width: 3,
+                }),
+                fill: new Fill({
+                  color: HexToRgbA(Response.data.Options.color, 0.3),
                 }),
               })
             );

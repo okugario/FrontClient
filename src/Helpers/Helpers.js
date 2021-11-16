@@ -14,6 +14,20 @@ export const CheckUniqale = (Trucks) => {
   });
   return Count <= 1;
 };
+export function HexToRgbA(Hex, Opasity) {
+  let c;
+  if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(Hex)) {
+    c = Hex.substring(1).split('');
+    if (c.length == 3) {
+      c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+    }
+    c = '0x' + c.join('');
+    return `rgba(${[(c >> 16) & 255, (c >> 8) & 255, c & 255].join(
+      ','
+    )},${Opasity})`;
+  }
+  throw new Error('Bad Hex');
+}
 export function AntDGenerateTreeData(Objects, Options) {
   return Objects.map((TreeNode) => {
     let NewTreeNode = {
