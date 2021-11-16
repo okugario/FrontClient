@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { inject } from 'mobx-react';
 import { observer } from 'mobx-react-lite';
 import { Fill, Stroke, Style, Text } from 'ol/style';
+import GeometryType from 'ol/geom/GeometryType';
 
 const GeozoneEditor = inject('ProviderStore')(
   observer((props) => {
@@ -56,6 +57,8 @@ const GeozoneEditor = inject('ProviderStore')(
         })
       );
     };
+    const ChangeGeozoneType = (Type) => {};
+    const SaveGeozone = () => {};
     const ChangeGeozoneColor = (Color) => {
       SetNewPickerColor(Color);
       props.ProviderStore.CurrentTab.Options.CurrentFeature.setStyle(
@@ -75,7 +78,13 @@ const GeozoneEditor = inject('ProviderStore')(
         title="Геозона"
         size="small"
         actions={[
-          <Button size="small" type="primary">
+          <Button
+            size="small"
+            type="primary"
+            onClick={() => {
+              SaveGeozone();
+            }}
+          >
             Сохранить
           </Button>,
           <Button
@@ -106,6 +115,11 @@ const GeozoneEditor = inject('ProviderStore')(
             <div>Название:</div>
             <div style={{ width: '120px' }}>
               <Input
+                disabled={
+                  props.ProviderStore.CurrentTab.Options.CurrentFeature != null
+                    ? false
+                    : true
+                }
                 size="small"
                 onChange={(Event) => {
                   ChangeGeozoneName(Event.target.value);
@@ -125,7 +139,11 @@ const GeozoneEditor = inject('ProviderStore')(
             <div
               style={Styles.swatch}
               onClick={() => {
-                SetNewShowColorPicker(true);
+                if (
+                  props.ProviderStore.CurrentTab.Options.CurrentFeature != null
+                ) {
+                  SetNewShowColorPicker(true);
+                }
               }}
             >
               <div style={Styles.color} />
@@ -157,11 +175,14 @@ const GeozoneEditor = inject('ProviderStore')(
             <div>Тип:</div>
             <div>
               <Select
+                onChange={(Value) => {
+                  ChangeGeozoneType(Value);
+                }}
                 defaultValue="Polygon"
                 size="small"
                 options={[
-                  { label: 'Полигон', value: 'Polygon' },
-                  { label: 'Окружность', value: 'Circle' },
+                  { label: 'Полигон', value: GeometryType.POLYGON },
+                  { label: 'Окружность', value: GeometryType.CIRCLE },
                 ]}
               />
             </div>

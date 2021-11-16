@@ -121,19 +121,9 @@ const MapButtonBarComponent = inject('ProviderStore')(
         props.ProviderStore.CurrentTab.Options.MapObject.addInteraction(
           DrawObject
         );
-        DrawObject.on('drawend', (DrawEvent) => {
-          DrawEvent.feature.setId(
-            `Geozone${
-              props.ProviderStore.CurrentTab.Options.GetNamedFeatures(
-                /^Geozone\d{1,}/
-              ).length
-            }`
-          );
+        DrawObject.on('drawstart', (DrawEvent) => {
           DrawEvent.feature.setStyle(
             new Style({
-              text: new Text({
-                font: 'bold 20px sans-serif',
-              }),
               stroke: new Stroke({
                 color: 'rgb(24, 144, 255)',
                 width: 2,
@@ -142,6 +132,19 @@ const MapButtonBarComponent = inject('ProviderStore')(
                 color: 'rgba(24, 144, 255,0.3)',
               }),
             })
+          );
+          props.ProviderStore.SetNewCurentFeature(DrawEvent.feature);
+        });
+        DrawObject.on('drawend', (DrawEvent) => {
+          DrawEvent.feature.setId(
+            `Geozone${
+              props.ProviderStore.CurrentTab.Options.GetNamedFeatures(
+                /^Geozone\w{1,}/
+              ).length
+            }`
+          );
+          DrawEvent.feature.setStyle(
+            props.ProviderStore.CurrentTab.Options.CurrentFeature.getStyle()
           );
           props.ProviderStore.SetNewCurentFeature(DrawEvent.feature);
           props.ProviderStore.CurrentTab.Options.MapObject.removeInteraction(

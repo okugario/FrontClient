@@ -141,12 +141,6 @@ export class Tab {
                 source: new OSM(),
               }),
               new VectorLayer({
-                style: new Style({
-                  stroke: new Stroke({
-                    color: 'rgb(24, 144, 255)',
-                    width: 2,
-                  }),
-                }),
                 source: new VectorSource(),
               }),
             ],
