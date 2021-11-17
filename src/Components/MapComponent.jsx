@@ -85,6 +85,10 @@ const MapComponent = inject('ProviderStore')(
             NewFeature.setId(`Geozone${GeozoneId}`);
             NewFeature.setStyle(
               new Style({
+                text: new Text({
+                  text: Response.data.Caption,
+                  font: 'bold 10px sans-serif',
+                }),
                 stroke: new Stroke({
                   color: Response.data.Options.color,
                   width: 3,
