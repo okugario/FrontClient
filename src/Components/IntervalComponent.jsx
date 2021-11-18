@@ -2,7 +2,7 @@ import * as React from 'react';
 import { observer, inject } from 'mobx-react';
 import { Modal, Calendar, TimePicker } from 'antd';
 import FooterIntervalModalWindow from './FooterIntervalModalWindow';
-import { ApiFetch } from '../Helpers/Helpers';
+import { AntDGenerateTreeData, ApiFetch } from '../Helpers/Helpers';
 
 @inject('ProviderStore')
 @observer
@@ -21,7 +21,14 @@ export default class IntervalComponent extends React.Component {
       'GET',
       undefined,
       (Response) => {
-        this.props.ProviderStore.SetNewTransportTree(Response.data);
+        this.props.ProviderStore.SetNewTransportTree(
+          AntDGenerateTreeData(Response.data, {
+            TitleName: 'Caption',
+            KeyName: 'Id',
+            ChildrensName: 'Vehicles',
+            TreeNodeOptions: { disableCheckbox: true },
+          })
+        );
       }
     );
   }

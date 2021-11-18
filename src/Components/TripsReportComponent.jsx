@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { observer, inject } from 'mobx-react';
-import { Table } from 'antd';
+import { Table, Button } from 'antd';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import 'chartjs-adapter-moment';
 import { ApiFetch, GenerateTableData } from '../Helpers/Helpers';
@@ -188,7 +188,8 @@ export default class TripsReportComponent extends React.Component {
                 );
                 this.Chart.data.datasets[0].data = this.state.LoadingChartData;
                 this.Chart.data.datasets[1].data = this.state.TripsChartData;
-                this.Chart.data.datasets[2].data = this.state.LoadingChartData;
+                this.Chart.data.datasets[2].data =
+                  this.state.LoadingCanChartData;
                 this.Chart.update('show');
               }
             );
@@ -214,7 +215,7 @@ export default class TripsReportComponent extends React.Component {
     if (this.Chart != null) {
       this.Chart.data.datasets[0].data = this.state.LoadingChartData;
       this.Chart.data.datasets[1].data = this.state.TripsChartData;
-      this.Chart.data.datasets[2].data = this.state.LoadingChartData;
+      this.Chart.data.datasets[2].data = this.state.LoadingCanChartData;
       this.Chart.data.labels = this.state.TripsChartData.map((Time) => {
         return Time[0];
       });

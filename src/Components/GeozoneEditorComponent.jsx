@@ -7,6 +7,7 @@ import { inject } from 'mobx-react';
 import { observer } from 'mobx-react-lite';
 import { Fill, Stroke, Style, Text } from 'ol/style';
 import GeometryType from 'ol/geom/GeometryType';
+import { Draw } from 'ol/interaction';
 
 const GeozoneEditor = inject('ProviderStore')(
   observer((props) => {
@@ -16,6 +17,7 @@ const GeozoneEditor = inject('ProviderStore')(
       b: '255',
       a: '0.3',
     });
+    const [GeozoneName, SetNewGeozoneName] = useState(null);
     const [ShowColorPicker, SetNewShowColorPicker] = useState(false);
     const Styles = reactCSS({
       default: {
@@ -47,6 +49,7 @@ const GeozoneEditor = inject('ProviderStore')(
       },
     });
     const ChangeGeozoneName = (NewName) => {
+      SetNewGeozoneName(NewName);
       props.ProviderStore.CurrentTab.Options.CurrentFeature.setStyle(
         new Style({
           text: new Text({ text: NewName, font: 'bold 20px sans-serif' }),
@@ -57,8 +60,86 @@ const GeozoneEditor = inject('ProviderStore')(
         })
       );
     };
-    const ChangeGeozoneType = (Type) => {};
-    const SaveGeozone = () => {};
+
+    const ChangeGeozoneType = (DrawObjectType) => {
+      if (props.ProviderStore.CurrentTab.Options.CurrentFeature != null) {
+        if (props.ProviderStore.CurrentTab.Options.CurrentDrawObject != null) {
+          props.ProviderStore.CurrentTab.Options.MapObject.removeInteraction(
+            props.ProviderStore.CurrentTab.Options.CurrentDrawObject
+          );
+          props.ProviderStore.SetNewCurrentDrawObject(null);
+          props.ProviderStore.SetNewCurentFeature(null);
+        } else {
+          props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().removeFeature(
+            props.ProviderStore.CurrentTab.Options.CurrentFeature
+          );
+          props.ProviderStore.SetNewCurentFeature(null);
+        }
+      }
+      props.ProviderStore.SetNewCurrentDrawObject(
+        new Draw({
+          source: props.ProviderStore.CurrentTab.Options.GetVectorLayerSource(),
+          type: DrawObjectType,
+          style: new Style({
+            stroke: new Stroke({
+              color: 'rgb(24, 144, 255)',
+              width: 2,
+            }),
+            fill: new Fill({
+              color: 'rgba(24, 144, 255,0.3)',
+            }),
+          }),
+        })
+      );
+
+      props.ProviderStore.CurrentTab.Options.MapObject.addInteraction(
+        props.ProviderStore.CurrentTab.Options.CurrentDrawObject
+      );
+      props.ProviderStore.CurrentTab.Options.CurrentDrawObject.on(
+        'drawstart',
+        (DrawEvent) => {
+          DrawEvent.feature.setStyle(
+            new Style({
+              stroke: new Stroke({
+                color: 'rgb(24, 144, 255)',
+                width: 2,
+              }),
+              fill: new Fill({
+                color: 'rgba(24, 144, 255,0.3)',
+              }),
+            })
+          );
+          props.ProviderStore.SetNewCurentFeature(DrawEvent.feature);
+        }
+      );
+      props.ProviderStore.CurrentTab.Options.CurrentDrawObject.on(
+        'drawend',
+        (DrawEvent) => {
+          DrawEvent.feature.setId(
+            `Geozone${
+              props.ProviderStore.CurrentTab.Options.GetNamedFeatures(
+                /^Geozone\w{1,}/
+              ).length
+            }`
+          );
+          DrawEvent.feature.setStyle(
+            props.ProviderStore.CurrentTab.Options.CurrentFeature.getStyle()
+          );
+          props.ProviderStore.SetNewCurentFeature(DrawEvent.feature);
+          props.ProviderStore.CurrentTab.Options.MapObject.removeInteraction(
+            props.ProviderStore.CurrentTab.Options.CurrentDrawObject
+          );
+          props.ProviderStore.SetNewCurrentDrawObject(null);
+        }
+      );
+      SetNewPickerColor({
+        r: '24',
+        g: '144',
+        b: '255',
+        a: '0.3',
+      });
+      SetNewGeozoneName(null);
+    };
     const ChangeGeozoneColor = (Color) => {
       SetNewPickerColor(Color);
       props.ProviderStore.CurrentTab.Options.CurrentFeature.setStyle(
@@ -115,6 +196,7 @@ const GeozoneEditor = inject('ProviderStore')(
             <div>Название:</div>
             <div style={{ width: '120px' }}>
               <Input
+                value={GeozoneName}
                 disabled={
                   props.ProviderStore.CurrentTab.Options.CurrentFeature != null
                     ? false
@@ -178,7 +260,7 @@ const GeozoneEditor = inject('ProviderStore')(
                 onChange={(Value) => {
                   ChangeGeozoneType(Value);
                 }}
-                defaultValue="Polygon"
+                defaultValue="Выберите тип"
                 size="small"
                 options={[
                   { label: 'Полигон', value: GeometryType.POLYGON },

@@ -75,6 +75,9 @@ class Store {
       }
     }
   }
+  SetNewCurrentDrawObject(NewDrawObject) {
+    this.CurrentTab.Options.CurrentDrawObject = NewDrawObject;
+  }
   SetNewTopMenu(NewTopMenu) {
     this.TopMenu = NewTopMenu;
   }

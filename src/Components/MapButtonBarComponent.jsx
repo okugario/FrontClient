@@ -76,6 +76,7 @@ const MapButtonBarComponent = inject('ProviderStore')(
         }
       }
     };
+
     const GeozoneEditorHandler = (Action) => {
       switch (Action) {
         case 'Close':
@@ -90,7 +91,7 @@ const MapButtonBarComponent = inject('ProviderStore')(
           break;
       }
     };
-    const GeozoneEditor = () => {
+    const AddGeozoneEditor = () => {
       if (
         props.ProviderStore.CurrentTab.Options.MapObject.getControls().array_.find(
           (Control) => {
@@ -105,52 +106,6 @@ const MapButtonBarComponent = inject('ProviderStore')(
         props.ProviderStore.CurrentTab.Options.MapObject.addControl(
           GeozoneControl
         );
-        let DrawObject = new Draw({
-          source: props.ProviderStore.CurrentTab.Options.GetVectorLayerSource(),
-          type: GeometryType.POLYGON,
-          style: new Style({
-            stroke: new Stroke({
-              color: 'rgb(24, 144, 255)',
-              width: 2,
-            }),
-            fill: new Fill({
-              color: 'rgba(24, 144, 255,0.3)',
-            }),
-          }),
-        });
-        props.ProviderStore.CurrentTab.Options.MapObject.addInteraction(
-          DrawObject
-        );
-        DrawObject.on('drawstart', (DrawEvent) => {
-          DrawEvent.feature.setStyle(
-            new Style({
-              stroke: new Stroke({
-                color: 'rgb(24, 144, 255)',
-                width: 2,
-              }),
-              fill: new Fill({
-                color: 'rgba(24, 144, 255,0.3)',
-              }),
-            })
-          );
-          props.ProviderStore.SetNewCurentFeature(DrawEvent.feature);
-        });
-        DrawObject.on('drawend', (DrawEvent) => {
-          DrawEvent.feature.setId(
-            `Geozone${
-              props.ProviderStore.CurrentTab.Options.GetNamedFeatures(
-                /^Geozone\w{1,}/
-              ).length
-            }`
-          );
-          DrawEvent.feature.setStyle(
-            props.ProviderStore.CurrentTab.Options.CurrentFeature.getStyle()
-          );
-          props.ProviderStore.SetNewCurentFeature(DrawEvent.feature);
-          props.ProviderStore.CurrentTab.Options.MapObject.removeInteraction(
-            DrawObject
-          );
-        });
       }
     };
     const FormatLength = (Line) => {
@@ -281,7 +236,7 @@ const MapButtonBarComponent = inject('ProviderStore')(
             size="small"
             type="primary"
             onClick={() => {
-              GeozoneEditor();
+              AddGeozoneEditor();
             }}
           >
             Геозона
