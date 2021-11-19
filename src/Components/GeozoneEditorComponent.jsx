@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Card, Input, Select, Popconfirm } from 'antd';
+import { Button, Card, Input, Select } from 'antd';
 import { ChromePicker } from 'react-color';
 import reactCSS from 'reactcss';
 import { useState } from 'react';
@@ -8,6 +8,8 @@ import { observer } from 'mobx-react-lite';
 import { Fill, Stroke, Style, Text } from 'ol/style';
 import GeometryType from 'ol/geom/GeometryType';
 import { Draw } from 'ol/interaction';
+import { ApiFetch } from '../Helpers/Helpers';
+import { useEffect } from 'react';
 
 const GeozoneEditor = inject('ProviderStore')(
   observer((props) => {
@@ -17,8 +19,11 @@ const GeozoneEditor = inject('ProviderStore')(
       b: '255',
       a: '0.3',
     });
+    const [CurrentRegionId, SetNewCurrentRegionId] =
+      useState('Выберите регион');
     const [GeozoneName, SetNewGeozoneName] = useState(null);
     const [ShowColorPicker, SetNewShowColorPicker] = useState(false);
+    const [AllRegions, SetNewAllRegions] = useState(null);
     const Styles = reactCSS({
       default: {
         color: {
@@ -140,6 +145,16 @@ const GeozoneEditor = inject('ProviderStore')(
       });
       SetNewGeozoneName(null);
     };
+
+    const RequestRegions = () => {
+      ApiFetch('model/Regions', 'GET', undefined, (Response) => {
+        SetNewAllRegions(
+          Response.data.map((Region) => {
+            return { label: Region.Caption, value: Region.Id };
+          })
+        );
+      });
+    };
     const ChangeGeozoneColor = (Color) => {
       SetNewPickerColor(Color);
       props.ProviderStore.CurrentTab.Options.CurrentFeature.setStyle(
@@ -154,18 +169,13 @@ const GeozoneEditor = inject('ProviderStore')(
         })
       );
     };
+    useEffect(RequestRegions, []);
     return (
       <Card
         title="Геозона"
         size="small"
         actions={[
-          <Button
-            size="small"
-            type="primary"
-            onClick={() => {
-              SaveGeozone();
-            }}
-          >
+          <Button size="small" type="primary" onClick={() => {}}>
             Сохранить
           </Button>,
           <Button
@@ -266,6 +276,25 @@ const GeozoneEditor = inject('ProviderStore')(
                   { label: 'Полигон', value: GeometryType.POLYGON },
                   { label: 'Окружность', value: GeometryType.CIRCLE },
                 ]}
+              />
+            </div>
+          </div>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <div>Регион:</div>
+            <div>
+              <Select
+                options={AllRegions}
+                onChange={(Value) => {
+                  SetNewCurrentRegionId(Value);
+                }}
+                value={CurrentRegionId}
+                size="small"
               />
             </div>
           </div>
