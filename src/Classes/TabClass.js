@@ -103,6 +103,7 @@ export class Tab {
         MapButtonBarControl.set('Id', 'MapButtonBar');
         ButtonBar.id = 'MapButtonBar';
         this.Options = {
+          CurrentControlsId: [],
           ButtonBarElement: ButtonBar,
           CurrentMenuItem: TabObject.items[0],
           CheckedTransportKeys: [],

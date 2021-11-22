@@ -8,11 +8,6 @@ const TabTreeComponent = inject('ProviderStore')(
   observer((props) => {
     const [ContextMenuKey, SetNewContextMenuKey] = useState(null);
 
-    const GeozonesGroupContextMenu = (
-      <Menu>
-        <Menu.Item key="AddGeozone">Добавить геозону</Menu.Item>
-      </Menu>
-    );
     const [GeozonesTree, SetNewGeozonesTree] = useState([]);
     const DeleteGeozone = (GeozoneId) => {
       ApiFetch(
@@ -49,11 +44,22 @@ const TabTreeComponent = inject('ProviderStore')(
               title: () => {
                 return (
                   <Dropdown
-                    onVisibleChange={() => {
-                      console.log('Работает на группах');
-                    }}
                     trigger={['contextMenu']}
-                    overlay={GeozonesGroupContextMenu}
+                    overlay={
+                      <Menu>
+                        <Menu.Item
+                          key="AddGeozone"
+                          onClick={() => {
+                            props.ProviderStore.SetNewCurrentControlsId(
+                              'Add',
+                              'GeozoneEditor'
+                            );
+                          }}
+                        >
+                          Добавить геозону
+                        </Menu.Item>
+                      </Menu>
+                    }
                   >
                     <div>{Group.Caption}</div>
                   </Dropdown>

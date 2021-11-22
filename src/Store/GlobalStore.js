@@ -30,6 +30,23 @@ class Store {
     this.CurrentTab.Options.StartDate = NewStartDate;
     this.CurrentTab.Options.EndDate = NewEndDate;
   }
+  SetNewCurrentControlsId(Action, ControlId) {
+    switch (Action) {
+      case 'Add':
+        if (!this.CurrentTab.Options.CurrentControlsId.includes(ControlId)) {
+          this.CurrentTab.Options.CurrentControlsId.push(ControlId);
+        }
+        break;
+      case 'Remove':
+        this.CurrentTab.Options.CurrentControlsId.splice(
+          this.CurrentTab.Options.CurrentControlsId.findIndex((ElementId) => {
+            return ElementId == ControlId;
+          }),
+          1
+        );
+        break;
+    }
+  }
   SetNewCheckedTransportKeys(NewTransportKeys) {
     const NewFilteredTransportKeys = NewTransportKeys.filter((Key) => {
       return this.TransportTree.reduce(

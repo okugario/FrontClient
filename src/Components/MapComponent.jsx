@@ -116,6 +116,7 @@ const MapComponent = inject('ProviderStore')(
                 dataProjection: 'EPSG:4326',
                 featureProjection: 'EPSG:3857',
               });
+
               NewFeature.setId(`Track${TransportId}`);
               NewFeature.setStyle(
                 new Style({
