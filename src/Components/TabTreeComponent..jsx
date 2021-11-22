@@ -2,24 +2,29 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { observer, inject } from 'mobx-react';
 import { AntDGenerateTreeData, ApiFetch } from '../Helpers/Helpers';
-import { Tabs, Tree, Dropdown, Menu } from 'antd';
+import { Tabs, Tree, Dropdown, Menu, Modal } from 'antd';
 const { TabPane } = Tabs;
 const TabTreeComponent = inject('ProviderStore')(
   observer((props) => {
     const [ContextMenuKey, SetNewContextMenuKey] = useState(null);
-    const GeozonesContextMenu = (
-      <Menu>
-        <Menu.Item key="EditGeozone">Редактировать</Menu.Item>
-        <Menu.Item key="DeleteGeozone">Удалить</Menu.Item>
-      </Menu>
-    );
+
     const GeozonesGroupContextMenu = (
       <Menu>
         <Menu.Item key="AddGeozone">Добавить геозону</Menu.Item>
       </Menu>
     );
     const [GeozonesTree, SetNewGeozonesTree] = useState([]);
-    const DeleteGeozone = () => {};
+    const DeleteGeozone = (GeozoneId) => {
+      ApiFetch(
+        `model/Geofences/${GeozoneId}`,
+        'DELETE',
+        undefined,
+        (Response) => {
+          SetNewContextMenuKey(null);
+          RequestTrees();
+        }
+      );
+    };
     const RequestTrees = () => {
       ApiFetch(
         `reports/VehicleTree?ts=${props.ProviderStore.CurrentTab.Options.StartDate.unix()}`,
@@ -64,7 +69,35 @@ const TabTreeComponent = inject('ProviderStore')(
                           SetNewContextMenuKey(Geozone.Id);
                         }}
                         trigger={['contextMenu']}
-                        overlay={GeozonesContextMenu}
+                        overlay={
+                          <Menu>
+                            <Menu.Item key="EditGeozone">
+                              Редактировать
+                            </Menu.Item>
+                            <Menu.Item
+                              key="DeleteGeozone"
+                              onClick={() => {
+                                Modal.confirm({
+                                  title: 'Подтвердите действие',
+                                  content:
+                                    'Вы действительно хотите удалить геозону?',
+                                  okButtonProps: {
+                                    danger: true,
+                                    size: 'small',
+                                  },
+                                  okText: 'Удалить',
+                                  cancelText: 'Отмена',
+                                  cancelButtonProps: { size: 'small' },
+                                  onOk: () => {
+                                    DeleteGeozone(Geozone.Id);
+                                  },
+                                });
+                              }}
+                            >
+                              Удалить
+                            </Menu.Item>
+                          </Menu>
+                        }
                       >
                         <div>{Geozone.Caption}</div>
                       </Dropdown>
