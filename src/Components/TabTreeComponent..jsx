@@ -6,6 +6,7 @@ import { Tabs, Tree, Dropdown, Menu } from 'antd';
 const { TabPane } = Tabs;
 const TabTreeComponent = inject('ProviderStore')(
   observer((props) => {
+    const [ContextMenuKey, SetNewContextMenuKey] = useState(null);
     const GeozonesContextMenu = (
       <Menu>
         <Menu.Item key="EditGeozone">Редактировать</Menu.Item>
@@ -18,6 +19,7 @@ const TabTreeComponent = inject('ProviderStore')(
       </Menu>
     );
     const [GeozonesTree, SetNewGeozonesTree] = useState([]);
+    const DeleteGeozone = () => {};
     const RequestTrees = () => {
       ApiFetch(
         `reports/VehicleTree?ts=${props.ProviderStore.CurrentTab.Options.StartDate.unix()}`,
@@ -42,6 +44,9 @@ const TabTreeComponent = inject('ProviderStore')(
               title: () => {
                 return (
                   <Dropdown
+                    onVisibleChange={() => {
+                      console.log('Работает на группах');
+                    }}
                     trigger={['contextMenu']}
                     overlay={GeozonesGroupContextMenu}
                   >
@@ -55,6 +60,9 @@ const TabTreeComponent = inject('ProviderStore')(
                   title: () => {
                     return (
                       <Dropdown
+                        onVisibleChange={() => {
+                          SetNewContextMenuKey(Geozone.Id);
+                        }}
                         trigger={['contextMenu']}
                         overlay={GeozonesContextMenu}
                       >
@@ -91,6 +99,9 @@ const TabTreeComponent = inject('ProviderStore')(
         {props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id == 'map' ? (
           <TabPane tab="Геозоны" key="GeoZones">
             <Tree
+              selectedKeys={[ContextMenuKey].concat(
+                props.ProviderStore.CurrentTab.Options.CheckedGeozonesKeys
+              )}
               defaultExpandedKeys={
                 props.ProviderStore.CurrentTab.Options.CheckedGeozonesKeys
               }

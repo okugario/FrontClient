@@ -1,9 +1,7 @@
 import MapObject from 'ol/Map';
 import OSM from 'ol/source/OSM';
 import * as React from 'react';
-import Stroke from 'ol/style/Stroke';
 import * as Moment from 'moment';
-import Style from 'ol/style/Style';
 import { Tile as TileLayer } from 'ol/layer';
 import { defaults } from 'ol/interaction';
 import VectorSource from 'ol/source/Vector';
