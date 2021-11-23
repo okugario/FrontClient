@@ -30,17 +30,21 @@ class Store {
     this.CurrentTab.Options.StartDate = NewStartDate;
     this.CurrentTab.Options.EndDate = NewEndDate;
   }
-  SetNewCurrentControlsId(Action, ControlId) {
+  SetNewCurrentControls(Action, ControlObject) {
     switch (Action) {
       case 'Add':
-        if (!this.CurrentTab.Options.CurrentControlsId.includes(ControlId)) {
-          this.CurrentTab.Options.CurrentControlsId.push(ControlId);
+        if (
+          this.CurrentTab.Options.CurrentControls.find((Element) => {
+            return Element.Id == ControlObject.Id;
+          }) == undefined
+        ) {
+          this.CurrentTab.Options.CurrentControls.push(ControlObject);
         }
         break;
       case 'Remove':
-        this.CurrentTab.Options.CurrentControlsId.splice(
-          this.CurrentTab.Options.CurrentControlsId.findIndex((ElementId) => {
-            return ElementId == ControlId;
+        this.CurrentTab.Options.CurrentControls.splice(
+          this.CurrentTab.Options.CurrentControls.findIndex((Element) => {
+            return Element.Id == ControlObject;
           }),
           1
         );

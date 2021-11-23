@@ -169,6 +169,18 @@ const GeozoneEditor = inject('ProviderStore')(
         })
       );
     };
+    const GetRegionId = () => {
+      let Control = props.ProviderStore.CurrentTab.Options.CurrentControls.find(
+        (Element) => {
+          return Element.Id == 'GeozoneEditor';
+        }
+      );
+      if (Control != undefined && 'RegionId' in Control.Options) {
+        return Control.Options.RegionId;
+      } else {
+        return CurrentRegionId;
+      }
+    };
     useEffect(RequestRegions, []);
     return (
       <Card
@@ -293,7 +305,7 @@ const GeozoneEditor = inject('ProviderStore')(
                 onChange={(Value) => {
                   SetNewCurrentRegionId(Value);
                 }}
-                value={CurrentRegionId}
+                value={GetRegionId()}
                 size="small"
               />
             </div>

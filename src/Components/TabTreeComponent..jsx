@@ -50,10 +50,10 @@ const TabTreeComponent = inject('ProviderStore')(
                         <Menu.Item
                           key="AddGeozone"
                           onClick={() => {
-                            props.ProviderStore.SetNewCurrentControlsId(
-                              'Add',
-                              'GeozoneEditor'
-                            );
+                            props.ProviderStore.SetNewCurrentControls('Add', {
+                              Id: 'GeozoneEditor',
+                              Options: { RegionId: Group.Id },
+                            });
                           }}
                         >
                           Добавить геозону

@@ -68,10 +68,7 @@ const MapButtonBarComponent = inject('ProviderStore')(
     const GeozoneEditorHandler = (Action) => {
       switch (Action) {
         case 'Close':
-          props.ProviderStore.SetNewCurrentControlsId(
-            'Remove',
-            'GeozoneEditor'
-          );
+          props.ProviderStore.SetNewCurrentControls('Remove', 'GeozoneEditor');
           props.ProviderStore.CurrentTab.Options.MapObject.removeControl(
             props.ProviderStore.CurrentTab.Options.MapObject.getControls().array_.find(
               (Control) => {
@@ -79,6 +76,10 @@ const MapButtonBarComponent = inject('ProviderStore')(
               }
             )
           );
+          props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().removeFeature(
+            props.ProviderStore.CurrentTab.Options.CurrentFeature
+          );
+          props.ProviderStore.SetNewCurentFeature(null);
 
           break;
       }
@@ -94,16 +95,20 @@ const MapButtonBarComponent = inject('ProviderStore')(
     };
     const MapControlsHandler = () => {
       if (
-        props.ProviderStore.CurrentTab.Options.CurrentControlsId.includes(
-          'GeozoneEditor'
-        )
+        props.ProviderStore.CurrentTab.Options.CurrentControls.find(
+          (Element) => {
+            return Element.Id == 'GeozoneEditor';
+          }
+        ) != undefined
       ) {
         AddGeozoneEditor();
       }
       if (
-        props.ProviderStore.CurrentTab.Options.CurrentControlsId.includes(
-          'TrackPlayer'
-        )
+        props.ProviderStore.CurrentTab.Options.CurrentControls.find(
+          (Element) => {
+            return Element.Id == 'TrackPlayer';
+          }
+        ) != undefined
       ) {
         AddTrackPlayer();
       }
@@ -203,7 +208,7 @@ const MapButtonBarComponent = inject('ProviderStore')(
       }
     };
     useEffect(MapControlsHandler, [
-      props.ProviderStore.CurrentTab.Options.CurrentControlsId.length,
+      props.ProviderStore.CurrentTab.Options.CurrentControls.length,
     ]);
     return (
       <>
@@ -235,10 +240,10 @@ const MapButtonBarComponent = inject('ProviderStore')(
                   /^Track\w{1,}/
                 ).length == 1
               ) {
-                props.ProviderStore.SetNewCurrentControlsId(
-                  'Add',
-                  'TrackPlayer'
-                );
+                props.ProviderStore.SetNewCurrentControls('Add', {
+                  Id: 'TrackPlayer',
+                  Options: {},
+                });
               }
             }}
           >
@@ -248,10 +253,10 @@ const MapButtonBarComponent = inject('ProviderStore')(
             size="small"
             type="primary"
             onClick={() => {
-              props.ProviderStore.SetNewCurrentControlsId(
-                'Add',
-                'GeozoneEditor'
-              );
+              props.ProviderStore.SetNewCurrentControls('Add', {
+                Id: 'GeozoneEditor',
+                Options: {},
+              });
             }}
           >
             Геозона

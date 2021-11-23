@@ -105,7 +105,7 @@ export default class TrackPlayerComponent extends React.Component {
     }
   }
   RemoveTrackPlayer = () => {
-    this.props.ProviderStore.SetNewCurrentControlsId('Remove', 'TrackPlayer');
+    this.props.ProviderStore.SetNewCurrentControls('Remove', 'TrackPlayer');
     this.CurrentTab.Options.MapObject.removeControl(
       this.CurrentTab.Options.MapObject.getControls().array_.find((Control) => {
         return Control.get('Id') == 'TrackPlayer';
