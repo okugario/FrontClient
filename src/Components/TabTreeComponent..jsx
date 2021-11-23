@@ -6,8 +6,6 @@ import { Tabs, Tree, Dropdown, Menu, Modal } from 'antd';
 const { TabPane } = Tabs;
 const TabTreeComponent = inject('ProviderStore')(
   observer((props) => {
-    const [ContextMenuKey, SetNewContextMenuKey] = useState(null);
-
     const [GeozonesTree, SetNewGeozonesTree] = useState([]);
     const DeleteGeozone = (GeozoneId) => {
       ApiFetch(
@@ -72,12 +70,29 @@ const TabTreeComponent = inject('ProviderStore')(
                     return (
                       <Dropdown
                         onVisibleChange={() => {
-                          SetNewContextMenuKey(Geozone.Id);
+                          props.ProviderStore.SetNewCheckedGeozonesKeys([
+                            Geozone.Id,
+                          ]);
                         }}
                         trigger={['contextMenu']}
                         overlay={
                           <Menu>
-                            <Menu.Item key="EditGeozone">
+                            <Menu.Item
+                              key="EditGeozone"
+                              onClick={(Event) => {
+                                props.ProviderStore.SetNewCurrentFeature(
+                                  props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().getFeatureById(
+                                    `Geozone${Geozone.Id}`
+                                  )
+                                );
+
+                                Event.domEvent.stopPropagation();
+                                props.ProviderStore.SetNewCurrentControls(
+                                  'Add',
+                                  { Id: 'GeozoneEditor', Options: {} }
+                                );
+                              }}
+                            >
                               Редактировать
                             </Menu.Item>
                             <Menu.Item
@@ -138,9 +153,9 @@ const TabTreeComponent = inject('ProviderStore')(
         {props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id == 'map' ? (
           <TabPane tab="Геозоны" key="GeoZones">
             <Tree
-              selectedKeys={[ContextMenuKey].concat(
+              selectedKeys={
                 props.ProviderStore.CurrentTab.Options.CheckedGeozonesKeys
-              )}
+              }
               defaultExpandedKeys={
                 props.ProviderStore.CurrentTab.Options.CheckedGeozonesKeys
               }

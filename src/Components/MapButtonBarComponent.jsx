@@ -69,17 +69,32 @@ const MapButtonBarComponent = inject('ProviderStore')(
       switch (Action) {
         case 'Close':
           props.ProviderStore.SetNewCurrentControls('Remove', 'GeozoneEditor');
-          props.ProviderStore.CurrentTab.Options.MapObject.removeControl(
-            props.ProviderStore.CurrentTab.Options.MapObject.getControls().array_.find(
-              (Control) => {
-                return Control.get('Id') == 'GeozoneEditor';
-              }
-            )
-          );
           props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().removeFeature(
             props.ProviderStore.CurrentTab.Options.CurrentFeature
           );
-          props.ProviderStore.SetNewCurentFeature(null);
+          const GeozoneId =
+            props.ProviderStore.CurrentTab.Options.CurrentFeature.getId().slice(
+              7
+            );
+          if (
+            props.ProviderStore.CurrentTab.Options.CheckedGeozonesKeys.includes(
+              GeozoneId
+            )
+          ) {
+            let NewCheckedGeozonesKeys = [
+              ...props.ProviderStore.CurrentTab.Options.CheckedGeozonesKeys,
+            ];
+            NewCheckedGeozonesKeys.splice(
+              NewCheckedGeozonesKeys.findIndex((Geozone) => {
+                return Geozone == GeozoneId;
+              }),
+              1
+            );
+            props.ProviderStore.SetNewCheckedGeozonesKeys(
+              NewCheckedGeozonesKeys
+            );
+          }
+          props.ProviderStore.SetNewCurrentFeature(null);
 
           break;
       }

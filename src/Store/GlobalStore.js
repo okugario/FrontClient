@@ -18,7 +18,7 @@ class Store {
       }
     );
   }
-  SetNewCurentFeature(NewFeature) {
+  SetNewCurrentFeature(NewFeature) {
     this.CurrentTab.Options.CurrentFeature = NewFeature;
   }
   SetNewCurrentTimeTrackPlayer(NewTime) {
@@ -54,7 +54,7 @@ class Store {
   SetNewCheckedTransportKeys(NewTransportKeys) {
     const NewFilteredTransportKeys = NewTransportKeys.filter((Key) => {
       return this.TransportTree.reduce(
-        (CheckedTransportArray, CurrentGroup, Index, GroupArray) => {
+        (CheckedTransportArray, CurrentGroup) => {
           return CheckedTransportArray.concat(
             CurrentGroup.children.map((Children) => {
               return Children.key;
@@ -67,7 +67,13 @@ class Store {
     this.CurrentTab.Options.CheckedTransportKeys = NewFilteredTransportKeys;
   }
   SetNewCheckedGeozonesKeys(NewCheckedKeys) {
-    this.CurrentTab.Options.CheckedGeozonesKeys = NewCheckedKeys;
+    if (
+      this.CurrentTab.Options.CurrentControls.find((Control) => {
+        return Control.Id == 'GeozoneEditor';
+      }) == undefined
+    ) {
+      this.CurrentTab.Options.CheckedGeozonesKeys = NewCheckedKeys;
+    }
   }
   SetNewTransportTree(NewTransportTree) {
     this.TransportTree = NewTransportTree;

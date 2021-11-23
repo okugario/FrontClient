@@ -73,12 +73,12 @@ const GeozoneEditor = inject('ProviderStore')(
             props.ProviderStore.CurrentTab.Options.CurrentDrawObject
           );
           props.ProviderStore.SetNewCurrentDrawObject(null);
-          props.ProviderStore.SetNewCurentFeature(null);
+          props.ProviderStore.SetNewCurrentFeature(null);
         } else {
           props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().removeFeature(
             props.ProviderStore.CurrentTab.Options.CurrentFeature
           );
-          props.ProviderStore.SetNewCurentFeature(null);
+          props.ProviderStore.SetNewCurrentFeature(null);
         }
       }
       props.ProviderStore.SetNewCurrentDrawObject(
@@ -114,7 +114,7 @@ const GeozoneEditor = inject('ProviderStore')(
               }),
             })
           );
-          props.ProviderStore.SetNewCurentFeature(DrawEvent.feature);
+          props.ProviderStore.SetNewCurrentFeature(DrawEvent.feature);
         }
       );
       props.ProviderStore.CurrentTab.Options.CurrentDrawObject.on(
@@ -130,7 +130,7 @@ const GeozoneEditor = inject('ProviderStore')(
           DrawEvent.feature.setStyle(
             props.ProviderStore.CurrentTab.Options.CurrentFeature.getStyle()
           );
-          props.ProviderStore.SetNewCurentFeature(DrawEvent.feature);
+          props.ProviderStore.SetNewCurrentFeature(DrawEvent.feature);
           props.ProviderStore.CurrentTab.Options.MapObject.removeInteraction(
             props.ProviderStore.CurrentTab.Options.CurrentDrawObject
           );

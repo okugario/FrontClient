@@ -45,7 +45,7 @@ const MapComponent = inject('ProviderStore')(
       }
       if (CurrentTab.Options.GetVectorLayerSource().getFeatures().length != 0) {
         CurrentTab.Options.MapObject.getView().fit(
-          CurrentTab.GetVectorLayerSource().getExtent()
+          CurrentTab.Options.GetVectorLayerSource().getExtent()
         );
       }
     };
@@ -63,7 +63,7 @@ const MapComponent = inject('ProviderStore')(
       }
       if (CurrentTab.Options.GetVectorLayerSource().getFeatures().length != 0) {
         CurrentTab.Options.MapObject.getView().fit(
-          CurrentTab.GetVectorLayerSource().getExtent()
+          CurrentTab.Options.GetVectorLayerSource().getExtent()
         );
       }
     };
@@ -99,6 +99,7 @@ const MapComponent = inject('ProviderStore')(
               })
             );
             CurrentTab.Options.GetVectorLayerSource().addFeature(NewFeature);
+
             resolve();
           }
         );
