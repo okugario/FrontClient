@@ -170,7 +170,13 @@ const GeozoneEditor = inject('ProviderStore')(
       );
     };
     const GetRegionId = () => {
-      return CurrentRegionId;
+      if (props.ProviderStore.CurrentTab.Options.CurrentFeature) {
+        return props.ProviderStore.CurrentTab.Options.CurrentFeature.get(
+          'RegionId'
+        );
+      } else {
+        ('Выберите регион');
+      }
     };
     useEffect(RequestRegions, []);
     return (
@@ -292,11 +298,11 @@ const GeozoneEditor = inject('ProviderStore')(
             <div>Регион:</div>
             <div>
               <Select
+                value={GetRegionId()}
                 options={AllRegions}
                 onChange={(Value) => {
                   SetNewCurrentRegionId(Value);
                 }}
-                value={GetRegionId()}
                 size="small"
               />
             </div>
