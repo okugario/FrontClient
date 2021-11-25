@@ -170,16 +170,7 @@ const GeozoneEditor = inject('ProviderStore')(
       );
     };
     const GetRegionId = () => {
-      let Control = props.ProviderStore.CurrentTab.Options.CurrentControls.find(
-        (Element) => {
-          return Element.Id == 'GeozoneEditor';
-        }
-      );
-      if (Control != undefined && 'RegionId' in Control.Options) {
-        return Control.Options.RegionId;
-      } else {
-        return CurrentRegionId;
-      }
+      return CurrentRegionId;
     };
     useEffect(RequestRegions, []);
     return (

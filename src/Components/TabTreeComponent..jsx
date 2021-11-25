@@ -50,7 +50,6 @@ const TabTreeComponent = inject('ProviderStore')(
                           onClick={() => {
                             props.ProviderStore.SetNewCurrentControls('Add', {
                               Id: 'GeozoneEditor',
-                              Options: { RegionId: Group.Id },
                             });
                           }}
                         >
@@ -89,7 +88,7 @@ const TabTreeComponent = inject('ProviderStore')(
                                 Event.domEvent.stopPropagation();
                                 props.ProviderStore.SetNewCurrentControls(
                                   'Add',
-                                  { Id: 'GeozoneEditor', Options: {} }
+                                  { Id: 'GeozoneEditor' }
                                 );
                               }}
                             >

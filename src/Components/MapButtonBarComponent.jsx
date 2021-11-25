@@ -257,7 +257,6 @@ const MapButtonBarComponent = inject('ProviderStore')(
               ) {
                 props.ProviderStore.SetNewCurrentControls('Add', {
                   Id: 'TrackPlayer',
-                  Options: {},
                 });
               }
             }}
@@ -270,7 +269,6 @@ const MapButtonBarComponent = inject('ProviderStore')(
             onClick={() => {
               props.ProviderStore.SetNewCurrentControls('Add', {
                 Id: 'GeozoneEditor',
-                Options: {},
               });
             }}
           >
