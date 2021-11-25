@@ -6,7 +6,6 @@ import { useState } from 'react';
 import { inject } from 'mobx-react';
 import { observer } from 'mobx-react-lite';
 import { Fill, Stroke, Style, Text } from 'ol/style';
-import GeometryType from 'ol/geom/GeometryType';
 import { Draw } from 'ol/interaction';
 import { ApiFetch } from '../Helpers/Helpers';
 import { useEffect } from 'react';
@@ -21,6 +20,7 @@ const GeozoneEditor = inject('ProviderStore')(
     });
     const [CurrentRegionId, SetNewCurrentRegionId] =
       useState('Выберите регион');
+    const [GeozoneType, SetNewGeozoneType] = useState('Выберите тип');
     const [GeozoneName, SetNewGeozoneName] = useState(null);
     const [ShowColorPicker, SetNewShowColorPicker] = useState(false);
     const [AllRegions, SetNewAllRegions] = useState(null);
@@ -81,6 +81,9 @@ const GeozoneEditor = inject('ProviderStore')(
           props.ProviderStore.SetNewCurrentFeature(null);
         }
       }
+
+      SetNewGeozoneType(DrawObjectType);
+
       props.ProviderStore.SetNewCurrentDrawObject(
         new Draw({
           source: props.ProviderStore.CurrentTab.Options.GetVectorLayerSource(),
@@ -153,6 +156,16 @@ const GeozoneEditor = inject('ProviderStore')(
             return { label: Region.Caption, value: Region.Id };
           })
         );
+        if (props.ProviderStore.CurrentTab.Options.CurrentFeature != null) {
+          SetNewCurrentRegionId(
+            props.ProviderStore.CurrentTab.Options.CurrentFeature.get(
+              'RegionId'
+            )
+          );
+          SetNewGeozoneType(
+            props.ProviderStore.CurrentTab.Options.CurrentFeature.getGeometry().getType()
+          );
+        }
       });
     };
     const ChangeGeozoneColor = (Color) => {
@@ -169,15 +182,7 @@ const GeozoneEditor = inject('ProviderStore')(
         })
       );
     };
-    const GetRegionId = () => {
-      if (props.ProviderStore.CurrentTab.Options.CurrentFeature) {
-        return props.ProviderStore.CurrentTab.Options.CurrentFeature.get(
-          'RegionId'
-        );
-      } else {
-        ('Выберите регион');
-      }
-    };
+
     useEffect(RequestRegions, []);
     return (
       <Card
@@ -279,11 +284,11 @@ const GeozoneEditor = inject('ProviderStore')(
                 onChange={(Value) => {
                   ChangeGeozoneType(Value);
                 }}
-                defaultValue="Выберите тип"
+                value={GeozoneType}
                 size="small"
                 options={[
-                  { label: 'Полигон', value: GeometryType.POLYGON },
-                  { label: 'Окружность', value: GeometryType.CIRCLE },
+                  { label: 'Полигон', value: 'Polygon' },
+                  { label: 'Окружность', value: 'Circle' },
                 ]}
               />
             </div>
@@ -298,7 +303,7 @@ const GeozoneEditor = inject('ProviderStore')(
             <div>Регион:</div>
             <div>
               <Select
-                value={GetRegionId()}
+                value={CurrentRegionId}
                 options={AllRegions}
                 onChange={(Value) => {
                   SetNewCurrentRegionId(Value);
