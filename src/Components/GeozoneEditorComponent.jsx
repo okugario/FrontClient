@@ -161,6 +161,11 @@ const GeozoneEditor = inject('ProviderStore')(
           SetNewGeozoneType(
             props.ProviderStore.CurrentTab.Options.CurrentFeature.getGeometry().getType()
           );
+          SetNewGeozoneName(
+            props.ProviderStore.CurrentTab.Options.CurrentFeature.getStyle()
+              .getText()
+              .getText()
+          );
         }
       });
     };
