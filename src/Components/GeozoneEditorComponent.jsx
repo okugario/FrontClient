@@ -12,12 +12,13 @@ import { useEffect } from 'react';
 
 const GeozoneEditor = inject('ProviderStore')(
   observer((props) => {
-    const [PickerColor, SetNewPickerColor] = useState({
-      r: '24',
-      g: '144',
-      b: '255',
-      a: '0.3',
-    });
+    const [PickerColor, SetNewPickerColor] = useState(
+      props.ProviderStore.CurrentTab.Options.CurrentFeature != null
+        ? props.ProviderStore.CurrentTab.Options.CurrentFeature.getStyle()
+            .getFill()
+            .getColor()
+        : 'rgba(24,144,255,0.3)'
+    );
     const [CurrentRegionId, SetNewCurrentRegionId] =
       useState('Выберите регион');
     const [GeozoneType, SetNewGeozoneType] = useState('Выберите тип');
@@ -30,7 +31,7 @@ const GeozoneEditor = inject('ProviderStore')(
           width: '36px',
           height: '14px',
           borderRadius: '2px',
-          background: `rgba(${PickerColor.r}, ${PickerColor.g}, ${PickerColor.b}, ${PickerColor.a})`,
+          background: PickerColor,
         },
         swatch: {
           padding: '5px',
@@ -140,12 +141,7 @@ const GeozoneEditor = inject('ProviderStore')(
           props.ProviderStore.SetNewCurrentDrawObject(null);
         }
       );
-      SetNewPickerColor({
-        r: '24',
-        g: '144',
-        b: '255',
-        a: '0.3',
-      });
+      SetNewPickerColor('rgba(24,144,255,0.3)');
       SetNewGeozoneName(null);
     };
 
@@ -169,7 +165,7 @@ const GeozoneEditor = inject('ProviderStore')(
       });
     };
     const ChangeGeozoneColor = (Color) => {
-      SetNewPickerColor(Color);
+      SetNewPickerColor(`rgba(${Color.r},${Color.g},${Color.b},${Color.a})`);
       props.ProviderStore.CurrentTab.Options.CurrentFeature.setStyle(
         new Style({
           text: props.ProviderStore.CurrentTab.Options.CurrentFeature.getStyle().getText(),
