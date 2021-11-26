@@ -109,6 +109,13 @@ const GeozoneEditor = inject('ProviderStore')(
         (DrawEvent) => {
           DrawEvent.feature.setStyle(
             new Style({
+              text:
+                GeozoneName != null
+                  ? new Text({
+                      text: GeozoneName,
+                      font: 'bold 20px sans-serif',
+                    })
+                  : undefined,
               stroke: new Stroke({
                 color: 'rgb(24, 144, 255)',
                 width: 2,
@@ -142,7 +149,6 @@ const GeozoneEditor = inject('ProviderStore')(
         }
       );
       SetNewPickerColor('rgba(24,144,255,0.3)');
-      SetNewGeozoneName(null);
     };
 
     const RequestRegions = () => {
