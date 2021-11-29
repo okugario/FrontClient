@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { observer, inject } from 'mobx-react';
-import { Button } from 'antd';
+import { Button, message } from 'antd';
 import { getLength } from 'ol/sphere';
 import * as ReactDOM from 'react-dom';
 import MapTooltipComponent from './MapTooltipComponent';
@@ -17,6 +17,7 @@ import Control from 'ol/control/Control';
 import GeoJSON from 'ol/format/GeoJSON';
 import TruckSVG from '../Svg/Truck.svg';
 import { useEffect } from 'react';
+import { ApiFetch } from '../Helpers/Helpers';
 
 const MapButtonBarComponent = inject('ProviderStore')(
   observer((props) => {
@@ -97,6 +98,49 @@ const MapButtonBarComponent = inject('ProviderStore')(
               );
             }
             props.ProviderStore.SetNewCurrentFeature(null);
+          }
+          break;
+        case 'Save':
+          if (
+            props.ProviderStore.CurrentTab.Options.CurrentFeature != null &&
+            props.ProviderStore.CurrentTab.Options.CurrentDrawObject == null
+          ) {
+            ApiFetch(
+              'model/Geofences',
+              'POST',
+              {
+                RegionId:
+                  props.ProviderStore.CurrentTab.Options.CurrentFeature.get(
+                    'RegionId'
+                  ),
+                Caption:
+                  props.ProviderStore.CurrentTab.Options.CurrentFeature.getStyle()
+                    .getText()
+                    .getText(),
+                Options: {
+                  color:
+                    props.ProviderStore.CurrentTab.Options.CurrentFeature.getStyle()
+                      .getFill()
+                      .getColor(),
+                  type: props.ProviderStore.CurrentTab.Options.CurrentFeature.getGeometry().getType(),
+                },
+                Geometries: [
+                  {
+                    TS: props.ProviderStore.CurrentTab.Options.StartDate.format(),
+                    Feature:
+                      props.ProviderStore.CurrentTab.Options.CurrentFeature,
+                  },
+                ],
+              },
+              (Response) => {
+                props.ProviderStore.SetNewCurrentControls(
+                  'Remove',
+                  'GeofoneEditor'
+                );
+              }
+            );
+          } else {
+            message.warning('Завершите рисование геозоны');
           }
           break;
       }

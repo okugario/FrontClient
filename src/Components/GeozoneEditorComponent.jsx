@@ -19,9 +19,8 @@ const GeozoneEditor = inject('ProviderStore')(
             .getColor()
         : 'rgba(24,144,255,0.3)'
     );
-    const [CurrentRegionId, SetNewCurrentRegionId] =
-      useState('Выберите регион');
-    const [GeozoneType, SetNewGeozoneType] = useState('Выберите тип');
+    const [CurrentRegionId, SetNewCurrentRegionId] = useState(null);
+
     const [GeozoneName, SetNewGeozoneName] = useState(null);
     const [ShowColorPicker, SetNewShowColorPicker] = useState(false);
     const [AllRegions, SetNewAllRegions] = useState(null);
@@ -83,8 +82,6 @@ const GeozoneEditor = inject('ProviderStore')(
         }
       }
 
-      SetNewGeozoneType(DrawObjectType);
-
       props.ProviderStore.SetNewCurrentDrawObject(
         new Draw({
           source: props.ProviderStore.CurrentTab.Options.GetVectorLayerSource(),
@@ -131,6 +128,7 @@ const GeozoneEditor = inject('ProviderStore')(
       props.ProviderStore.CurrentTab.Options.CurrentDrawObject.on(
         'drawend',
         (DrawEvent) => {
+          DrawEvent.feature.set('RegionId', CurrentRegionId);
           DrawEvent.feature.setId(
             `Geozone${
               props.ProviderStore.CurrentTab.Options.GetNamedFeatures(
@@ -164,9 +162,7 @@ const GeozoneEditor = inject('ProviderStore')(
               'RegionId'
             )
           );
-          SetNewGeozoneType(
-            props.ProviderStore.CurrentTab.Options.CurrentFeature.getGeometry().getType()
-          );
+
           SetNewGeozoneName(
             props.ProviderStore.CurrentTab.Options.CurrentFeature.getStyle()
               .getText()
@@ -196,7 +192,13 @@ const GeozoneEditor = inject('ProviderStore')(
         title="Геозона"
         size="small"
         actions={[
-          <Button size="small" type="primary" onClick={() => {}}>
+          <Button
+            size="small"
+            type="primary"
+            onClick={() => {
+              props.GeozoneEditorHandler('Save');
+            }}
+          >
             Сохранить
           </Button>,
           <Button
@@ -288,10 +290,10 @@ const GeozoneEditor = inject('ProviderStore')(
             <div>Тип:</div>
             <div>
               <Select
+                defaultValue="Выберите тип"
                 onChange={(Value) => {
                   ChangeGeozoneType(Value);
                 }}
-                value={GeozoneType}
                 size="small"
                 options={[
                   { label: 'Полигон', value: 'Polygon' },
@@ -310,10 +312,19 @@ const GeozoneEditor = inject('ProviderStore')(
             <div>Регион:</div>
             <div>
               <Select
-                value={CurrentRegionId}
+                defaultValue="Выберите регион"
                 options={AllRegions}
+                disabled={
+                  props.ProviderStore.CurrentTab.Options.CurrentFeature ==
+                    null ||
+                  props.ProviderStore.CurrentTab.Options.CurrentDrawObject !=
+                    null
+                }
                 onChange={(Value) => {
-                  SetNewCurrentRegionId(Value);
+                  props.ProviderStore.CurrentTab.Options.CurrentFeature.set(
+                    'RegionId',
+                    Value
+                  );
                 }}
                 size="small"
               />
