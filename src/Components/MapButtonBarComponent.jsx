@@ -18,6 +18,7 @@ import GeoJSON from 'ol/format/GeoJSON';
 import TruckSVG from '../Svg/Truck.svg';
 import { useEffect } from 'react';
 import { ApiFetch } from '../Helpers/Helpers';
+import { toLonLat } from 'ol/proj';
 
 const MapButtonBarComponent = inject('ProviderStore')(
   observer((props) => {
@@ -126,9 +127,19 @@ const MapButtonBarComponent = inject('ProviderStore')(
                 },
                 Geometries: [
                   {
+                    Geometry:
+                      props.ProviderStore.CurrentTab.Options.CurrentFeature.getGeometry()
+                        .getCoordinates()[0]
+                        .map((Coordinate) => {
+                          let LonLatCordinate = toLonLat(Coordinate);
+                          return {
+                            Lon: LonLatCordinate[0],
+                            Lat: LonLatCordinate[1],
+                          };
+                        }),
                     TS: props.ProviderStore.CurrentTab.Options.StartDate.format(),
                     Feature:
-                      props.ProviderStore.CurrentTab.Options.CurrentFeature,
+                      props.ProviderStore.CurrentTab.Options.CurrentFeature.getGeometry(),
                   },
                 ],
               },
