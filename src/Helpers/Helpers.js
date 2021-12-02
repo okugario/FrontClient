@@ -15,18 +15,19 @@ export const CheckUniqale = (Trucks) => {
   return Count <= 1;
 };
 export function HexToRgbA(Hex, Opasity) {
-  let c;
   if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(Hex)) {
-    c = Hex.substring(1).split('');
-    if (c.length == 3) {
-      c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+    let Color = Hex.substring(1).split('');
+    if (Color.length == 3) {
+      Color = [Color[0], Color[0], Color[1], Color[1], Color[2], Color[2]];
     }
-    c = '0x' + c.join('');
-    return `rgba(${[(c >> 16) & 255, (c >> 8) & 255, c & 255].join(
+    Color = '0x' + Color.join('');
+    return `rgba(${[(Color >> 16) & 255, (Color >> 8) & 255, Color & 255].join(
       ','
-    )},${Opasity})`;
+    )},${Opasity == undefined ? 1 : Opasity})`;
   }
-  throw new Error('Bad Hex');
+  if (/^rgb/.test(Hex)) {
+    return Hex;
+  }
 }
 export function AntDGenerateTreeData(Objects, Options) {
   return Objects.map((TreeNode) => {
