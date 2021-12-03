@@ -107,9 +107,31 @@ const MapButtonBarComponent = inject('ProviderStore')(
             props.ProviderStore.CurrentTab.Options.CurrentDrawObject == null
           ) {
             ApiFetch(
-              'model/Geofences',
-              'POST',
+              `model/Geofences/${
+                /^Geozone\d+$/.test(
+                  props.ProviderStore.CurrentTab.Options.CurrentFeature.getId()
+                )
+                  ? ''
+                  : props.ProviderStore.CurrentTab.Options.CurrentFeature.getId().slice(
+                      7
+                    )
+              }`,
+              `${
+                /^Geozone\d+$/.test(
+                  props.ProviderStore.CurrentTab.Options.CurrentFeature.getId()
+                )
+                  ? 'POST'
+                  : 'PATCH'
+              }`,
               {
+                Id: /^Geozone\d+$/.test(
+                  props.ProviderStore.CurrentTab.Options.CurrentFeature.getId()
+                )
+                  ? undefined
+                  : props.ProviderStore.CurrentTab.Options.CurrentFeature.getId().slice(
+                      7
+                    ),
+
                 RegionId:
                   props.ProviderStore.CurrentTab.Options.CurrentFeature.get(
                     'RegionId'

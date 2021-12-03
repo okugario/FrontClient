@@ -22,6 +22,7 @@ const GeozoneEditor = inject('ProviderStore')(
     const [CurrentRegionId, SetNewCurrentRegionId] = useState(null);
 
     const [GeozoneName, SetNewGeozoneName] = useState(null);
+    const [GeozoneType, SetNewGeozoneType] = useState('Выберите тип');
     const [ShowColorPicker, SetNewShowColorPicker] = useState(false);
     const [AllRegions, SetNewAllRegions] = useState(null);
     const Styles = reactCSS({
@@ -290,8 +291,15 @@ const GeozoneEditor = inject('ProviderStore')(
             <div>Тип:</div>
             <div>
               <Select
-                defaultValue="Выберите тип"
+                value={
+                  props.ProviderStore.CurrentTab.Options.CurrentFeature !=
+                    null &&
+                  props.ProviderStore.CurrentTab.Options.DrawObject == null
+                    ? props.ProviderStore.CurrentTab.Options.CurrentFeature.getGeometry().getType()
+                    : GeozoneType
+                }
                 onChange={(Value) => {
+                  SetNewGeozoneType(Value);
                   ChangeGeozoneType(Value);
                 }}
                 size="small"
