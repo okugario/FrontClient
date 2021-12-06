@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Card, Input, Modal, Select, Table } from 'antd';
+import { Button, Card, Input, Modal, Select, Table, DatePicker } from 'antd';
 import { ChromePicker } from 'react-color';
 import reactCSS from 'reactcss';
 import { useState } from 'react';
@@ -22,7 +22,7 @@ const GeozoneEditor = inject('ProviderStore')(
         : 'rgba(24,144,255,0.3)'
     );
     const [CurrentRegionId, SetNewCurrentRegionId] = useState(null);
-
+    const [CurrentSnapshots, SetNewCurrentSnapshots] = useState([]);
     const [GeozoneName, SetNewGeozoneName] = useState(null);
     const [GeozoneType, SetNewGeozoneType] = useState('Выберите тип');
     const [ShowColorPicker, SetNewShowColorPicker] = useState(false);
@@ -172,8 +172,27 @@ const GeozoneEditor = inject('ProviderStore')(
               .getText()
               .getText()
           );
+          if (
+            props.ProviderStore.CurrentTab.Options.CurrentFeature.get(
+              'GeozoneHistory'
+            ) != undefined
+          ) {
+            SetNewCurrentSnapshots(
+              props.ProviderStore.CurrentTab.Options.CurrentFeature.get(
+                'GeozoneHistory'
+              ).map((Element, Index) => {
+                Element.Key = Index;
+                return Element;
+              })
+            );
+          }
         }
       });
+    };
+    const DeleteSnapshot = (Index) => {
+      let NewSnapshots = [...CurrentSnapshots];
+      NewSnapshots.splice(Index, 1);
+      SetNewCurrentSnapshots(NewSnapshots);
     };
     const ChangeGeozoneColor = (Color) => {
       SetNewPickerColor(`rgba(${Color.r},${Color.g},${Color.b},${Color.a})`);
@@ -220,7 +239,7 @@ const GeozoneEditor = inject('ProviderStore')(
             display: 'flex',
             flexDirection: 'column',
             rowGap: '10px',
-            width: '200px',
+            width: '250px',
           }}
         >
           <div
@@ -356,24 +375,12 @@ const GeozoneEditor = inject('ProviderStore')(
               selectedRowKeys: [SelectedKey],
               hideSelectAll: true,
               renderCell: () => null,
-              columnWidth: '1px',
+              columnWidth: 1,
             }}
             rowKey="Key"
             scroll={{ y: '300px' }}
             pagination={false}
-            dataSource={
-              props.ProviderStore.CurrentTab.Options.CurrentFeature != null &&
-              props.ProviderStore.CurrentTab.Options.CurrentFeature.get(
-                'GeozoneHistory'
-              ) != undefined
-                ? props.ProviderStore.CurrentTab.Options.CurrentFeature.get(
-                    'GeozoneHistory'
-                  ).map((Element, Index) => {
-                    Element.Key = Index;
-                    return Element;
-                  })
-                : []
-            }
+            dataSource={CurrentSnapshots}
             columns={[
               {
                 title: 'Дата изменения',
@@ -393,7 +400,12 @@ const GeozoneEditor = inject('ProviderStore')(
                         alignItems: 'center',
                       }}
                     >
-                      {Moment(Value).format('DD.MM.YYYY HH:mm:ss')}
+                      <DatePicker
+                        style={{ width: '170px' }}
+                        size="small"
+                        value={Moment(Value)}
+                        format="DD.MM.YYYY HH:mm:ss"
+                      />
                       <CloseOutlined
                         onClick={() => {
                           Modal.confirm({
@@ -404,6 +416,9 @@ const GeozoneEditor = inject('ProviderStore')(
                               size: 'small',
                               type: 'primary',
                               danger: true,
+                            },
+                            onOk: () => {
+                              DeleteSnapshot(Index);
                             },
                             cancelButtonProps: { size: 'small' },
                             cancelText: 'Отменить',

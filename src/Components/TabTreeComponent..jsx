@@ -3,8 +3,8 @@ import { useEffect, useState } from 'react';
 import { observer, inject } from 'mobx-react';
 import { AntDGenerateTreeData, ApiFetch } from '../Helpers/Helpers';
 import { Tabs, Tree, Dropdown, Menu, Modal } from 'antd';
-import { Modify, Snap } from 'ol/interaction';
-import Select from 'rc-select';
+import { Modify } from 'ol/interaction';
+
 const { TabPane } = Tabs;
 const TabTreeComponent = inject('ProviderStore')(
   observer((props) => {
@@ -15,12 +15,12 @@ const TabTreeComponent = inject('ProviderStore')(
         'DELETE',
         undefined,
         (Response) => {
+          RequestGeozoneTree();
           SetNewContextMenuKey(null);
-          RequestTrees();
         }
       );
     };
-    const RequestTrees = () => {
+    const RequestTransportTree = () => {
       ApiFetch(
         `reports/VehicleTree?ts=${props.ProviderStore.CurrentTab.Options.StartDate.unix()}`,
         'GET',
@@ -36,6 +36,8 @@ const TabTreeComponent = inject('ProviderStore')(
           );
         }
       );
+    };
+    const RequestGeozoneTree = () => {
       ApiFetch('reports/GeofenceTree', 'GET', undefined, (Response) => {
         SetNewGeozonesTree(
           Response.data.map((Group) => {
@@ -123,6 +125,7 @@ const TabTreeComponent = inject('ProviderStore')(
         );
       });
     };
+
     const EditGeozone = (GeozoneId, Event) => {
       props.ProviderStore.SetNewCurrentFeature(
         props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().getFeatureById(
@@ -141,16 +144,34 @@ const TabTreeComponent = inject('ProviderStore')(
           ModifyObject.features.array_[0]
         );
       });
-      props.ProviderStore.SetNewModifyObject(ModifyObject);
 
       props.ProviderStore.CurrentTab.Options.MapObject.addInteraction(
         ModifyObject
       );
     };
-    useEffect(RequestTrees, []);
+    const TreesUpdate = (TabKey) => {
+      switch (TabKey) {
+        case 'Transports':
+          RequestTransportTree();
+          break;
+        case 'Geozones':
+          RequestGeozoneTree();
+          break;
+      }
+    };
+    useEffect(() => {
+      RequestTransportTree();
+    }, []);
     return (
-      <Tabs size="small" hideAdd={true} type="card">
-        <TabPane tab="Транспорт" key="Transport">
+      <Tabs
+        size="small"
+        hideAdd={true}
+        type="card"
+        onChange={(Key) => {
+          TreesUpdate(Key);
+        }}
+      >
+        <TabPane tab="Транспорт" key="Transports">
           <Tree
             defaultExpandedKeys={
               props.ProviderStore.CurrentTab.Options.CheckedTransportKeys
@@ -166,7 +187,7 @@ const TabTreeComponent = inject('ProviderStore')(
           />
         </TabPane>
         {props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id == 'map' ? (
-          <TabPane tab="Геозоны" key="GeoZones">
+          <TabPane tab="Геозоны" key="Geozones">
             <Tree
               selectedKeys={
                 props.ProviderStore.CurrentTab.Options.CheckedGeozonesKeys

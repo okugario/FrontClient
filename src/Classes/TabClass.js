@@ -110,8 +110,7 @@ export class Tab {
           CheckedGeozonesKeys: [],
           CurrentDrawObject: null,
           CurrentFeature: null,
-          CurrentModifyObject: null,
-          CurentSnapObject: null,
+
           LeftMenu: [
             React.lazy(() => import('../Components/IntervalComponent')),
 
