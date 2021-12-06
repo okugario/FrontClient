@@ -2,7 +2,6 @@ import * as React from 'react';
 import { observer, inject } from 'mobx-react';
 import { Modal, Calendar, TimePicker } from 'antd';
 import FooterIntervalModalWindow from './FooterIntervalModalWindow';
-import { AntDGenerateTreeData, ApiFetch } from '../Helpers/Helpers';
 
 @inject('ProviderStore')
 @observer
@@ -15,23 +14,7 @@ export default class IntervalComponent extends React.Component {
       EndDate: this.props.ProviderStore.CurrentTab.Options.EndDate.clone(),
     };
   }
-  RequestTransportTree() {
-    return ApiFetch(
-      `reports/VehicleTree?ts=${this.props.ProviderStore.CurrentTab.Options.StartDate.unix()}`,
-      'GET',
-      undefined,
-      (Response) => {
-        this.props.ProviderStore.SetNewTransportTree(
-          AntDGenerateTreeData(Response.data, {
-            TitleName: 'Caption',
-            KeyName: 'Id',
-            ChildrensName: 'Vehicles',
-            TreeNodeOptions: { disableCheckbox: true },
-          })
-        );
-      }
-    );
-  }
+
   ButtonHandler = (Button) => {
     const NewStartDate = this.state.StartDate.clone();
     switch (Button) {
@@ -67,9 +50,7 @@ export default class IntervalComponent extends React.Component {
           this.state.StartDate,
           this.state.EndDate
         );
-        this.RequestTransportTree().then(() => {
-          this.ModalHandler(false);
-        });
+        this.ModalHandler(false);
         break;
       case 'Cancel':
         this.ModalHandler(false);

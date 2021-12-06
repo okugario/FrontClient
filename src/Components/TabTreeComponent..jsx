@@ -161,7 +161,7 @@ const TabTreeComponent = inject('ProviderStore')(
     };
     useEffect(() => {
       RequestTransportTree();
-    }, []);
+    }, [props.ProviderStore.CurrentTab.Options.StartDate]);
     return (
       <Tabs
         size="small"
