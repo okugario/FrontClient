@@ -1,15 +1,17 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import TransportProfile from './TransportProfile';
-import { Table, Modal, Button, message } from 'antd';
+import { Table, Modal, Button, message, Input } from 'antd';
 import { ApiFetch } from '../Helpers/Helpers';
 import Moment from 'moment';
 import ProfilePageHandler from './ProfilePageHandler';
 import TerminalProfileComponent from './TerminalProfileComponent';
 import { inject, observer } from 'mobx-react';
+import { SearchOutlined } from '@ant-design/icons';
 
 const TransportComponent = inject('ProviderStore')(
   observer((props) => {
+    const [SearchString, SetNewSearchString] = useState(null);
     const [TransportTable, SetNewTransportTable] = useState(null);
     const [ProfileMode, SetNewProfileMode] = useState({
       Mode: 'TransportProfile',
@@ -311,6 +313,11 @@ const TransportComponent = inject('ProviderStore')(
           );
       }
     };
+    const ClearSearch = (Event) => {
+      if (Event.key === 'Escape') {
+        SetNewSearchString(null);
+      }
+    };
     const RequestTransportTable = () => {
       if (
         props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id == 'Vehicles'
@@ -358,9 +365,13 @@ const TransportComponent = inject('ProviderStore')(
         SetNewProfile(NewProfile);
       });
     };
-    useEffect(RequestTransportTable, [
-      props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id,
-    ]);
+    useEffect(() => {
+      RequestTransportTable();
+      document.addEventListener('keydown', ClearSearch, false);
+      return () => {
+        document.removeEventListener('keydown', ClearSearch, false);
+      };
+    }, [props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id]);
     return (
       <div className="FullExtend">
         <Modal
@@ -469,41 +480,30 @@ const TransportComponent = inject('ProviderStore')(
           dataSource={TransportTable}
           columns={[
             {
+              onFilter: (Value, Record) => {
+                if (SearchString != null) {
+                  return Record[Value].toString()
+                    .toLowerCase()
+                    .includes(SearchString);
+                } else {
+                  return true;
+                }
+              },
+              filteredValue: ['Caption'],
+              filterIcon: <SearchOutlined />,
+              filterDropdown: (
+                <Input
+                  size="small"
+                  placeholder="Поиск"
+                  value={SearchString}
+                  onChange={(Event) => {
+                    SetNewSearchString(Event.target.value);
+                  }}
+                />
+              ),
               title: 'Наименование',
-              key: 'caption',
+              key: 'Caption',
               dataIndex: 'Caption',
-              render: (Record) => {
-                return <div style={{ cursor: 'pointer' }}>{Record}</div>;
-              },
-            },
-            {
-              title: 'ID терминала',
-              key: 'TerminalID',
-              dataIndex: 'TerminalID',
-              render: (Record) => {
-                return <div style={{ cursor: 'pointer' }}>{Record}</div>;
-              },
-            },
-            {
-              title: 'Тип',
-              key: 'Type',
-              dataIndex: 'Type',
-              render: (Record) => {
-                return <div style={{ cursor: 'pointer' }}>{Record}</div>;
-              },
-            },
-            {
-              title: 'Дата добавления',
-              key: 'AddDate',
-              dataIndex: 'AddDate',
-              render: (Record) => {
-                return <div style={{ cursor: 'pointer' }}>{Record}</div>;
-              },
-            },
-            {
-              title: 'Последние данные',
-              key: 'LastData',
-              dataIndex: 'LastData',
               render: (Record) => {
                 return <div style={{ cursor: 'pointer' }}>{Record}</div>;
               },
