@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Card, Input, Select } from 'antd';
+import { Button, Card, Input, Modal, Select, Table } from 'antd';
 import { ChromePicker } from 'react-color';
 import reactCSS from 'reactcss';
 import { useState } from 'react';
@@ -9,6 +9,8 @@ import { Fill, Stroke, Style, Text } from 'ol/style';
 import { Draw } from 'ol/interaction';
 import { ApiFetch } from '../Helpers/Helpers';
 import { useEffect } from 'react';
+import Moment from 'moment';
+import { CloseOutlined } from '@ant-design/icons';
 
 const GeozoneEditor = inject('ProviderStore')(
   observer((props) => {
@@ -25,6 +27,7 @@ const GeozoneEditor = inject('ProviderStore')(
     const [GeozoneType, SetNewGeozoneType] = useState('Выберите тип');
     const [ShowColorPicker, SetNewShowColorPicker] = useState(false);
     const [AllRegions, SetNewAllRegions] = useState(null);
+    const [SelectedKey, SetNewSelectedKey] = useState(null);
     const Styles = reactCSS({
       default: {
         color: {
@@ -320,7 +323,17 @@ const GeozoneEditor = inject('ProviderStore')(
             <div>Регион:</div>
             <div>
               <Select
-                defaultValue="Выберите регион"
+                value={
+                  props.ProviderStore.CurrentTab.Options.CurrentFeature !=
+                    null &&
+                  props.ProviderStore.CurrentTab.Options.CurrentFeature.get(
+                    'RegionId'
+                  ) != undefined
+                    ? props.ProviderStore.CurrentTab.Options.CurrentFeature.get(
+                        'RegionId'
+                      )
+                    : 'Выберите регион'
+                }
                 options={AllRegions}
                 disabled={
                   props.ProviderStore.CurrentTab.Options.CurrentFeature ==
@@ -338,6 +351,74 @@ const GeozoneEditor = inject('ProviderStore')(
               />
             </div>
           </div>
+          <Table
+            rowSelection={{
+              selectedRowKeys: [SelectedKey],
+              hideSelectAll: true,
+              renderCell: () => null,
+              columnWidth: '1px',
+            }}
+            rowKey="Key"
+            scroll={{ y: '300px' }}
+            pagination={false}
+            dataSource={
+              props.ProviderStore.CurrentTab.Options.CurrentFeature != null &&
+              props.ProviderStore.CurrentTab.Options.CurrentFeature.get(
+                'GeozoneHistory'
+              ) != undefined
+                ? props.ProviderStore.CurrentTab.Options.CurrentFeature.get(
+                    'GeozoneHistory'
+                  ).map((Element, Index) => {
+                    Element.Key = Index;
+                    return Element;
+                  })
+                : []
+            }
+            columns={[
+              {
+                title: 'Дата изменения',
+                dataIndex: 'TS',
+                key: 'TS',
+                render: (Value, Record, Index) => {
+                  return (
+                    <div
+                      onClick={() => {
+                        SetNewSelectedKey(Index);
+                      }}
+                      style={{
+                        cursor: 'pointer',
+                        width: '100%',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                      }}
+                    >
+                      {Moment(Value).format('DD.MM.YYYY HH:mm:ss')}
+                      <CloseOutlined
+                        onClick={() => {
+                          Modal.confirm({
+                            title: 'Подтвердите удаление?',
+                            content:
+                              'Вы действительно хотите удалить это изменение?',
+                            okButtonProps: {
+                              size: 'small',
+                              type: 'primary',
+                              danger: true,
+                            },
+                            cancelButtonProps: { size: 'small' },
+                            cancelText: 'Отменить',
+                            okText: 'Удалить',
+                          });
+                        }}
+                        style={{ color: 'red', cursor: 'pointer' }}
+                      />
+                    </div>
+                  );
+                },
+              },
+            ]}
+            size="small"
+          />
         </div>
       </Card>
     );

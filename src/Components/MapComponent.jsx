@@ -84,6 +84,7 @@ const MapComponent = inject('ProviderStore')(
             );
             NewFeature.setId(`Geozone${GeozoneId}`);
             NewFeature.set('RegionId', Response.data.RegionId);
+            NewFeature.set('GeozoneHistory', Response.data.Geometries);
             NewFeature.setStyle(
               new Style({
                 text: new Text({

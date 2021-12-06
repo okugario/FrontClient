@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { observer, inject } from 'mobx-react';
 import { AntDGenerateTreeData, ApiFetch } from '../Helpers/Helpers';
 import { Tabs, Tree, Dropdown, Menu, Modal } from 'antd';
+import { Modify, Snap } from 'ol/interaction';
+import Select from 'rc-select';
 const { TabPane } = Tabs;
 const TabTreeComponent = inject('ProviderStore')(
   observer((props) => {
@@ -79,17 +81,7 @@ const TabTreeComponent = inject('ProviderStore')(
                             <Menu.Item
                               key="EditGeozone"
                               onClick={(Event) => {
-                                props.ProviderStore.SetNewCurrentFeature(
-                                  props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().getFeatureById(
-                                    `Geozone${Geozone.Id}`
-                                  )
-                                );
-
-                                Event.domEvent.stopPropagation();
-                                props.ProviderStore.SetNewCurrentControls(
-                                  'Add',
-                                  { Id: 'GeozoneEditor' }
-                                );
+                                EditGeozone(Geozone.Id, Event);
                               }}
                             >
                               Редактировать
@@ -130,6 +122,30 @@ const TabTreeComponent = inject('ProviderStore')(
           })
         );
       });
+    };
+    const EditGeozone = (GeozoneId, Event) => {
+      props.ProviderStore.SetNewCurrentFeature(
+        props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().getFeatureById(
+          `Geozone${GeozoneId}`
+        )
+      );
+
+      Event.domEvent.stopPropagation();
+      props.ProviderStore.SetNewCurrentControls('Add', { Id: 'GeozoneEditor' });
+
+      const ModifyObject = new Modify({
+        source: props.ProviderStore.CurrentTab.Options.GetVectorLayerSource(),
+      });
+      ModifyObject.on('modifyend', (ModifyObject) => {
+        props.ProviderStore.SetNewCurrentFeature(
+          ModifyObject.features.array_[0]
+        );
+      });
+      props.ProviderStore.SetNewModifyObject(ModifyObject);
+
+      props.ProviderStore.CurrentTab.Options.MapObject.addInteraction(
+        ModifyObject
+      );
     };
     useEffect(RequestTrees, []);
     return (

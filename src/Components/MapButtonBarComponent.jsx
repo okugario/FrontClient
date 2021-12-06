@@ -106,15 +106,21 @@ const MapButtonBarComponent = inject('ProviderStore')(
             props.ProviderStore.CurrentTab.Options.CurrentFeature != null &&
             props.ProviderStore.CurrentTab.Options.CurrentDrawObject == null
           ) {
+            props.ProviderStore.CurrentTab.Options.MapObject.removeInteraction(
+              props.ProviderStore.CurrentTab.Options.CurrentModifyObject
+            );
+            props.ProviderStore.CurrentTab.Options.MapObject.removeInteraction(
+              props.ProviderStore.CurrentTab.Options.CurrentSnapObject
+            );
             ApiFetch(
-              `model/Geofences/${
+              `model/Geofences${
                 /^Geozone\d+$/.test(
                   props.ProviderStore.CurrentTab.Options.CurrentFeature.getId()
                 )
                   ? ''
-                  : props.ProviderStore.CurrentTab.Options.CurrentFeature.getId().slice(
+                  : `/${props.ProviderStore.CurrentTab.Options.CurrentFeature.getId().slice(
                       7
-                    )
+                    )}`
               }`,
               `${
                 /^Geozone\d+$/.test(
@@ -168,7 +174,7 @@ const MapButtonBarComponent = inject('ProviderStore')(
               (Response) => {
                 props.ProviderStore.SetNewCurrentControls(
                   'Remove',
-                  'GeofoneEditor'
+                  'GeozoneEditor'
                 );
               }
             );
