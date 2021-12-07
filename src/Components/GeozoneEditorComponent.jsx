@@ -21,7 +21,7 @@ const GeozoneEditor = inject('ProviderStore')(
             .getColor()
         : 'rgba(24,144,255,0.3)'
     );
-    const [CurrentRegionId, SetNewCurrentRegionId] = useState(null);
+    const [CurrentRegionId, SetNewCurrentRegionId] = useState('Не указан');
     const [CurrentSnapshots, SetNewCurrentSnapshots] = useState([]);
     const [GeozoneName, SetNewGeozoneName] = useState(null);
     const [GeozoneType, SetNewGeozoneType] = useState('Выберите тип');
@@ -351,7 +351,7 @@ const GeozoneEditor = inject('ProviderStore')(
                     ? props.ProviderStore.CurrentTab.Options.CurrentFeature.get(
                         'RegionId'
                       )
-                    : 'Выберите регион'
+                    : CurrentRegionId
                 }
                 options={AllRegions}
                 disabled={
@@ -365,6 +365,7 @@ const GeozoneEditor = inject('ProviderStore')(
                     'RegionId',
                     Value
                   );
+                  SetNewCurrentRegionId(Value);
                 }}
                 size="small"
               />

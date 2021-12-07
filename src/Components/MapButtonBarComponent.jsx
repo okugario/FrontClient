@@ -106,12 +106,6 @@ const MapButtonBarComponent = inject('ProviderStore')(
             props.ProviderStore.CurrentTab.Options.CurrentFeature != null &&
             props.ProviderStore.CurrentTab.Options.CurrentDrawObject == null
           ) {
-            props.ProviderStore.CurrentTab.Options.MapObject.removeInteraction(
-              props.ProviderStore.CurrentTab.Options.CurrentModifyObject
-            );
-            props.ProviderStore.CurrentTab.Options.MapObject.removeInteraction(
-              props.ProviderStore.CurrentTab.Options.CurrentSnapObject
-            );
             ApiFetch(
               `model/Geofences${
                 /^Geozone\d+$/.test(
@@ -176,6 +170,10 @@ const MapButtonBarComponent = inject('ProviderStore')(
                   'Remove',
                   'GeozoneEditor'
                 );
+                props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().removeFeature(
+                  props.ProviderStore.CurrentTab.Options.CurrentFeature
+                );
+                props.ProviderStore.SetNewCurrentFeature(null);
               }
             );
           } else {
