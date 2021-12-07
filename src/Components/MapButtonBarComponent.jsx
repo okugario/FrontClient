@@ -72,34 +72,43 @@ const MapButtonBarComponent = inject('ProviderStore')(
         case 'Close':
           props.ProviderStore.SetNewCurrentControls('Remove', 'GeozoneEditor');
           if (props.ProviderStore.CurrentTab.Options.CurrentFeature != null) {
-            props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().removeFeature(
-              props.ProviderStore.CurrentTab.Options.CurrentFeature
-            );
-
-            const GeozoneId =
-              props.ProviderStore.CurrentTab.Options.CurrentFeature.getId().slice(
-                7
-              );
             if (
-              props.ProviderStore.CurrentTab.Options.CheckedGeozonesKeys.includes(
-                GeozoneId
-              )
+              props.ProviderStore.CurrentTab.Options.CurrentDrawObject != null
             ) {
-              let NewCheckedGeozonesKeys = [
-                ...props.ProviderStore.CurrentTab.Options.CheckedGeozonesKeys,
-              ];
-              NewCheckedGeozonesKeys.splice(
-                NewCheckedGeozonesKeys.findIndex((Geozone) => {
-                  return Geozone == GeozoneId;
-                }),
-                1
+              props.ProviderStore.CurrentTab.Options.MapObject.removeInteraction(
+                props.ProviderStore.CurrentTab.Options.CurrentDrawObject
               );
-              props.ProviderStore.SetNewCheckedGeozonesKeys(
-                NewCheckedGeozonesKeys
+            } else {
+              props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().removeFeature(
+                props.ProviderStore.CurrentTab.Options.CurrentFeature
               );
+
+              const GeozoneId =
+                props.ProviderStore.CurrentTab.Options.CurrentFeature.getId().slice(
+                  7
+                );
+              if (
+                props.ProviderStore.CurrentTab.Options.CheckedGeozonesKeys.includes(
+                  GeozoneId
+                )
+              ) {
+                let NewCheckedGeozonesKeys = [
+                  ...props.ProviderStore.CurrentTab.Options.CheckedGeozonesKeys,
+                ];
+                NewCheckedGeozonesKeys.splice(
+                  NewCheckedGeozonesKeys.findIndex((Geozone) => {
+                    return Geozone == GeozoneId;
+                  }),
+                  1
+                );
+                props.ProviderStore.SetNewCheckedGeozonesKeys(
+                  NewCheckedGeozonesKeys
+                );
+              }
+              props.ProviderStore.SetNewCurrentFeature(null);
             }
-            props.ProviderStore.SetNewCurrentFeature(null);
           }
+
           break;
         case 'Save':
           if (

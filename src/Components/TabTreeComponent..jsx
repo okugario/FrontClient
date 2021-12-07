@@ -162,6 +162,9 @@ const TabTreeComponent = inject('ProviderStore')(
     useEffect(() => {
       RequestTransportTree();
     }, [props.ProviderStore.CurrentTab.Options.StartDate]);
+    useEffect(() => {
+      RequestGeozoneTree();
+    }, [props.ProviderStore.CurrentTab.Options.CurrentControls.length]);
     return (
       <Tabs
         size="small"
