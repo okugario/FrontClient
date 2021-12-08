@@ -135,18 +135,23 @@ const TabTreeComponent = inject('ProviderStore')(
 
       Event.domEvent.stopPropagation();
       props.ProviderStore.SetNewCurrentControls('Add', { Id: 'GeozoneEditor' });
+      props.ProviderStore.SetNewModifyObject(
+        new Modify({
+          source: props.ProviderStore.CurrentTab.Options.GetVectorLayerSource(),
+        })
+      );
 
-      const ModifyObject = new Modify({
-        source: props.ProviderStore.CurrentTab.Options.GetVectorLayerSource(),
-      });
-      ModifyObject.on('modifyend', (ModifyObject) => {
-        props.ProviderStore.SetNewCurrentFeature(
-          ModifyObject.features.array_[0]
-        );
-      });
+      props.ProviderStore.CurrentTab.Options.CurrentModifyObject.on(
+        'modifyend',
+        (ModifyEvent) => {
+          props.ProviderStore.SetNewCurrentFeature(
+            ModifyEvent.features.array_[0]
+          );
+        }
+      );
 
       props.ProviderStore.CurrentTab.Options.MapObject.addInteraction(
-        ModifyObject
+        props.ProviderStore.CurrentTab.Options.CurrentModifyObject
       );
     };
     const TreesUpdate = (TabKey) => {

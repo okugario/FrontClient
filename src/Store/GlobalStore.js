@@ -84,7 +84,9 @@ class Store {
       return Tab.Key == NewCurrentTabKey;
     });
   }
-
+  SetNewModifyObject(NewModifyObject) {
+    this.CurrentTab.Options.CurrentModifyObject = NewModifyObject;
+  }
   DeleteTab(TabKey) {
     const DeleteIndex = this.OpenTabs.findIndex((Tab) => {
       return Tab.Key == TabKey;

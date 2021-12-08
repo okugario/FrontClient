@@ -71,6 +71,14 @@ const MapButtonBarComponent = inject('ProviderStore')(
       switch (Action) {
         case 'Close':
           props.ProviderStore.SetNewCurrentControls('Remove', 'GeozoneEditor');
+          if (
+            props.ProviderStore.CurrentTab.Options.CurrentModifyObject != null
+          ) {
+            props.ProviderStore.CurrentTab.Options.MapObject.removeInteraction(
+              props.ProviderStore.CurrentTab.Options.CurrentModifyObject
+            );
+            props.ProviderStore.SetNewModifyObject(null);
+          }
           if (props.ProviderStore.CurrentTab.Options.CurrentFeature != null) {
             if (
               props.ProviderStore.CurrentTab.Options.CurrentDrawObject != null
@@ -115,6 +123,14 @@ const MapButtonBarComponent = inject('ProviderStore')(
             props.ProviderStore.CurrentTab.Options.CurrentFeature != null &&
             props.ProviderStore.CurrentTab.Options.CurrentDrawObject == null
           ) {
+            if (
+              props.ProviderStore.CurrentTab.Options.CurrentModifyObject != null
+            ) {
+              props.ProviderStore.CurrentTab.Options.MapObject.removeInteraction(
+                props.ProviderStore.CurrentTab.Options.CurrentModifyObject
+              );
+              props.ProviderStore.SetNewModifyObject(null);
+            }
             ApiFetch(
               `model/Geofences${
                 /^Geozone\d+$/.test(
