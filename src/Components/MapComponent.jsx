@@ -75,8 +75,7 @@ const MapComponent = inject('ProviderStore')(
           undefined,
           (Response) => {
             let NewFeature = new GeoJSON().readFeature(
-              Response.data.Geometries[Response.data.Geometries.length - 1]
-                .Feature,
+              Response.data.Geometries[0].Feature,
               {
                 dataProjection: 'EPSG:4326',
                 featureProjection: 'EPSG:3857',
