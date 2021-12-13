@@ -69,7 +69,130 @@ const GeozoneEditor = inject('ProviderStore')(
         })
       );
     };
+    const GeozoneEditorHandler = (Action) => {
+      switch (Action) {
+        case 'Close':
+          props.ProviderStore.SetNewCurrentControls('Remove', 'GeozoneEditor');
+          if (
+            props.ProviderStore.CurrentTab.Options.CurrentModifyObject != null
+          ) {
+            props.ProviderStore.CurrentTab.Options.MapObject.removeInteraction(
+              props.ProviderStore.CurrentTab.Options.CurrentModifyObject
+            );
+            props.ProviderStore.SetNewModifyObject(null);
+          }
+          if (props.ProviderStore.CurrentTab.Options.CurrentFeature != null) {
+            if (
+              props.ProviderStore.CurrentTab.Options.CurrentDrawObject != null
+            ) {
+              props.ProviderStore.CurrentTab.Options.MapObject.removeInteraction(
+                props.ProviderStore.CurrentTab.Options.CurrentDrawObject
+              );
+            } else {
+              props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().removeFeature(
+                props.ProviderStore.CurrentTab.Options.CurrentFeature
+              );
 
+              const GeozoneId =
+                props.ProviderStore.CurrentTab.Options.CurrentFeature.getId().slice(
+                  7
+                );
+              if (
+                props.ProviderStore.CurrentTab.Options.CheckedGeozonesKeys.includes(
+                  GeozoneId
+                )
+              ) {
+                let NewCheckedGeozonesKeys = [
+                  ...props.ProviderStore.CurrentTab.Options.CheckedGeozonesKeys,
+                ];
+                NewCheckedGeozonesKeys.splice(
+                  NewCheckedGeozonesKeys.findIndex((Geozone) => {
+                    return Geozone == GeozoneId;
+                  }),
+                  1
+                );
+                props.ProviderStore.SetNewCheckedGeozonesKeys(
+                  NewCheckedGeozonesKeys
+                );
+              }
+              props.ProviderStore.SetNewCurrentFeature(null);
+            }
+          }
+
+          break;
+        case 'Save':
+          if (
+            props.ProviderStore.CurrentTab.Options.CurrentFeature != null &&
+            props.ProviderStore.CurrentTab.Options.CurrentDrawObject == null
+          ) {
+            if (
+              props.ProviderStore.CurrentTab.Options.CurrentModifyObject != null
+            ) {
+              props.ProviderStore.CurrentTab.Options.MapObject.removeInteraction(
+                props.ProviderStore.CurrentTab.Options.CurrentModifyObject
+              );
+              props.ProviderStore.SetNewModifyObject(null);
+            }
+            ApiFetch(
+              `model/Geofences${
+                /^Geozone\d+$/.test(
+                  props.ProviderStore.CurrentTab.Options.CurrentFeature.getId()
+                )
+                  ? ''
+                  : `/${props.ProviderStore.CurrentTab.Options.CurrentFeature.getId().slice(
+                      7
+                    )}`
+              }`,
+              `${
+                /^Geozone\d+$/.test(
+                  props.ProviderStore.CurrentTab.Options.CurrentFeature.getId()
+                )
+                  ? 'POST'
+                  : 'PATCH'
+              }`,
+              {
+                Id: /^Geozone\d+$/.test(
+                  props.ProviderStore.CurrentTab.Options.CurrentFeature.getId()
+                )
+                  ? undefined
+                  : props.ProviderStore.CurrentTab.Options.CurrentFeature.getId().slice(
+                      7
+                    ),
+
+                RegionId:
+                  props.ProviderStore.CurrentTab.Options.CurrentFeature.get(
+                    'RegionId'
+                  ),
+                Caption:
+                  props.ProviderStore.CurrentTab.Options.CurrentFeature.getStyle()
+                    .getText()
+                    .getText(),
+                Options: {
+                  color:
+                    props.ProviderStore.CurrentTab.Options.CurrentFeature.getStyle()
+                      .getFill()
+                      .getColor(),
+                  type: props.ProviderStore.CurrentTab.Options.CurrentFeature.getGeometry().getType(),
+                },
+                Geometries: CurrentSnapshots,
+              },
+              (Response) => {
+                props.ProviderStore.SetNewCurrentControls(
+                  'Remove',
+                  'GeozoneEditor'
+                );
+                props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().removeFeature(
+                  props.ProviderStore.CurrentTab.Options.CurrentFeature
+                );
+                props.ProviderStore.SetNewCurrentFeature(null);
+              }
+            );
+          } else {
+            message.warning('Завершите рисование геозоны');
+          }
+          break;
+      }
+    };
     const ChangeGeozoneType = (DrawObjectType) => {
       if (props.ProviderStore.CurrentTab.Options.CurrentFeature != null) {
         if (props.ProviderStore.CurrentTab.Options.CurrentDrawObject != null) {
@@ -219,7 +342,7 @@ const GeozoneEditor = inject('ProviderStore')(
             size="small"
             type="primary"
             onClick={() => {
-              props.GeozoneEditorHandler('Save');
+              GeozoneEditorHandler('Save');
             }}
           >
             Сохранить
@@ -227,7 +350,7 @@ const GeozoneEditor = inject('ProviderStore')(
           <Button
             size="small"
             onClick={() => {
-              props.GeozoneEditorHandler('Close');
+              GeozoneEditorHandler('Close');
             }}
           >
             Отмена
