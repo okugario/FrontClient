@@ -11,6 +11,8 @@ import { ApiFetch } from '../Helpers/Helpers';
 import { useEffect } from 'react';
 import Moment from 'moment';
 import { CloseOutlined } from '@ant-design/icons';
+import { GeoJSON } from 'ol/format';
+import { toLonLat } from 'ol/proj';
 
 const GeozoneEditor = inject('ProviderStore')(
   observer((props) => {
@@ -121,6 +123,28 @@ const GeozoneEditor = inject('ProviderStore')(
 
           break;
         case 'Save':
+          let NewSnapshots = null;
+          if (SelectedKey == null) {
+            NewSnapshots = [...CurrentSnapshots];
+            NewSnapshots.push({
+              Geometry:
+                props.ProviderStore.CurrentTab.Options.CurrentFeature.getGeometry()
+                  .getCoordinates()[0]
+                  .map((Coordinate) => {
+                    let LonLatCordinate = toLonLat(Coordinate);
+                    return {
+                      Lon: LonLatCordinate[0],
+                      Lat: LonLatCordinate[1],
+                    };
+                  }),
+              TS: Moment().format(),
+              Feature:
+                props.ProviderStore.CurrentTab.Options.CurrentFeature.getGeometry(),
+              Key: NewSnapshots.length + 1,
+            });
+
+            SetNewCurrentSnapshots(NewSnapshots);
+          }
           if (
             props.ProviderStore.CurrentTab.Options.CurrentFeature != null &&
             props.ProviderStore.CurrentTab.Options.CurrentDrawObject == null
@@ -174,7 +198,8 @@ const GeozoneEditor = inject('ProviderStore')(
                       .getColor(),
                   type: props.ProviderStore.CurrentTab.Options.CurrentFeature.getGeometry().getType(),
                 },
-                Geometries: CurrentSnapshots,
+                Geometries:
+                  SelectedKey != null ? CurrentSnapshots : NewSnapshots,
               },
               (Response) => {
                 props.ProviderStore.SetNewCurrentControls(
@@ -515,6 +540,12 @@ const GeozoneEditor = inject('ProviderStore')(
                     <div
                       onClick={() => {
                         SetNewSelectedKey(Index);
+                        props.ProviderStore.CurrentTab.Options.CurrentFeature.setGeometry(
+                          new GeoJSON().readGeometry(Record.Feature.geometry, {
+                            dataProjection: 'EPSG:4326',
+                            featureProjection: 'EPSG:3857',
+                          })
+                        );
                       }}
                       style={{
                         cursor: 'pointer',
@@ -524,12 +555,7 @@ const GeozoneEditor = inject('ProviderStore')(
                         alignItems: 'center',
                       }}
                     >
-                      <DatePicker
-                        style={{ width: '170px' }}
-                        size="small"
-                        value={Moment(Value)}
-                        format="DD.MM.YYYY HH:mm:ss"
-                      />
+                      {Moment(Value).format('DD.MM.YYYY HH:mm:ss')}
                       <CloseOutlined
                         onClick={() => {
                           Modal.confirm({
