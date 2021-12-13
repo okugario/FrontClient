@@ -1,4 +1,5 @@
 import Moment from 'moment';
+import { toLonLat } from 'ol/proj';
 export const CheckUniqale = (Trucks) => {
   let Count = 0;
   Trucks.forEach((Truck) => {
@@ -14,6 +15,15 @@ export const CheckUniqale = (Trucks) => {
   });
   return Count <= 1;
 };
+export function CoordinatesToLonLat(Coordinates) {
+  return Coordinates[0].map((Coordinate) => {
+    let LonLatCordinate = toLonLat(Coordinate);
+    return {
+      Lon: LonLatCordinate[0],
+      Lat: LonLatCordinate[1],
+    };
+  });
+}
 export function HexToRgbA(Hex, Opasity) {
   if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(Hex)) {
     let Color = Hex.substring(1).split('');

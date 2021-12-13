@@ -7,12 +7,11 @@ import { inject } from 'mobx-react';
 import { observer } from 'mobx-react-lite';
 import { Fill, Stroke, Style, Text } from 'ol/style';
 import { Draw } from 'ol/interaction';
-import { ApiFetch } from '../Helpers/Helpers';
+import { ApiFetch, CoordinatesToLonLat } from '../Helpers/Helpers';
 import { useEffect } from 'react';
 import Moment from 'moment';
 import { CloseOutlined } from '@ant-design/icons';
 import { GeoJSON } from 'ol/format';
-import { toLonLat } from 'ol/proj';
 
 const GeozoneEditor = inject('ProviderStore')(
   observer((props) => {
@@ -127,16 +126,9 @@ const GeozoneEditor = inject('ProviderStore')(
           if (SelectedKey == null) {
             NewSnapshots = [...CurrentSnapshots];
             NewSnapshots.push({
-              Geometry:
-                props.ProviderStore.CurrentTab.Options.CurrentFeature.getGeometry()
-                  .getCoordinates()[0]
-                  .map((Coordinate) => {
-                    let LonLatCordinate = toLonLat(Coordinate);
-                    return {
-                      Lon: LonLatCordinate[0],
-                      Lat: LonLatCordinate[1],
-                    };
-                  }),
+              Geometry: CoordinatesToLonLat(
+                props.ProviderStore.CurrentTab.Options.CurrentFeature.getGeometry().getCoordinates()
+              ),
               TS: Moment().format(),
               Feature:
                 props.ProviderStore.CurrentTab.Options.CurrentFeature.getGeometry(),
@@ -336,6 +328,14 @@ const GeozoneEditor = inject('ProviderStore')(
           }
         }
       });
+    };
+    const ChangeCurrentGeometry = (Record) => {
+      props.ProviderStore.CurrentTab.Options.CurrentFeature.setGeometry(
+        new GeoJSON().readGeometry(Record.Feature.geometry, {
+          dataProjection: 'EPSG:4326',
+          featureProjection: 'EPSG:3857',
+        })
+      );
     };
     const DeleteSnapshot = (Index) => {
       let NewSnapshots = [...CurrentSnapshots];
@@ -540,12 +540,7 @@ const GeozoneEditor = inject('ProviderStore')(
                     <div
                       onClick={() => {
                         SetNewSelectedKey(Index);
-                        props.ProviderStore.CurrentTab.Options.CurrentFeature.setGeometry(
-                          new GeoJSON().readGeometry(Record.Feature.geometry, {
-                            dataProjection: 'EPSG:4326',
-                            featureProjection: 'EPSG:3857',
-                          })
-                        );
+                        ChangeCurrentGeometry(Record);
                       }}
                       style={{
                         cursor: 'pointer',
