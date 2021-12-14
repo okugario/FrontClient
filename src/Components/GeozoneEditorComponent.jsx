@@ -292,7 +292,37 @@ const GeozoneEditor = inject('ProviderStore')(
       );
       SetNewPickerColor('rgba(24,144,255,0.3)');
     };
-
+    const GetRegionId = () => {
+      if (props.ProviderStore.CurrentTab.Options.CurrentFeature != null) {
+        SetNewCurrentRegionId(
+          props.ProviderStore.CurrentTab.Options.CurrentFeature.get('RegionId')
+        );
+      }
+    };
+    const GetGeozoneName = () => {
+      if (props.ProviderStore.CurrentTab.Options.CurrentFeature != null) {
+        SetNewGeozoneName(
+          props.ProviderStore.CurrentTab.Options.CurrentFeature.getStyle()
+            .getText()
+            .getText()
+        );
+      }
+    };
+    const GetGeozoneSnapshots = () => {
+      if (props.ProviderStore.CurrentTab.Options.CurrentFeature != null) {
+        if (
+          props.ProviderStore.CurrentTab.Options.CurrentFeature.get(
+            'GeozoneSnapshots'
+          ) != undefined
+        ) {
+          SetNewCurrentSnapshots(
+            props.ProviderStore.CurrentTab.Options.CurrentFeature.get(
+              'GeozoneSnapshots'
+            )
+          );
+        }
+      }
+    };
     const RequestRegions = () => {
       ApiFetch('model/Regions', 'GET', undefined, (Response) => {
         SetNewAllRegions(
@@ -300,33 +330,6 @@ const GeozoneEditor = inject('ProviderStore')(
             return { label: Region.Caption, value: Region.Id };
           })
         );
-        if (props.ProviderStore.CurrentTab.Options.CurrentFeature != null) {
-          SetNewCurrentRegionId(
-            props.ProviderStore.CurrentTab.Options.CurrentFeature.get(
-              'RegionId'
-            )
-          );
-
-          SetNewGeozoneName(
-            props.ProviderStore.CurrentTab.Options.CurrentFeature.getStyle()
-              .getText()
-              .getText()
-          );
-          if (
-            props.ProviderStore.CurrentTab.Options.CurrentFeature.get(
-              'GeozoneHistory'
-            ) != undefined
-          ) {
-            SetNewCurrentSnapshots(
-              props.ProviderStore.CurrentTab.Options.CurrentFeature.get(
-                'GeozoneHistory'
-              ).map((Element, Index) => {
-                Element.Key = Index;
-                return Element;
-              })
-            );
-          }
-        }
       });
     };
     const ChangeCurrentGeometry = (Record) => {
@@ -357,7 +360,12 @@ const GeozoneEditor = inject('ProviderStore')(
       );
     };
 
-    useEffect(RequestRegions, []);
+    useEffect(() => {
+      GetGeozoneSnapshots();
+      RequestRegions();
+      GetRegionId();
+      GetGeozoneName();
+    }, []);
     return (
       <Card
         title="Геозона"
@@ -539,8 +547,8 @@ const GeozoneEditor = inject('ProviderStore')(
                   return (
                     <div
                       onClick={() => {
-                        SetNewSelectedKey(Index);
                         ChangeCurrentGeometry(Record);
+                        SetNewSelectedKey(Index);
                       }}
                       style={{
                         cursor: 'pointer',
