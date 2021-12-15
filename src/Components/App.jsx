@@ -41,6 +41,7 @@ const App = observer(() => {
         { id: 'Vehicles', caption: 'Транспорт' },
         { id: 'Regions', caption: 'Участки' },
         { id: 'VehicleTypes', caption: 'Типы ТС' },
+        { id: 'VehicleModels', caption: 'Модели ТС' },
         { id: 'Manufacturers', caption: 'Производители' },
         { id: 'AccessRoles', caption: 'Роли' },
         { id: 'Firms', caption: 'Организации' },

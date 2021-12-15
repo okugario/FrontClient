@@ -72,6 +72,11 @@ export class Tab {
               import('../Components/CrudObjectsComponent')
             );
             break;
+          case 'VehicleModels':
+            Item.Component = React.lazy(() =>
+              import('../Components/VehicleModelsComponent')
+            );
+            break;
           case 'WorkConditions':
             Item.Component = React.lazy(() =>
               import('../Components/WorkConditionsComponent')
