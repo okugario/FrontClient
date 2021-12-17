@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Input, message, Select, Table } from 'antd';
+import { Button, Input, message, Modal, Select, Table } from 'antd';
 import { useEffect, useState } from 'react';
 import { ApiFetch } from '../Helpers/Helpers';
 import TableButtonComponent from './TableButtonComponent';
@@ -32,28 +32,23 @@ export default function VehicleModelsComponent(props) {
   };
 
   const AddModel = () => {
-    if (
-      ModelsTable.every((Model) => {
-        return !Model.Edited;
-      })
-    ) {
-      let NewModelsTable = [...ModelsTable];
-      NewModelsTable.unshift({
-        Caption: '',
-        Edited: true,
-        Edit: false,
-        ManftId: Manufacturers.find((Manufacturer) => {
-          return Manufacturer.label == '-';
-        }).value,
-        TypeId: VehicleTypes.find((Type) => {
-          return Type.label == '-';
-        }).value,
-        Key: NewModelsTable.length + 1,
-      });
-      SetNewModelsTable(NewModelsTable);
-    } else {
-      message.warning('Сначала сохраните модель');
-    }
+    let NewModelsTable = [...ModelsTable];
+    NewModelsTable.unshift({
+      Caption: '',
+      Edited: true,
+      Edit: false,
+      ManftId: Manufacturers.find((Manufacturer) => {
+        return Manufacturer.label == '-';
+      }).value,
+      TypeId: VehicleTypes.find((Type) => {
+        return Type.label == '-';
+      }).value,
+    });
+    NewModelsTable.forEach((Model, Index) => {
+      Model.Key = Index;
+    });
+    SetNewModelsTable(NewModelsTable);
+    SetNewSelectedKey(0);
   };
 
   const RequestVehicleManufacturers = () => {
@@ -104,9 +99,40 @@ export default function VehicleModelsComponent(props) {
       SetNewModelsTable(NewModelsTable);
     }
   };
+  const DeleteModel = () => {
+    if (SelectedKey != null) {
+      Modal.confirm({
+        title: 'Подтвердите действие',
+        content: 'Вы дейстивтельно хотите удалить эту модель?',
+        okButtonProps: { size: 'small', danger: true, type: 'primary' },
+        okText: 'Удалить',
+        onOk: () => {
+          let NewModelsTable = [...ModelsTable];
+          if ('Id' in NewModelsTable[SelectedKey]) {
+            ApiFetch(
+              `model/VehicleModels/${NewModelsTable[SelectedKey].Id}`,
+              'DELETE',
+              undefined,
+              (Response) => {
+                NewModelsTable.splice(SelectedKey, 1);
+                SetNewModelsTable(NewModelsTable);
+                SetNewSelectedKey(null);
+              }
+            );
+          } else {
+            NewModelsTable.splice(SelectedKey, 1);
+            SetNewModelsTable(NewModelsTable);
+            SetNewSelectedKey(null);
+          }
+        },
+        cancelButtonProps: { size: 'small' },
+        cancelText: 'Отмена',
+      });
+    }
+  };
   const SaveModel = (Index) => {
     let NewModelsTable = [...ModelsTable];
-    ApiFetch(
+    return ApiFetch(
       `model/VehicleModels${
         'Id' in NewModelsTable[Index] ? `/${NewModelsTable[Index].Id}` : ''
       }`,
@@ -140,6 +166,9 @@ export default function VehicleModelsComponent(props) {
         onAdd={() => {
           AddModel();
         }}
+        onDelete={() => {
+          DeleteModel();
+        }}
       />
       <Table
         onRow={(Record, Index) => {
@@ -148,7 +177,7 @@ export default function VehicleModelsComponent(props) {
         rowSelection={{
           selectedRowKeys: [SelectedKey],
           renderCell: () => null,
-          columnWidth: '1px',
+          columnWidth: 0,
         }}
         scroll={{ y: 700 }}
         pagination={false}
@@ -264,7 +293,11 @@ export default function VehicleModelsComponent(props) {
                       size="small"
                       type="primary"
                       onClick={() => {
-                        SaveModel(Index);
+                        SaveModel(Index).catch(() => {
+                          message.warning(
+                            'Выберите другое наименование модели'
+                          );
+                        });
                       }}
                     >
                       Сохранить
