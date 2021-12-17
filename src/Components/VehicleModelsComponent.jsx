@@ -55,15 +55,7 @@ export default function VehicleModelsComponent(props) {
       message.warning('Сначала сохраните модель');
     }
   };
-  const CancelEdited = (Index) => {
-    let NewModelsTable = [...ModelsTable];
-    if ('Id' in NewModelsTable[Index]) {
-      NewModelsTable[Index].Edited = false;
-    } else {
-      NewModelsTable.splice(Index, 1);
-    }
-    SetNewModelsTable(NewModelsTable);
-  };
+
   const RequestVehicleManufacturers = () => {
     ApiFetch('model/Manufacturers', 'GET', undefined, (Response) => {
       SetNewManufacturers(
@@ -87,16 +79,45 @@ export default function VehicleModelsComponent(props) {
     }
   };
   const RecordEdit = (Index, Data, ColumnId) => {
-    if (ModelsTable.every((Model) => !Model.Edit)) {
-      let NewModelsTable = [...ModelsTable];
-      NewModelsTable[Index][ColumnId] = Data;
-      NewModelsTable[Index].Edit = true;
-      SetNewModelsTable(NewModelsTable);
+    let NewModelsTable = [...ModelsTable];
+    NewModelsTable[Index][ColumnId] = Data;
+    NewModelsTable[Index].Edit = true;
+    SetNewModelsTable(NewModelsTable);
+  };
+  const RollbackModel = (Index) => {
+    let NewModelsTable = [...ModelsTable];
+    if ('Id' in NewModelsTable[Index]) {
+      ApiFetch(
+        `model/VehicleModels/${NewModelsTable[Index].Id}`,
+        'GET',
+        undefined,
+        (Response) => {
+          Response.data.Key = Index;
+          Response.data.Edit = false;
+          Response.data.Edited = false;
+          NewModelsTable.splice(Index, 1, Response.data);
+          SetNewModelsTable(NewModelsTable);
+        }
+      );
     } else {
-      message.warning('Сначала сохраните модель');
+      NewModelsTable.splice(Index, 1);
+      SetNewModelsTable(NewModelsTable);
     }
   };
-
+  const SaveModel = (Index) => {
+    let NewModelsTable = [...ModelsTable];
+    ApiFetch(
+      `model/VehicleModels${
+        'Id' in NewModelsTable[Index] ? `/${NewModelsTable[Index].Id}` : ''
+      }`,
+      `${'Id' in NewModelsTable[Index] ? 'PATCH' : 'POST'}`,
+      NewModelsTable[Index],
+      (Response) => {
+        NewModelsTable[Index].Edit = false;
+        SetNewModelsTable(NewModelsTable);
+      }
+    );
+  };
   const SaveCaption = (Index) => {
     if (InputRef.current.input.value.length != 0) {
       let NewModelsTable = [...ModelsTable];
@@ -121,6 +142,9 @@ export default function VehicleModelsComponent(props) {
         }}
       />
       <Table
+        onRow={(Record, Index) => {
+          return { onClick: () => SetNewSelectedKey(Index) };
+        }}
         rowSelection={{
           selectedRowKeys: [SelectedKey],
           renderCell: () => null,
@@ -168,7 +192,7 @@ export default function VehicleModelsComponent(props) {
                     <Button
                       size="small"
                       onClick={() => {
-                        CancelEdited(Index);
+                        RollbackModel(Index);
                       }}
                     >
                       Отмена
@@ -177,9 +201,6 @@ export default function VehicleModelsComponent(props) {
                 </div>
               ) : (
                 <div
-                  onClick={() => {
-                    SetNewSelectedKey(Index);
-                  }}
                   style={{ cursor: 'pointer' }}
                   onDoubleClick={() => {
                     EditCaption(Index);
@@ -195,13 +216,9 @@ export default function VehicleModelsComponent(props) {
             dataIndex: 'ManftId',
             key: 'ManftId',
             render: (Value, Record, Index) => (
-              <div
-                style={{ width: '100%', cursor: 'pointer' }}
-                onClick={() => {
-                  SetNewSelectedKey(Index);
-                }}
-              >
+              <div style={{ width: '100%', cursor: 'pointer' }}>
                 <Select
+                  style={{ width: '130px' }}
                   size="small"
                   value={Value}
                   options={Manufacturers}
@@ -219,9 +236,6 @@ export default function VehicleModelsComponent(props) {
             key: 'TypeId',
             render: (Value, Record, Index) => (
               <div
-                onClick={() => {
-                  SetNewSelectedKey(Index);
-                }}
                 style={{
                   cursor: 'pointer',
                   width: '100%',
@@ -230,6 +244,7 @@ export default function VehicleModelsComponent(props) {
                 }}
               >
                 <Select
+                  style={{ width: '130px' }}
                   size="small"
                   value={Value}
                   options={VehicleTypes}
@@ -245,13 +260,19 @@ export default function VehicleModelsComponent(props) {
                       justifyContent: 'space-between',
                     }}
                   >
-                    <Button size="small" type="primary">
+                    <Button
+                      size="small"
+                      type="primary"
+                      onClick={() => {
+                        SaveModel(Index);
+                      }}
+                    >
                       Сохранить
                     </Button>
                     <Button
                       size="small"
                       onClick={() => {
-                        RequestVehicleModels();
+                        RollbackModel(Index);
                       }}
                     >
                       Отмена
