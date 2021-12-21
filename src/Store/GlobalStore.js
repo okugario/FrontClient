@@ -4,12 +4,16 @@ import * as Moment from 'moment';
 
 class Store {
   TransportTree = [];
-  TopMenu = [];
   OpenTabs = [];
   CurrentTab = null;
   CurrentTabKey = null;
+  TopMenu = [];
+
   constructor() {
     makeAutoObservable(this);
+  }
+  SetNewTopMenu(NewTopMenu) {
+    this.TopMenu = NewTopMenu;
   }
   SetNewCurrentMenuItem(NewMenuItemKey) {
     this.CurrentTab.Options.CurrentMenuItem = this.CurrentTab.Items.find(
@@ -108,9 +112,7 @@ class Store {
   SetNewCurrentDrawObject(NewDrawObject) {
     this.CurrentTab.Options.CurrentDrawObject = NewDrawObject;
   }
-  SetNewTopMenu(NewTopMenu) {
-    this.TopMenu = NewTopMenu;
-  }
+
   AddTab(TabObject) {
     this.OpenTabs.push(new Tab(TabObject, this.OpenTabs));
     if (this.OpenTabs.length == 1) {

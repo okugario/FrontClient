@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Layout, Tabs, ConfigProvider, Spin, Button } from 'antd';
 import ru_RU from 'antd/lib/locale/ru_RU';
 import { observer, Provider } from 'mobx-react';
@@ -9,50 +9,22 @@ const { Header, Sider, Content } = Layout;
 const { TabPane } = Tabs;
 import 'antd/dist/antd.css';
 import '../CSS/AppComponent.css';
+import { ApiFetch } from '../Helpers/Helpers';
 
 const App = observer(() => {
   const GetComponent = (Tab) => {
     const Component = Tab.Options.CurrentMenuItem.Component;
     return <Component key={Tab.Key} />;
   };
-  useEffect(() => {
-    GlobalStore.AddTab({
-      id: 'reports',
-      type: 'report',
-      caption: 'Отчеты',
-      items: [
-        { id: 'map', caption: 'Карта' },
-        { id: 'tripsReport', caption: 'Отчет по рейсам' },
-        { id: 'loadsReport', caption: 'Отчет по погрузкам' },
-      ],
+  const OpenTab = (MenuItem) => {
+    GlobalStore.AddTab(MenuItem);
+  };
+  const RequestUserMenu = () => {
+    ApiFetch('model/GetConfig', 'GET', undefined, (Response) => {
+      GlobalStore.SetNewTopMenu(Response.data);
     });
-    GlobalStore.AddTab({
-      caption: 'Действия',
-      id: 'workplace',
-      type: 'workplace',
-      items: [{ caption: 'Наряды экскаваторов', id: 'DiggerOrders' }],
-    });
-    GlobalStore.AddTab({
-      id: 'settings',
-      type: 'setting',
-      caption: 'Администрирование',
-      items: [
-        { id: 'statistic', caption: 'Статистика' },
-        { id: 'Vehicles', caption: 'Транспорт' },
-        { id: 'Regions', caption: 'Участки' },
-        { id: 'VehicleTypes', caption: 'Типы ТС' },
-        { id: 'VehicleModels', caption: 'Модели ТС' },
-        { id: 'Manufacturers', caption: 'Производители' },
-        { id: 'AccessRoles', caption: 'Роли' },
-        { id: 'Firms', caption: 'Организации' },
-        { id: 'WorkConditions', caption: 'Условия работы' },
-        { id: 'DiggerPassports', caption: 'Паспорта загрузки' },
-        { id: 'LoadTypes', caption: 'Виды грузов' },
-        { id: 'RetransTargets', caption: 'Ретрансляторы' },
-        { id: 'ConfigSchemes', caption: 'Схемы настроек' },
-      ],
-    });
-  }, []);
+  };
+  useEffect(RequestUserMenu, []);
   return (
     <Provider ProviderStore={GlobalStore}>
       <ConfigProvider locale={ru_RU}>
@@ -87,7 +59,22 @@ const App = observer(() => {
                   )
                 : null}
             </Sider>
+
             <Content>
+              {GlobalStore.TopMenu != null
+                ? GlobalStore.TopMenu.map((Item) => {
+                    return (
+                      <Button
+                        key={Item.id}
+                        onClick={() => {
+                          OpenTab(Item);
+                        }}
+                      >
+                        {Item.caption}
+                      </Button>
+                    );
+                  })
+                : null}
               <Tabs
                 destroyInactiveTabPane={true}
                 activeKey={GlobalStore.CurrentTabKey}
