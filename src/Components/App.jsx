@@ -81,7 +81,7 @@ const App = observer(() => {
                 size="small"
                 style={{ height: '100%', with: '100%' }}
                 hideAdd={true}
-                type="card"
+                type="editable-card"
                 onChange={(TabKey) => {
                   GlobalStore.SetNewCurrentTab(TabKey);
                 }}
