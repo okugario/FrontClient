@@ -94,14 +94,6 @@ const AccessRolesComponent = inject('ProviderStore')(
           SetNewAccessRoleProfile(NewAccessRoleProfile);
           break;
         case 'ChangeCategories':
-          Data.forEach((TreeKey, Index) => {
-            NewAccessRoleProfile.ConfigCategoriesAll.forEach((Element) => {
-              if (TreeKey == Element.key) {
-                Data.splice(Index, 1);
-              }
-            });
-          });
-
           NewAccessRoleProfile.Profile.options.config_categories = Data;
           SetNewAccessRoleProfile(NewAccessRoleProfile);
           break;

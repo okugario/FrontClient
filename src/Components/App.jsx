@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Layout, Tabs, ConfigProvider, Spin, Button } from 'antd';
 import ru_RU from 'antd/lib/locale/ru_RU';
 import { observer, Provider } from 'mobx-react';
