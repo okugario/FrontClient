@@ -99,7 +99,7 @@ class Store {
 
     if (this.CurrentTab.Key == TabKey) {
       if (this.OpenTabs.length > DeleteIndex) {
-        this.SetNewCurrentTab(this.OpenTabs[DeleteIndex].key);
+        this.SetNewCurrentTab(this.OpenTabs[DeleteIndex].Key);
       } else {
         if (this.OpenTabs.length > 0) {
           this.SetNewCurrentTab(this.OpenTabs[DeleteIndex - 1].Key);

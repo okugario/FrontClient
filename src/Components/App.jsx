@@ -75,42 +75,59 @@ const App = observer(() => {
                     );
                   })
                 : null}
-              <Tabs
-                destroyInactiveTabPane={true}
-                activeKey={GlobalStore.CurrentTabKey}
-                size="small"
-                style={{ height: '100%', with: '100%' }}
-                hideAdd={true}
-                type="editable-card"
-                onChange={(TabKey) => {
-                  GlobalStore.SetNewCurrentTab(TabKey);
-                }}
-                onEdit={(TabKey, Action) => {
-                  if (Action == 'remove') {
-                    GlobalStore.DeleteTab(TabKey);
-                  }
-                }}
-              >
-                {GlobalStore.OpenTabs.map((Tab) => {
-                  return (
-                    <TabPane
-                      tab={Tab.Caption}
-                      key={Tab.Key}
-                      className="FullExtend"
-                    >
-                      {GlobalStore.CurrentTab != null ? (
-                        <React.Suspense
-                          fallback={
-                            <Spin tip="Загрузка компонента" size="large" />
-                          }
-                        >
-                          {GetComponent(Tab)}
-                        </React.Suspense>
-                      ) : null}
-                    </TabPane>
-                  );
-                })}
-              </Tabs>
+              {GlobalStore.OpenTabs.length > 0 ? (
+                <Tabs
+                  destroyInactiveTabPane={true}
+                  activeKey={GlobalStore.CurrentTabKey}
+                  size="small"
+                  style={{ height: 'calc(100% - 32px)', with: '100%' }}
+                  hideAdd={true}
+                  type="editable-card"
+                  onChange={(TabKey) => {
+                    GlobalStore.SetNewCurrentTab(TabKey);
+                  }}
+                  onEdit={(TabKey, Action) => {
+                    if (Action == 'remove') {
+                      GlobalStore.DeleteTab(TabKey);
+                    }
+                  }}
+                >
+                  {GlobalStore.OpenTabs.map((Tab) => {
+                    return (
+                      <TabPane
+                        tab={Tab.Caption}
+                        key={Tab.Key}
+                        className="FullExtend"
+                      >
+                        {GlobalStore.CurrentTab != null ? (
+                          <React.Suspense
+                            fallback={
+                              <Spin tip="Загрузка компонента" size="large" />
+                            }
+                          >
+                            {GetComponent(Tab)}
+                          </React.Suspense>
+                        ) : null}
+                      </TabPane>
+                    );
+                  })}
+                </Tabs>
+              ) : (
+                <div
+                  style={{
+                    width: '100%',
+                    height: 'calc(100% - 32px)',
+                    display: 'flex',
+                    fontSize: '75px',
+                    fontWeight: 'bolder',
+                    color: 'rgba(107, 106, 106, 0.5)',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  Нет активных вкладок
+                </div>
+              )}
             </Content>
           </Layout>
         </Layout>
