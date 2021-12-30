@@ -94,7 +94,8 @@ const AccessRolesComponent = inject('ProviderStore')(
           SetNewAccessRoleProfile(NewAccessRoleProfile);
           break;
         case 'ChangeCategories':
-          NewAccessRoleProfile.Profile.options.config_categories = Data;
+          const NewData = Data.checked.concat(Data.halfChecked);
+          NewAccessRoleProfile.Profile.options.config_categories = NewData;
           SetNewAccessRoleProfile(NewAccessRoleProfile);
           break;
         case 'ChangeRegions':
