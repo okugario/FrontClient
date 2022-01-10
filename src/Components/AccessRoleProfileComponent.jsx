@@ -46,7 +46,6 @@ export default function AccessRoleProfile(props) {
       <Collapse>
         <Panel header="Меню пользователя" key="UserMenu">
           <Tree
-            checkStrictly={true}
             onCheck={(Checked, Event) => {
               props.RoleProfileHandler('ChangeCategories', Checked);
             }}
