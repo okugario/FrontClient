@@ -22,6 +22,11 @@ export class Tab {
               import('../Components/MapComponent')
             );
             break;
+          case 'Users':
+            Item.Component = React.lazy(() =>
+              import('../Components/UsersComponent')
+            );
+            break;
           case 'RetransTargets':
             Item.Component = React.lazy(() =>
               import('../Components/RetranslationComponent')

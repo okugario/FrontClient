@@ -1,5 +1,8 @@
 module.exports = {
   resolve: {
+    fallback: {
+      crypto: false,
+    },
     extensions: ['.js', '.jsx'],
   },
   mode: 'production',
