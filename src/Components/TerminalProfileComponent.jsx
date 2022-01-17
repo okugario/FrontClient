@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { useState } from 'react';
+import * as React from "react";
+import { useState } from "react";
 import {
   Input,
   Checkbox,
@@ -8,8 +8,8 @@ import {
   Button,
   DatePicker,
   Modal,
-} from 'antd';
-import Moment from 'moment';
+} from "antd";
+import Moment from "moment";
 
 export default function TerminalProfile(props) {
   const [SelectedSensorKey, SetNewSelectedSensorKey] = useState(null);
@@ -18,59 +18,59 @@ export default function TerminalProfile(props) {
     <>
       <div
         style={{
-          display: 'flex',
-          justifyContent: 'space-between',
+          display: "flex",
+          justifyContent: "space-between",
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
           Транспортное средство:
         </div>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
           <Input
             disabled={true}
             size="small"
-            style={{ width: '160px' }}
+            style={{ width: "160px" }}
             value={props.TransportCaption}
           />
         </div>
       </div>
       <div
         style={{
-          marginTop: '10px',
-          display: 'flex',
-          justifyContent: 'space-between',
+          marginTop: "10px",
+          display: "flex",
+          justifyContent: "space-between",
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center' }}>Дата:</div>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ display: "flex", alignItems: "center" }}>Дата:</div>
+        <div style={{ display: "flex", alignItems: "center" }}>
           <DatePicker
             onOk={(Value) => {
-              props.ProfileHandler('ChangeEquipmentDate', Value.format());
+              props.ProfileHandler("ChangeEquipmentDate", Value.format());
             }}
-            format="DD.MM.YYYY hh:mm:ss"
+            format="DD.MM.YYYY HH:mm:ss"
             size="small"
             showTime={true}
             value={Moment(props.TerminalProfile.TS)}
-            style={{ width: '160px' }}
+            style={{ width: "160px" }}
           />
         </div>
       </div>
 
       <div
         style={{
-          marginTop: '10px',
-          display: 'flex',
-          justifyContent: 'space-between',
+          marginTop: "10px",
+          display: "flex",
+          justifyContent: "space-between",
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center' }}>ID:</div>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ display: "flex", alignItems: "center" }}>ID:</div>
+        <div style={{ display: "flex", alignItems: "center" }}>
           <Input
             onChange={(Event) => {
-              props.ProfileHandler('ChangeTerminalID', Event.target.value);
+              props.ProfileHandler("ChangeTerminalID", Event.target.value);
             }}
             size="small"
-            style={{ width: '160px' }}
+            style={{ width: "160px" }}
             value={props.TerminalProfile.ObjectId}
           />
         </div>
@@ -79,21 +79,21 @@ export default function TerminalProfile(props) {
         <>
           <div
             style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              marginTop: '10px',
+              display: "flex",
+              justifyContent: "space-between",
+              marginTop: "10px",
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ display: "flex", alignItems: "center" }}>
               Грузоподъемность:
             </div>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ display: "flex", alignItems: "center" }}>
               <Input
                 onChange={(Event) => {
-                  props.ProfileHandler('ChangeMaxWeight', Event.target.value);
+                  props.ProfileHandler("ChangeMaxWeight", Event.target.value);
                 }}
                 size="small"
-                style={{ width: '160px' }}
+                style={{ width: "160px" }}
                 value={
                   props.TerminalProfile.UnitProfile.Options.truck.maxweight
                 }
@@ -102,60 +102,60 @@ export default function TerminalProfile(props) {
           </div>
           <div
             style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              marginTop: '10px',
+              display: "flex",
+              justifyContent: "space-between",
+              marginTop: "10px",
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ display: "flex", alignItems: "center" }}>
               Данные с CAN шины :
             </div>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ display: "flex", alignItems: "center" }}>
               <Checkbox
                 checked={
                   props.TerminalProfile.UnitProfile.Options.truck.canweight
                 }
                 onChange={(Event) => {
-                  props.ProfileHandler('ChangeCanData', Event.target.checked);
+                  props.ProfileHandler("ChangeCanData", Event.target.checked);
                 }}
               />
             </div>
           </div>
           <div
             style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              marginTop: '10px',
+              display: "flex",
+              justifyContent: "space-between",
+              marginTop: "10px",
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ display: "flex", alignItems: "center" }}>
               Система давления в шинах :
             </div>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ display: "flex", alignItems: "center" }}>
               <Select
                 size="small"
                 value={
                   props.TerminalProfile.UnitProfile.Options.truck.tyresystem
                 }
-                style={{ width: '160px' }}
+                style={{ width: "160px" }}
                 onChange={(Value) => {
-                  props.ProfileHandler('ChangeTyreSystem', Value);
+                  props.ProfileHandler("ChangeTyreSystem", Value);
                 }}
                 options={[
-                  { value: 'skt', label: 'СКТ' },
-                  { value: 'parkm', label: 'ParkMaster' },
-                  { value: 'presspro', label: 'Pressure Pro' },
-                  { value: 'none', label: 'Не установлена' },
+                  { value: "skt", label: "СКТ" },
+                  { value: "parkm", label: "ParkMaster" },
+                  { value: "presspro", label: "Pressure Pro" },
+                  { value: "none", label: "Не установлена" },
                 ]}
               />
             </div>
           </div>
           <div
             style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginTop: '10px',
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginTop: "10px",
             }}
           >
             <span> Датчики давления в подвеске</span>
@@ -163,9 +163,9 @@ export default function TerminalProfile(props) {
               <Button
                 size="small"
                 type="primary"
-                style={{ marginLeft: '5px' }}
+                style={{ marginLeft: "5px" }}
                 onClick={() => {
-                  props.ProfileHandler('AddSensor');
+                  props.ProfileHandler("AddSensor");
                 }}
               >
                 Добавить
@@ -174,24 +174,24 @@ export default function TerminalProfile(props) {
                 size="small"
                 danger
                 type="primary"
-                style={{ margin: '5px' }}
+                style={{ margin: "5px" }}
                 onClick={() => {
                   if (SelectedSensorKey != null) {
                     Modal.confirm({
                       onOk: () => {
                         props.ProfileHandler(
-                          'DeleteSensor',
+                          "DeleteSensor",
                           undefined,
                           SelectedSensorKey
                         );
                         SetNewSelectedSensorKey(null);
                       },
-                      title: 'Подтвердите действие',
-                      content: 'Удалить данный датчик?',
-                      cancelButtonProps: { size: 'small' },
-                      okButtonProps: { size: 'small', danger: true },
-                      okText: 'Удалить',
-                      cancelText: 'Отмена',
+                      title: "Подтвердите действие",
+                      content: "Удалить данный датчик?",
+                      cancelButtonProps: { size: "small" },
+                      okButtonProps: { size: "small", danger: true },
+                      okText: "Удалить",
+                      cancelText: "Отмена",
                     });
                   }
                 }}
@@ -224,16 +224,16 @@ export default function TerminalProfile(props) {
             )}
             columns={[
               {
-                title: 'Номер входа',
-                key: 'id',
-                dataIndex: 'id',
+                title: "Номер входа",
+                key: "id",
+                dataIndex: "id",
                 render: (Value, Record, Index) => {
                   return (
-                    <div style={{ cursor: 'pointer' }}>
+                    <div style={{ cursor: "pointer" }}>
                       <Select
                         onChange={(Value) => {
                           props.ProfileHandler(
-                            'ChangeSensorEnterNumber',
+                            "ChangeSensorEnterNumber",
                             Value,
                             Index
                           );
@@ -256,19 +256,19 @@ export default function TerminalProfile(props) {
                 },
               },
               {
-                title: 'Множитель',
-                key: 'k',
-                dataIndex: 'k',
+                title: "Множитель",
+                key: "k",
+                dataIndex: "k",
                 render: (Value, Record, Index) => {
                   return (
-                    <div style={{ cursor: 'pointer' }}>
+                    <div style={{ cursor: "pointer" }}>
                       <Input
                         size="small"
                         value={Value}
-                        style={{ width: '50px' }}
+                        style={{ width: "50px" }}
                         onChange={(Event) => {
                           props.ProfileHandler(
-                            'ChangeSensorMultiplier',
+                            "ChangeSensorMultiplier",
                             Event.target.value,
                             Index
                           );
