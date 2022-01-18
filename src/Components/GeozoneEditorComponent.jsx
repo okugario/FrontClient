@@ -341,12 +341,8 @@ const GeozoneEditor = inject('ProviderStore')(
       });
     };
     const ChangeCurrentGeometry = (Record) => {
-      console.log(Record);
       props.ProviderStore.CurrentTab.Options.CurrentFeature.setGeometry(
-        new GeoJSON().readGeometry(Record.Feature, {
-          dataProjection: 'EPSG:4326',
-          featureProjection: 'EPSG:3857',
-        })
+        Record.Feature
       );
     };
     const DeleteSnapshot = (Index) => {
