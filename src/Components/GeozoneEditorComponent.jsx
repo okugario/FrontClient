@@ -1,5 +1,14 @@
 import * as React from 'react';
-import { Button, Card, Input, Modal, Select, Table, DatePicker } from 'antd';
+import {
+  Button,
+  Card,
+  Input,
+  Modal,
+  Select,
+  Table,
+  DatePicker,
+  message,
+} from 'antd';
 import { ChromePicker } from 'react-color';
 import reactCSS from 'reactcss';
 import { useState } from 'react';
@@ -12,6 +21,7 @@ import { useEffect } from 'react';
 import Moment from 'moment';
 import { CloseOutlined } from '@ant-design/icons';
 import { GeoJSON } from 'ol/format';
+import { Feature } from 'ol';
 
 const GeozoneEditor = inject('ProviderStore')(
   observer((props) => {
@@ -25,7 +35,7 @@ const GeozoneEditor = inject('ProviderStore')(
     const [CurrentRegionId, SetNewCurrentRegionId] = useState('Не указан');
     const [CurrentSnapshots, SetNewCurrentSnapshots] = useState([]);
     const [GeozoneName, SetNewGeozoneName] = useState(null);
-    const [GeozoneType, SetNewGeozoneType] = useState('Выберите тип');
+    const [GeozoneType, SetNewGeozoneType] = useState(null);
     const [ShowColorPicker, SetNewShowColorPicker] = useState(false);
     const [AllRegions, SetNewAllRegions] = useState(null);
     const [SelectedKey, SetNewSelectedKey] = useState(null);
@@ -121,22 +131,8 @@ const GeozoneEditor = inject('ProviderStore')(
           }
 
           break;
-        case 'Save':
-          let NewSnapshots = null;
-          if (SelectedKey == null) {
-            NewSnapshots = [...CurrentSnapshots];
-            NewSnapshots.push({
-              Geometry: CoordinatesToLonLat(
-                props.ProviderStore.CurrentTab.Options.CurrentFeature.getGeometry().getCoordinates()
-              ),
-              TS: Moment().format(),
-              Feature:
-                props.ProviderStore.CurrentTab.Options.CurrentFeature.getGeometry(),
-              Key: NewSnapshots.length + 1,
-            });
 
-            SetNewCurrentSnapshots(NewSnapshots);
-          }
+        case 'Save':
           if (
             props.ProviderStore.CurrentTab.Options.CurrentFeature != null &&
             props.ProviderStore.CurrentTab.Options.CurrentDrawObject == null
@@ -210,87 +206,99 @@ const GeozoneEditor = inject('ProviderStore')(
           break;
       }
     };
-    const ChangeGeozoneType = (DrawObjectType) => {
-      if (props.ProviderStore.CurrentTab.Options.CurrentFeature != null) {
-        if (props.ProviderStore.CurrentTab.Options.CurrentDrawObject != null) {
-          props.ProviderStore.CurrentTab.Options.MapObject.removeInteraction(
-            props.ProviderStore.CurrentTab.Options.CurrentDrawObject
-          );
-          props.ProviderStore.SetNewCurrentDrawObject(null);
-          props.ProviderStore.SetNewCurrentFeature(null);
-        } else {
-          props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().removeFeature(
-            props.ProviderStore.CurrentTab.Options.CurrentFeature
-          );
-          props.ProviderStore.SetNewCurrentFeature(null);
-        }
-      }
+    const AddGeozoneSnapshot = () => {
+      if (GeozoneType != null) {
+        if (props.ProviderStore.CurrentTab.Options.CurrentDrawObject == null) {
+          if (props.ProviderStore.CurrentTab.Options.CurrentFeature != null) {
+            props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().removeFeature(
+              props.ProviderStore.CurrentTab.Options.CurrentFeature
+            );
+            props.ProviderStore.SetNewCurrentFeature(null);
+          }
 
-      props.ProviderStore.SetNewCurrentDrawObject(
-        new Draw({
-          source: props.ProviderStore.CurrentTab.Options.GetVectorLayerSource(),
-          type: DrawObjectType,
-          style: new Style({
-            stroke: new Stroke({
-              color: 'rgb(24, 144, 255)',
-              width: 2,
-            }),
-            fill: new Fill({
-              color: 'rgba(24, 144, 255,0.3)',
-            }),
-          }),
-        })
-      );
-
-      props.ProviderStore.CurrentTab.Options.MapObject.addInteraction(
-        props.ProviderStore.CurrentTab.Options.CurrentDrawObject
-      );
-      props.ProviderStore.CurrentTab.Options.CurrentDrawObject.on(
-        'drawstart',
-        (DrawEvent) => {
-          DrawEvent.feature.setStyle(
-            new Style({
-              text:
-                GeozoneName != null
-                  ? new Text({
-                      text: GeozoneName,
-                      font: 'bold 20px sans-serif',
-                    })
-                  : undefined,
-              stroke: new Stroke({
-                color: 'rgb(24, 144, 255)',
-                width: 2,
-              }),
-              fill: new Fill({
-                color: 'rgba(24, 144, 255,0.3)',
+          props.ProviderStore.SetNewCurrentDrawObject(
+            new Draw({
+              source:
+                props.ProviderStore.CurrentTab.Options.GetVectorLayerSource(),
+              type: GeozoneType,
+              style: new Style({
+                stroke: new Stroke({
+                  color: 'rgb(24, 144, 255)',
+                  width: 2,
+                }),
+                fill: new Fill({
+                  color: 'rgba(24, 144, 255,0.3)',
+                }),
               }),
             })
           );
-          props.ProviderStore.SetNewCurrentFeature(DrawEvent.feature);
-        }
-      );
-      props.ProviderStore.CurrentTab.Options.CurrentDrawObject.on(
-        'drawend',
-        (DrawEvent) => {
-          DrawEvent.feature.set('RegionId', CurrentRegionId);
-          DrawEvent.feature.setId(
-            `Geozone${
-              props.ProviderStore.CurrentTab.Options.GetNamedFeatures(
-                /^Geozone\w{1,}/
-              ).length
-            }`
-          );
-          DrawEvent.feature.setStyle(
-            props.ProviderStore.CurrentTab.Options.CurrentFeature.getStyle()
-          );
-          props.ProviderStore.SetNewCurrentFeature(DrawEvent.feature);
-          props.ProviderStore.CurrentTab.Options.MapObject.removeInteraction(
+
+          props.ProviderStore.CurrentTab.Options.MapObject.addInteraction(
             props.ProviderStore.CurrentTab.Options.CurrentDrawObject
           );
-          props.ProviderStore.SetNewCurrentDrawObject(null);
+          props.ProviderStore.CurrentTab.Options.CurrentDrawObject.on(
+            'drawstart',
+            (DrawEvent) => {
+              DrawEvent.feature.setStyle(
+                new Style({
+                  text:
+                    GeozoneName != null
+                      ? new Text({
+                          text: GeozoneName,
+                          font: 'bold 20px sans-serif',
+                        })
+                      : undefined,
+                  stroke: new Stroke({
+                    color: 'rgb(24, 144, 255)',
+                    width: 2,
+                  }),
+                  fill: new Fill({
+                    color: 'rgba(24, 144, 255,0.3)',
+                  }),
+                })
+              );
+              props.ProviderStore.SetNewCurrentFeature(DrawEvent.feature);
+            }
+          );
+          props.ProviderStore.CurrentTab.Options.CurrentDrawObject.on(
+            'drawend',
+            (DrawEvent) => {
+              DrawEvent.feature.set('RegionId', CurrentRegionId);
+              DrawEvent.feature.setId(
+                `Geozone${
+                  props.ProviderStore.CurrentTab.Options.GetNamedFeatures(
+                    /^Geozone\w{1,}/
+                  ).length
+                }`
+              );
+              DrawEvent.feature.setStyle(
+                props.ProviderStore.CurrentTab.Options.CurrentFeature.getStyle()
+              );
+              props.ProviderStore.SetNewCurrentFeature(DrawEvent.feature);
+              props.ProviderStore.CurrentTab.Options.MapObject.removeInteraction(
+                props.ProviderStore.CurrentTab.Options.CurrentDrawObject
+              );
+              props.ProviderStore.SetNewCurrentDrawObject(null);
+              let NewCurrentSnapshots = [...CurrentSnapshots];
+              NewCurrentSnapshots.unshift({
+                TS: Moment().format(),
+
+                Feature:
+                  props.ProviderStore.CurrentTab.Options.CurrentFeature.getGeometry(),
+
+                Geometry: CoordinatesToLonLat(
+                  props.ProviderStore.CurrentTab.Options.CurrentFeature.getGeometry().getCoordinates()
+                ),
+              });
+
+              SetNewCurrentSnapshots(NewCurrentSnapshots);
+            }
+          );
+          SetNewPickerColor('rgba(24,144,255,0.3)');
         }
-      );
-      SetNewPickerColor('rgba(24,144,255,0.3)');
+      } else {
+        message.warning('Выберите тип геозоны');
+      }
     };
     const GetRegionId = () => {
       if (props.ProviderStore.CurrentTab.Options.CurrentFeature != null) {
@@ -333,8 +341,9 @@ const GeozoneEditor = inject('ProviderStore')(
       });
     };
     const ChangeCurrentGeometry = (Record) => {
+      console.log(Record);
       props.ProviderStore.CurrentTab.Options.CurrentFeature.setGeometry(
-        new GeoJSON().readGeometry(Record.Feature.geometry, {
+        new GeoJSON().readGeometry(Record.Feature, {
           dataProjection: 'EPSG:4326',
           featureProjection: 'EPSG:3857',
         })
@@ -359,7 +368,20 @@ const GeozoneEditor = inject('ProviderStore')(
         })
       );
     };
-
+    const GetGeozoneType = () => {
+      if (GeozoneType != null) {
+        return GeozoneType;
+      } else {
+        if (
+          props.ProviderStore.CurrentTab.Options.CurrentFeature != null &&
+          props.ProviderStore.CurrentTab.Options.DrawObject == null
+        ) {
+          return props.ProviderStore.CurrentTab.Options.CurrentFeature.getGeometry().getType();
+        } else {
+          return 'Выберите тип';
+        }
+      }
+    };
     useEffect(() => {
       GetGeozoneSnapshots();
       RequestRegions();
@@ -469,16 +491,9 @@ const GeozoneEditor = inject('ProviderStore')(
             <div>Тип:</div>
             <div>
               <Select
-                value={
-                  props.ProviderStore.CurrentTab.Options.CurrentFeature !=
-                    null &&
-                  props.ProviderStore.CurrentTab.Options.DrawObject == null
-                    ? props.ProviderStore.CurrentTab.Options.CurrentFeature.getGeometry().getType()
-                    : GeozoneType
-                }
+                value={GetGeozoneType()}
                 onChange={(Value) => {
                   SetNewGeozoneType(Value);
-                  ChangeGeozoneType(Value);
                 }}
                 size="small"
                 options={[
@@ -527,6 +542,24 @@ const GeozoneEditor = inject('ProviderStore')(
               />
             </div>
           </div>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <Button
+              size="small"
+              type="primary"
+              onClick={() => {
+                AddGeozoneSnapshot();
+              }}
+            >
+              Добавить снимок
+            </Button>
+          </div>
+
           <Table
             rowSelection={{
               selectedRowKeys: [SelectedKey],
@@ -534,7 +567,7 @@ const GeozoneEditor = inject('ProviderStore')(
               renderCell: () => null,
               columnWidth: 1,
             }}
-            rowKey="Key"
+            rowKey="TS"
             scroll={{ y: '300px' }}
             pagination={false}
             dataSource={CurrentSnapshots}
@@ -543,12 +576,12 @@ const GeozoneEditor = inject('ProviderStore')(
                 title: 'Дата изменения',
                 dataIndex: 'TS',
                 key: 'TS',
-                render: (Value, Record, Index) => {
+                render: (Value, Record) => {
                   return (
                     <div
                       onClick={() => {
                         ChangeCurrentGeometry(Record);
-                        SetNewSelectedKey(Index);
+                        SetNewSelectedKey(Record.TS);
                       }}
                       style={{
                         cursor: 'pointer',
