@@ -36,6 +36,59 @@ export default function UserProfile(props) {
           paddingBottom: "10px",
         }}
       >
+        <div style={{ display: "flex", alignItems: "center" }}>Пароль:</div>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          {ShowPassword ? (
+            <>
+              <Input
+                value={props.Profile.Profile.Password}
+                size="small"
+                style={{ width: "150px" }}
+                onChange={(Event) => {
+                  props.UserProfileHandler(
+                    "ChangePassword",
+                    Event.target.value
+                  );
+                }}
+              />
+              <Button
+                style={{ marginLeft: "10px" }}
+                type="primary"
+                size="small"
+                onClick={() => {
+                  if (props.Profile.Profile.Password.length == 0) {
+                    message.warn("Введите корректный пароль!");
+                  } else {
+                    props.UserProfileHandler(
+                      "HashPassword",
+                      SetNewShowPassword(false)
+                    );
+                  }
+                }}
+              >
+                Сохранить
+              </Button>
+            </>
+          ) : (
+            <Button
+              size="small"
+              type="primary"
+              onClick={() => {
+                SetNewShowPassword(true);
+              }}
+            >
+              Установить новый пароль
+            </Button>
+          )}
+        </div>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          paddingBottom: "10px",
+        }}
+      >
         <div style={{ display: "flex", alignItems: "center" }}>Выбор роли:</div>
         <div style={{ display: "flex", alignItems: "center" }}>
           <Select
@@ -126,59 +179,6 @@ export default function UserProfile(props) {
               props.UserProfileHandler("ChangeEndDate", Moment);
             }}
           />
-        </div>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          paddingBottom: "10px",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center" }}>Пароль:</div>
-        <div style={{ display: "flex", alignItems: "center" }}>
-          {ShowPassword ? (
-            <>
-              <Input
-                value={props.Profile.Profile.Password}
-                size="small"
-                style={{ width: "150px" }}
-                onChange={(Event) => {
-                  props.UserProfileHandler(
-                    "ChangePassword",
-                    Event.target.value
-                  );
-                }}
-              />
-              <Button
-                style={{ marginLeft: "10px" }}
-                type="primary"
-                size="small"
-                onClick={() => {
-                  if (props.Profile.Profile.Password.length == 0) {
-                    message.warn("Введите корректный пароль!");
-                  } else {
-                    props.UserProfileHandler(
-                      "HashPassword",
-                      SetNewShowPassword(false)
-                    );
-                  }
-                }}
-              >
-                Сохранить
-              </Button>
-            </>
-          ) : (
-            <Button
-              size="small"
-              type="primary"
-              onClick={() => {
-                SetNewShowPassword(true);
-              }}
-            >
-              Установить новый пароль
-            </Button>
-          )}
         </div>
       </div>
     </>
