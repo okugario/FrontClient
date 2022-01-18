@@ -3,7 +3,6 @@ import { Button, Checkbox, DatePicker, Input, message, Select } from "antd";
 import { useState } from "react";
 import Moment from "moment";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
-import Password from "antd/lib/input/Password";
 
 export default function UserProfile(props) {
   const [ShowPassword, SetNewShowPassword] = useState(false);
