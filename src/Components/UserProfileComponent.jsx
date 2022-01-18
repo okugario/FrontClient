@@ -2,6 +2,7 @@ import * as React from "react";
 import { Button, Checkbox, DatePicker, Input, message, Select } from "antd";
 import { useState } from "react";
 import Moment from "moment";
+import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 
 export default function UserProfile(props) {
   const [ShowPassword, SetNewShowPassword] = useState(false);
@@ -20,7 +21,7 @@ export default function UserProfile(props) {
         <div style={{ display: "flex", alignItems: "center" }}>
           <Input
             size="small"
-            style={{ width: "160px" }}
+            style={{ width: "190px" }}
             value={props.Profile.Profile.Username}
             disabled={!props.Profile.Profile.New}
             onChange={(Event) => {
@@ -43,7 +44,9 @@ export default function UserProfile(props) {
               <Input
                 value={props.Profile.Profile.Password}
                 size="small"
-                style={{ width: "150px" }}
+                autoComplete="new-password"
+                type="password"
+                style={{ width: "126px" }}
                 onChange={(Event) => {
                   props.UserProfileHandler(
                     "ChangePassword",
@@ -52,7 +55,8 @@ export default function UserProfile(props) {
                 }}
               />
               <Button
-                style={{ marginLeft: "10px" }}
+                icon={<CheckOutlined />}
+                style={{ marginLeft: "8px" }}
                 type="primary"
                 size="small"
                 onClick={() => {
@@ -65,14 +69,24 @@ export default function UserProfile(props) {
                     );
                   }
                 }}
-              >
-                Сохранить
-              </Button>
+              />
+              <Button
+                type="primary"
+                size="small"
+                danger="true"
+                style={{ marginLeft: "8px" }}
+                onClick={() => {
+                  SetNewShowPassword(false);
+                  props.UserProfileHandler("ChangePassword", null);
+                }}
+                icon={<CloseOutlined />}
+              />
             </>
           ) : (
             <Button
               size="small"
               type="primary"
+              style={{ width: "190px" }}
               onClick={() => {
                 SetNewShowPassword(true);
               }}
