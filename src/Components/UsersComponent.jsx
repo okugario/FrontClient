@@ -163,6 +163,7 @@ export default function UsersComponent(props) {
         }}
       />
       <Modal
+        destroyOnClose={true}
         maskClosable={false}
         okButtonProps={{ size: "small", type: "primary" }}
         cancelButtonProps={{ size: "small" }}
