@@ -1,6 +1,7 @@
 import * as React from "react";
-import { Button, Checkbox, Input, message, Select } from "antd";
+import { Button, Checkbox, DatePicker, Input, message, Select } from "antd";
 import { useState } from "react";
+import Moment from "moment";
 
 export default function UserProfile(props) {
   const [ShowPassword, SetNewShowPassword] = useState(false);
@@ -54,13 +55,75 @@ export default function UserProfile(props) {
           paddingBottom: "10px",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center" }}>Включен:</div>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          Доступ включен:
+        </div>
         <div style={{ display: "flex", alignItems: "center" }}>
           <Checkbox
             size="small"
             checked={props.Profile.Profile.Enabled}
             onChange={(Event) => {
               props.UserProfileHandler("ChangeEnabled", Event.target.checked);
+            }}
+          />
+        </div>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          paddingBottom: "10px",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <Checkbox
+            size="small"
+            style={{ marginRight: "5px" }}
+            checked={"StartDate" in props.Profile.Profile.options}
+            onChange={(Event) => {
+              props.UserProfileHandler("EnableStartDate", Event.target.checked);
+            }}
+          />
+          Доступ с:
+        </div>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <DatePicker
+            disabled={!("StartDate" in props.Profile.Profile.options)}
+            size="small"
+            format="DD.MM.YYYY HH:mm:ss"
+            value={Moment(props.Profile.Profile.options.StartDate)}
+            onChange={(Moment) => {
+              props.UserProfileHandler("ChangeStartDate", Moment);
+            }}
+          />
+        </div>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          paddingBottom: "10px",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <Checkbox
+            size="small"
+            style={{ marginRight: "5px" }}
+            checked={"EndDate" in props.Profile.Profile.options}
+            onChange={(Event) => {
+              props.UserProfileHandler("EnableEndDate", Event.target.checked);
+            }}
+          />
+          Доступ по:
+        </div>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <DatePicker
+            size="small"
+            disabled={!("EndDate" in props.Profile.Profile.options)}
+            format="DD.MM.YYYY HH:mm:ss"
+            value={Moment(props.Profile.Profile.options.EndDate)}
+            onChange={(Moment) => {
+              props.UserProfileHandler("ChangeEndDate", Moment);
             }}
           />
         </div>
