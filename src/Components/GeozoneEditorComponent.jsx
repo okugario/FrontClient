@@ -280,7 +280,7 @@ const GeozoneEditor = inject('ProviderStore')(
               );
               props.ProviderStore.SetNewCurrentDrawObject(null);
               let NewCurrentSnapshots = [...CurrentSnapshots];
-              NewCurrentSnapshots.unshift({
+              const NewSnapshot = {
                 TS: Moment().format(),
 
                 Feature:
@@ -289,9 +289,11 @@ const GeozoneEditor = inject('ProviderStore')(
                 Geometry: CoordinatesToLonLat(
                   props.ProviderStore.CurrentTab.Options.CurrentFeature.getGeometry().getCoordinates()
                 ),
-              });
+              };
+              NewCurrentSnapshots.unshift(NewSnapshot);
 
               SetNewCurrentSnapshots(NewCurrentSnapshots);
+              SetNewSelectedKey(NewSnapshot.TS);
             }
           );
           SetNewPickerColor('rgba(24,144,255,0.3)');
@@ -340,19 +342,30 @@ const GeozoneEditor = inject('ProviderStore')(
         );
       });
     };
-    const ChangeCurrentGeometry = (Record) => {
-      console.log(Record);
-      props.ProviderStore.CurrentTab.Options.CurrentFeature.setGeometry(
-        new GeoJSON().readGeometry(Record.Feature, {
-          dataProjection: 'EPSG:4326',
-          featureProjection: 'EPSG:3857',
-        })
-      );
+    const ChangeCurrentGeometry = () => {
+      if (
+        props.ProviderStore.CurrentTab.Options.CurrentFeature != null &&
+        SelectedKey != null
+      ) {
+        props.ProviderStore.CurrentTab.Options.CurrentFeature.setGeometry(
+          CurrentSnapshots.find((Snapshot) => {
+            return Snapshot.TS == SelectedKey;
+          }).Feature
+        );
+      }
     };
     const DeleteSnapshot = (Index) => {
       let NewSnapshots = [...CurrentSnapshots];
       NewSnapshots.splice(Index, 1);
       SetNewCurrentSnapshots(NewSnapshots);
+      if (Index != 0) {
+        SetNewSelectedKey(NewSnapshots[Index - 1].TS);
+      }
+      if (NewSnapshots.length == 0) {
+        props.ProviderStore.CurrentTab.Options.GetVectorLayerSource().removeFeature(
+          props.ProviderStore.CurrentTab.Options.CurrentFeature
+        );
+      }
     };
     const ChangeGeozoneColor = (Color) => {
       SetNewPickerColor(`rgba(${Color.r},${Color.g},${Color.b},${Color.a})`);
@@ -382,6 +395,9 @@ const GeozoneEditor = inject('ProviderStore')(
         }
       }
     };
+    useEffect(() => {
+      ChangeCurrentGeometry();
+    }, [SelectedKey]);
     useEffect(() => {
       GetGeozoneSnapshots();
       RequestRegions();
@@ -576,11 +592,10 @@ const GeozoneEditor = inject('ProviderStore')(
                 title: 'Дата изменения',
                 dataIndex: 'TS',
                 key: 'TS',
-                render: (Value, Record) => {
+                render: (Value, Record, Index) => {
                   return (
                     <div
                       onClick={() => {
-                        ChangeCurrentGeometry(Record);
                         SetNewSelectedKey(Record.TS);
                       }}
                       style={{
@@ -595,9 +610,9 @@ const GeozoneEditor = inject('ProviderStore')(
                       <CloseOutlined
                         onClick={() => {
                           Modal.confirm({
-                            title: 'Подтвердите удаление?',
+                            title: 'Подтвердите удаление',
                             content:
-                              'Вы действительно хотите удалить это изменение?',
+                              'Вы действительно хотите удалить снимок геозоны?',
                             okButtonProps: {
                               size: 'small',
                               type: 'primary',
