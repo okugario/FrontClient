@@ -1,105 +1,120 @@
-import MapObject from 'ol/Map';
-import OSM from 'ol/source/OSM';
-import * as React from 'react';
-import * as Moment from 'moment';
-import { Tile as TileLayer } from 'ol/layer';
-import { defaults } from 'ol/interaction';
-import VectorSource from 'ol/source/Vector';
-import VectorLayer from 'ol/layer/Vector';
-import View from 'ol/View';
-import { makeAutoObservable } from 'mobx';
-import Control from 'ol/control/Control';
+import MapObject from "ol/Map";
+import OSM from "ol/source/OSM";
+import * as React from "react";
+import * as Moment from "moment";
+import { Tile as TileLayer } from "ol/layer";
+import { defaults } from "ol/interaction";
+import VectorSource from "ol/source/Vector";
+import VectorLayer from "ol/layer/Vector";
+import View from "ol/View";
+import { makeAutoObservable } from "mobx";
+import Control from "ol/control/Control";
 export class Tab {
   constructor(TabObject, OpenTabs) {
     this.Id = TabObject.id;
     this.Caption = TabObject.caption;
     this.Key = this.GenerateTabKey(TabObject.id, OpenTabs);
-    if ('items' in TabObject) {
+    if ("items" in TabObject) {
       this.Items = TabObject.items.map((Item) => {
         switch (Item.id) {
-          case 'map':
+          case "map":
             Item.Component = React.lazy(() =>
-              import('../Components/MapComponent')
+              import("../Components/MapComponent")
             );
             break;
-          case 'Users':
+          case "Users":
             Item.Component = React.lazy(() =>
-              import('../Components/UsersComponent')
+              import("../Components/UsersComponent")
             );
             break;
-          case 'RetransTargets':
+          case "RetransTargets":
             Item.Component = React.lazy(() =>
-              import('../Components/RetranslationComponent')
+              import("../Components/RetranslationComponent")
             );
             break;
-          case 'statistic':
+          case "statistic":
             Item.Component = React.lazy(() =>
-              import('../Components/StatisticComponent')
+              import("../Components/StatisticComponent")
             );
             break;
-          case 'Vehicles':
+          case "Vehicles":
             Item.Component = React.lazy(() =>
-              import('../Components/TransportComponent')
+              import("../Components/TransportComponent")
             );
             break;
-          case 'Regions':
+          case "Regions":
             Item.Component = React.lazy(() =>
-              import('../Components/CrudObjectsComponent')
+              import("../Components/CrudObjectsComponent")
             );
             break;
-          case 'tripsReport':
+          case "UnitState":
             Item.Component = React.lazy(() =>
-              import('../Components/TripsReportComponent')
+              import("../Components/CrudObjectsComponent")
             );
             break;
-          case 'loadsReport':
+          case "Unit":
             Item.Component = React.lazy(() =>
-              import('../Components/LoadsReportComponent')
+              import("../Components/CrudObjectsComponent")
             );
             break;
-          case 'VehicleTypes':
+          case "UnitMove":
             Item.Component = React.lazy(() =>
-              import('../Components/CrudObjectsComponent')
+              import("../Components/UnitMoveComponent")
             );
             break;
-          case 'Manufacturers':
+          case "tripsReport":
             Item.Component = React.lazy(() =>
-              import('../Components/CrudObjectsComponent')
+              import("../Components/TripsReportComponent")
             );
             break;
-          case 'Firms':
+          case "loadsReport":
             Item.Component = React.lazy(() =>
-              import('../Components/CrudObjectsComponent')
+              import("../Components/LoadsReportComponent")
             );
             break;
-          case 'LoadTypes':
+          case "VehicleTypes":
             Item.Component = React.lazy(() =>
-              import('../Components/CrudObjectsComponent')
+              import("../Components/CrudObjectsComponent")
             );
             break;
-          case 'VehicleModels':
+          case "Manufacturers":
             Item.Component = React.lazy(() =>
-              import('../Components/VehicleModelsComponent')
+              import("../Components/CrudObjectsComponent")
             );
             break;
-          case 'WorkConditions':
+          case "Firms":
             Item.Component = React.lazy(() =>
-              import('../Components/WorkConditionsComponent')
+              import("../Components/CrudObjectsComponent")
             );
             break;
-          case 'DiggerPassports':
+          case "LoadTypes":
             Item.Component = React.lazy(() =>
-              import('../Components/LoadsPassportComponent')
+              import("../Components/CrudObjectsComponent")
             );
             break;
-          case 'AccessRoles':
+          case "VehicleModels":
             Item.Component = React.lazy(() =>
-              import('../Components/AccessRolesComponent')
+              import("../Components/VehicleModelsComponent")
             );
             break;
-          case 'ConfigSchemes':
+          case "WorkConditions":
             Item.Component = React.lazy(() =>
-              import('../Components/ConfigSchemesComponent')
+              import("../Components/WorkConditionsComponent")
+            );
+            break;
+          case "DiggerPassports":
+            Item.Component = React.lazy(() =>
+              import("../Components/LoadsPassportComponent")
+            );
+            break;
+          case "AccessRoles":
+            Item.Component = React.lazy(() =>
+              import("../Components/AccessRolesComponent")
+            );
+            break;
+          case "ConfigSchemes":
+            Item.Component = React.lazy(() =>
+              import("../Components/ConfigSchemesComponent")
             );
             break;
         }
@@ -107,11 +122,11 @@ export class Tab {
       });
     }
     switch (TabObject.type) {
-      case 'report':
-        let ButtonBar = document.createElement('div');
+      case "report":
+        let ButtonBar = document.createElement("div");
         let MapButtonBarControl = new Control({ element: ButtonBar });
-        MapButtonBarControl.set('Id', 'MapButtonBar');
-        ButtonBar.id = 'MapButtonBar';
+        MapButtonBarControl.set("Id", "MapButtonBar");
+        ButtonBar.id = "MapButtonBar";
         this.Options = {
           CurrentControls: [],
           ButtonBarElement: ButtonBar,
@@ -123,26 +138,26 @@ export class Tab {
           CurrentModifyObject: null,
 
           LeftMenu: [
-            React.lazy(() => import('../Components/IntervalComponent')),
+            React.lazy(() => import("../Components/IntervalComponent")),
 
-            React.lazy(() => import('../Components/TabTreeComponent.')),
+            React.lazy(() => import("../Components/TabTreeComponent.")),
             React.lazy(() =>
-              import('../Components/AdministrationMenuComponent')
+              import("../Components/AdministrationMenuComponent")
             ),
           ],
           StartDate:
             Moment().hours() < 20
-              ? Moment('08:00:00', 'HH:mm:ss')
-              : Moment('20:00:00', 'HH:mm:ss'),
+              ? Moment("08:00:00", "HH:mm:ss")
+              : Moment("20:00:00", "HH:mm:ss"),
 
           EndDate:
             Moment().hours() < 20
-              ? Moment('20:00:00', 'HH:mm:ss')
-              : Moment('08:00:00', 'HH:mm:ss').add(1, 'day'),
+              ? Moment("20:00:00", "HH:mm:ss")
+              : Moment("08:00:00", "HH:mm:ss").add(1, "day"),
           CurrentTrackPlayerTime:
             Moment().hours() < 20
-              ? Moment('08:00:00', 'HH:mm:ss')
-              : Moment('20:00:00', 'HH:mm:ss'),
+              ? Moment("08:00:00", "HH:mm:ss")
+              : Moment("20:00:00", "HH:mm:ss"),
 
           MapObject: new MapObject({
             interactions: defaults({ doubleClickZoom: false }),
@@ -181,31 +196,31 @@ export class Tab {
         };
 
         break;
-      case 'setting':
+      case "setting":
         this.Options = {
           CurrentMenuItem: TabObject.items[0],
           LeftMenu: [
             React.lazy(() =>
-              import('../Components/AdministrationMenuComponent')
+              import("../Components/AdministrationMenuComponent")
             ),
           ],
         };
 
         break;
-      case 'workplace':
+      case "workplace":
         this.Options = {
           LeftMenu: [
             React.lazy(() =>
-              import('../Components/AdministrationMenuComponent')
+              import("../Components/AdministrationMenuComponent")
             ),
           ],
           CurrentMenuItem: TabObject.items[0],
         };
         this.Items = TabObject.items.map((Item) => {
           switch (Item.id) {
-            case 'DiggerOrders':
+            case "DiggerOrders":
               Item.Component = React.lazy(() =>
-                import('../Components/DiggerOrderComponent')
+                import("../Components/DiggerOrderComponent")
               );
               break;
           }
