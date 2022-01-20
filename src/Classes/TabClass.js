@@ -52,14 +52,14 @@ export class Tab {
               import("../Components/CrudObjectsComponent")
             );
             break;
-          case "Unit":
+          case "UnitType":
             Item.Component = React.lazy(() =>
               import("../Components/CrudObjectsComponent")
             );
             break;
-          case "UnitMove":
+          case "Unit":
             Item.Component = React.lazy(() =>
-              import("../Components/UnitMoveComponent")
+              import("../Components/UnitComponent")
             );
             break;
           case "tripsReport":

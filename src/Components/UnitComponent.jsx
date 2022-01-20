@@ -1,10 +1,13 @@
 import * as React from "react";
 import { useState } from "react";
-import { Modal, Select, Table } from "antd";
+import { Modal, Table } from "antd";
 import TableButtonComponent from "./TableButtonComponent";
+import UnitProfileComponent from "./UnitProfileComponent";
 export default function UnitMoveComponent() {
   const [UnitsTable, SetNewUnitsTable] = useState();
+  const [UnitProfile, SetNewUnitProfile] = useState(null);
   const [SelectedKey, SetNewSelectedKey] = useState();
+  const [ShowUnit, SetNewShowUnit] = useState(true);
 
   const DeleteUnit = () => {
     if (SelectedKey != null) {
@@ -23,6 +26,26 @@ export default function UnitMoveComponent() {
   };
   return (
     <>
+      <Modal
+        destroyOnClose={true}
+        maskClosable={false}
+        okButtonProps={{ size: "small", type: "primary" }}
+        cancelButtonProps={{ size: "small" }}
+        title="Профиль агрегата"
+        visible={ShowUnit}
+        onCancel={() => {
+          SetNewShowUnit(false);
+          SetNewUnitProfile(null);
+        }}
+        onOk={() => {
+          {
+            SetNewShowProfile(false);
+          }
+        }}
+        okText="Сохранить"
+      >
+        <UnitProfileComponent Profile={UnitProfile} />
+      </Modal>
       <TableButtonComponent
         onDelete={() => {
           DeleteUnit();
@@ -41,12 +64,19 @@ export default function UnitMoveComponent() {
             return null;
           },
         }}
+        onRow={(Record) => {
+          return {
+            onClick: () => {
+              SetNewSelectedKey(Record["Caption"]);
+            },
+            onDoubleClick: () => {
+              SetNewShowProfile(true);
+            },
+          };
+        }}
         columns={[
           { title: "Агрегат", dataIndex: "Unit", key: "Unit" },
-          { title: "Состояние", dataIndex: "UnitState", key: "UnitState" },
-          { title: "Транспорт", dataIndex: "Transport", key: "Transport" },
-          { title: "Дата с:", dataIndex: "FirstDate", key: "FirstDate" },
-          { title: "Дата по:", dataIndex: "SecondDate", key: "SecondDate" },
+          { title: "Наименование", dataIndex: "Caption", key: "Caption" },
         ]}
       />
     </>
