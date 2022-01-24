@@ -47,17 +47,17 @@ export class Tab {
               import("../Components/CrudObjectsComponent")
             );
             break;
-          case "UnitState":
+          case "UnitStates":
             Item.Component = React.lazy(() =>
               import("../Components/CrudObjectsComponent")
             );
             break;
-          case "UnitType":
+          case "UnitTypes":
             Item.Component = React.lazy(() =>
               import("../Components/CrudObjectsComponent")
             );
             break;
-          case "Unit":
+          case "Units":
             Item.Component = React.lazy(() =>
               import("../Components/UnitComponent")
             );

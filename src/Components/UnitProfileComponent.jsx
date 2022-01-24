@@ -15,7 +15,11 @@ export default function UnitProfile(props) {
           Наименование:
         </div>
         <div style={{ display: "flex", alignItems: "center" }}>
-          <Input size="small" />
+          <Input
+            value={props.Profile.Profile.Caption}
+            style={{ width: "200px" }}
+            size="small"
+          />
         </div>
       </div>
       <div
@@ -27,7 +31,15 @@ export default function UnitProfile(props) {
       >
         <div style={{ display: "flex", alignItems: "center" }}>Тип:</div>
         <div style={{ display: "flex", alignItems: "center" }}>
-          <Select size="small" />
+          <Select
+            options={props.Profile.AllUnitType}
+            value={props.Profile.Profile.UnitTypeId}
+            onChange={(Value) => {
+              props.UnitProfileHandler("ChangeUnitType", Value);
+            }}
+            size="small"
+            style={{ width: "200px" }}
+          />
         </div>
       </div>
       <div
@@ -93,7 +105,7 @@ export default function UnitProfile(props) {
           pagination={false}
           //dataSource={}
           columns={[
-            { title: "ТС", dataIndex: "Vehicle", key: "Vehicle" },
+            { title: "Транспорт", dataIndex: "Vehicle", key: "Vehicle" },
             { title: "Дата с:", dataIndex: "StartDate", key: "StartDate" },
             { title: "Дата по:", dataIndex: "EndDate", key: "EndDate" },
           ]}
