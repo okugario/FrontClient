@@ -1,7 +1,20 @@
 import * as React from "react";
-import { Select, DatePicker, Table, Input } from "antd";
+import { useState, useEffect } from "react";
+import { Select, DatePicker, Table, Input, Button } from "antd";
+import Moment from "moment";
+import { CloseOutlined } from "@ant-design/icons";
 
 export default function UnitProfile(props) {
+  const [SelectedKey, SetNewSelectedKey] = useState(
+    props.Profile.Profile.UnitHistory[0].TS
+  );
+  const UniversalGetter = (Feeld) => {
+    return props.Profile.Profile.UnitHistory[
+      props.Profile.Profile.UnitHistory.findIndex((Unit) => {
+        return Unit.TS == SelectedKey;
+      })
+    ][Feeld];
+  };
   return (
     <>
       <div
@@ -16,7 +29,14 @@ export default function UnitProfile(props) {
         </div>
         <div style={{ display: "flex", alignItems: "center" }}>
           <Input
-            value={props.Profile.Profile.Caption}
+            value={UniversalGetter("Caption")}
+            onChange={(Event) => {
+              props.UnitProfileHandler(
+                "ChangeUnitCaption",
+                Event.target.value,
+                SelectedKey
+              );
+            }}
             style={{ width: "200px" }}
             size="small"
           />
@@ -32,6 +52,7 @@ export default function UnitProfile(props) {
         <div style={{ display: "flex", alignItems: "center" }}>Тип:</div>
         <div style={{ display: "flex", alignItems: "center" }}>
           <Select
+            disabled={props.Profile.Profile.UnitHistory != null}
             options={props.Profile.AllUnitType}
             value={props.Profile.Profile.UnitTypeId}
             onChange={(Value) => {
@@ -51,7 +72,14 @@ export default function UnitProfile(props) {
       >
         <div style={{ display: "flex", alignItems: "center" }}>Состояние</div>
         <div style={{ display: "flex", alignItems: "center" }}>
-          <Select size="small" />
+          <Select
+            options={props.Profile.AllStates}
+            value={UniversalGetter("UnitStateId")}
+            onChange={(Value) => {
+              props.UnitProfileHandler("ChangeUnitState", Value, SelectedKey);
+            }}
+            size="small"
+          />
         </div>
       </div>
       <div
@@ -63,7 +91,14 @@ export default function UnitProfile(props) {
       >
         <div style={{ display: "flex", alignItems: "center" }}>Транспорт</div>
         <div style={{ display: "flex", alignItems: "center" }}>
-          <Select size="small" />
+          <Select
+            options={props.Profile.AllVehicles}
+            value={UniversalGetter("VehicleId")}
+            onChange={(Value) => {
+              props.UnitProfileHandler("ChangeUnitVehicle", Value, SelectedKey);
+            }}
+            size="small"
+          />
         </div>
       </div>
       <div
@@ -73,21 +108,16 @@ export default function UnitProfile(props) {
           paddingBottom: "10px",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center" }}>Дата с:</div>
+        <div style={{ display: "flex", alignItems: "center" }}>Дата</div>
         <div style={{ display: "flex", alignItems: "center" }}>
-          <DatePicker size="small" />
-        </div>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          paddingBottom: "10px",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center" }}>Дата по:</div>
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <DatePicker size="small" />
+          <DatePicker
+            value={Moment(props.Profile.Profile.UnitHistory[0].TS)}
+            onChange={(Moment) => {
+              props.UnitProfileHandler("ChangeUnitDate", Moment, SelectedKey);
+            }}
+            format="DD.MM.YYYY HH:mm:ss"
+            size="small"
+          />
         </div>
       </div>
       <div
@@ -97,17 +127,63 @@ export default function UnitProfile(props) {
       >
         <Table
           title={() => (
-            <div style={{ textAlign: "center" }}>История перемещений</div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <div>История перемещений</div>
+              <Button
+                size="small"
+                type="primary"
+                onClick={() => {
+                  const CurrentTime = Moment().format();
+                  SetNewSelectedKey(CurrentTime);
+                  props.UnitProfileHandler("AddUnitSnapshot", CurrentTime);
+                }}
+              >
+                Добавить
+              </Button>
+            </div>
           )}
           bordered
           size="small"
-          scroll={{ y: "500px" }}
+          rowKey="TS"
+          rowSelection={{
+            selectedRowKeys: [SelectedKey],
+            columnWidth: 1,
+            hideSelectAll: true,
+            renderCell: () => {
+              return null;
+            },
+          }}
+          onRow={(Record) => {
+            return {
+              onClick: () => {
+                SetNewSelectedKey(Record["TS"]);
+              },
+            };
+          }}
           pagination={false}
-          //dataSource={}
+          dataSource={[...props.Profile.Profile.UnitHistory]}
           columns={[
-            { title: "Транспорт", dataIndex: "Vehicle", key: "Vehicle" },
-            { title: "Дата с:", dataIndex: "StartDate", key: "StartDate" },
-            { title: "Дата по:", dataIndex: "EndDate", key: "EndDate" },
+            {
+              title: "Дата",
+              dataIndex: "TS",
+              key: "TS",
+              render: (Value, Record, Index) => {
+                return (
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    {Moment(Value).format("DD.MM.YYYY HH:mm:ss")}
+                    <CloseOutlined
+                      style={{ cursor: "pointer", color: "red" }}
+                    />
+                  </div>
+                );
+              },
+            },
           ]}
         />
       </div>

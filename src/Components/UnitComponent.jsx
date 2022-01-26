@@ -4,6 +4,8 @@ import { Modal, Table } from "antd";
 import TableButtonComponent from "./TableButtonComponent";
 import UnitProfileComponent from "./UnitProfileComponent";
 import { ApiFetch } from "../Helpers/Helpers";
+import Moment from "moment";
+
 export default function UnitMoveComponent() {
   const [UnitsTable, SetNewUnitsTable] = useState();
   const [UnitProfile, SetNewUnitProfile] = useState(null);
@@ -45,17 +47,75 @@ export default function UnitMoveComponent() {
         });
       })
     );
+    PromiseArray.push(
+      ApiFetch("model/UnitStates", "GET", undefined, (Response) => {
+        Profile.AllStates = Response.data.map((State) => {
+          return { value: State.Id, label: State.Caption };
+        });
+      })
+    );
+    PromiseArray.push(
+      ApiFetch("model/Vehicles", "GET", undefined, (Response) => {
+        Profile.AllVehicles = Response.data.map((Vehicle) => {
+          return { value: Vehicle.Id, label: Vehicle.Caption };
+        });
+      })
+    );
     return Promise.all(PromiseArray).then(() => {
       SetNewUnitProfile(Profile);
     });
   };
 
-  const UnitProfileHandler = (Action, Data) => {
+  const UnitProfileHandler = (Action, Data, Key) => {
     let NewUnitProfile = { ...UnitProfile };
     switch (Action) {
+      case "ChangeUnitCaption":
+        NewUnitProfile.Profile.UnitHistory[
+          NewUnitProfile.Profile.UnitHistory.findIndex((Unit) => {
+            return Unit.TS == Key;
+          })
+        ].Caption = Data;
+        SetNewUnitProfile(NewUnitProfile);
+        break;
       case "ChangeUnitType":
         NewUnitProfile.Profile.UnitTypeId = Data;
         SetNewUnitProfile(NewUnitProfile);
+        break;
+      case "ChangeUnitState":
+        NewUnitProfile.Profile.UnitHistory[
+          NewUnitProfile.Profile.UnitHistory.findIndex((Unit) => {
+            return Unit.TS == Key;
+          })
+        ].UnitStateId = Data;
+        SetNewUnitProfile(NewUnitProfile);
+        break;
+      case "ChangeUnitVehicle":
+        NewUnitProfile.Profile.UnitHistory[
+          NewUnitProfile.Profile.UnitHistory.findIndex((Unit) => {
+            return Unit.TS == Key;
+          })
+        ].VehicleId = Data;
+        SetNewUnitProfile(NewUnitProfile);
+        break;
+      case "ChangeUnitDate":
+        NewUnitProfile.Profile.UnitHistory[
+          NewUnitProfile.Profile.UnitHistory.findIndex((Unit) => {
+            return Unit.TS == Key;
+          })
+        ].TS = Data.format();
+        SetNewUnitProfile(NewUnitProfile);
+        break;
+      case "AddUnitSnapshot":
+        NewUnitProfile.Profile.UnitHistory.unshift({
+          Caption: "",
+          TS: Data,
+          UnitStateId: NewUnitProfile.AllStates.find((State) => {
+            return State.label == "-";
+          }).value,
+          VehicleId: NewUnitProfile.AllVehicles[0].value,
+        });
+        SetNewUnitProfile(NewUnitProfile);
+
         break;
     }
   };
@@ -121,13 +181,20 @@ export default function UnitMoveComponent() {
             title: "Наименование",
             dataIndex: "Caption",
             key: "Caption",
+            render: (Value, Record, Index) => {
+              return <div style={{ cursor: "pointer" }}>{Value}</div>;
+            },
           },
           {
             title: "Тип агрегата",
             dataIndex: "UnitType",
             key: "UnitType",
             render: (Value, Record, Index) => {
-              return Record.UnitType.Caption;
+              return (
+                <div style={{ cursor: "pointer" }}>
+                  {Record.UnitType.Caption}
+                </div>
+              );
             },
           },
         ]}
