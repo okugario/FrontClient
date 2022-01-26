@@ -5,15 +5,9 @@ import Moment from "moment";
 import { CloseOutlined } from "@ant-design/icons";
 
 export default function UnitProfile(props) {
-  const [SelectedKey, SetNewSelectedKey] = useState(
-    props.Profile.Profile.UnitHistory[0].TS
-  );
+  const [SelectedKey, SetNewSelectedKey] = useState(0);
   const UniversalGetter = (Feeld) => {
-    return props.Profile.Profile.UnitHistory[
-      props.Profile.Profile.UnitHistory.findIndex((Unit) => {
-        return Unit.TS == SelectedKey;
-      })
-    ][Feeld];
+    return props.Profile.Profile.UnitHistory[SelectedKey][Feeld];
   };
   return (
     <>
@@ -133,18 +127,18 @@ export default function UnitProfile(props) {
                 size="small"
                 type="primary"
                 onClick={() => {
-                  const CurrentTime = Moment().format();
-                  SetNewSelectedKey(CurrentTime);
-                  props.UnitProfileHandler("AddUnitSnapshot", CurrentTime);
+                  SetNewSelectedKey(0);
+                  props.UnitProfileHandler("AddUnitSnapshot");
                 }}
               >
                 Добавить
               </Button>
             </div>
           )}
+          scroll={{ y: 700 }}
           bordered
           size="small"
-          rowKey="TS"
+          rowKey="Key"
           rowSelection={{
             selectedRowKeys: [SelectedKey],
             columnWidth: 1,
@@ -153,15 +147,20 @@ export default function UnitProfile(props) {
               return null;
             },
           }}
-          onRow={(Record) => {
+          onRow={(Record, Index) => {
             return {
               onClick: () => {
-                SetNewSelectedKey(Record["TS"]);
+                SetNewSelectedKey(Index);
               },
             };
           }}
           pagination={false}
-          dataSource={[...props.Profile.Profile.UnitHistory]}
+          dataSource={props.Profile.Profile.UnitHistory.map(
+            (Snapshot, Index) => {
+              Snapshot.Key = Index;
+              return Snapshot;
+            }
+          )}
           columns={[
             {
               title: "Дата",
