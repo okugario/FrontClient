@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Table, Modal } from "antd";
+import { Table, Modal, message } from "antd";
 import { useState, useEffect } from "react";
 import { ApiFetch } from "../Helpers/Helpers";
 import UserProfileComponent from "../Components/UserProfileComponent";
@@ -60,20 +60,24 @@ export default function UsersComponent(props) {
         SetNewUserProfile(NewUserProfile);
         break;
       case "SaveUserProfile":
-        ApiFetch(
-          `model/Users/${
-            NewUserProfile.Profile.New
-              ? ``
-              : `${NewUserProfile.Profile.Username}`
-          }`,
-          NewUserProfile.Profile.New ? "POST" : "PATCH",
-          NewUserProfile.Profile,
-          (Response) => {
-            RequestTable().then(() => {
-              SetNewShowProfile(false);
-            });
-          }
-        );
+        if (NewUserProfile.Profile.Hash.length > 0) {
+          ApiFetch(
+            `model/Users${
+              NewUserProfile.Profile.New
+                ? ``
+                : `${NewUserProfile.Profile.Username}`
+            }`,
+            NewUserProfile.Profile.New ? "POST" : "PATCH",
+            NewUserProfile.Profile,
+            (Response) => {
+              RequestTable().then(() => {
+                SetNewShowProfile(false);
+              });
+            }
+          );
+        } else {
+          message.warn("Установите пароль!");
+        }
         break;
       case "HashPassword":
         NewUserProfile.Profile.Hash = Bcrypt.hashSync(
@@ -176,7 +180,6 @@ export default function UsersComponent(props) {
         onOk={() => {
           {
             UserProfileHandler("SaveUserProfile");
-            SetNewShowProfile(false);
           }
         }}
         okText="Сохранить"
