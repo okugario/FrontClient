@@ -28,7 +28,7 @@ export default function UnitMoveComponent() {
     }
   };
   const RequestUnitTable = () => {
-    ApiFetch("model/Units", "GET", undefined, (Response) => {
+    return ApiFetch("model/Units", "GET", undefined, (Response) => {
       SetNewUnitsTable(Response.data);
     });
   };
@@ -37,6 +37,10 @@ export default function UnitMoveComponent() {
     let PromiseArray = [];
     PromiseArray.push(
       ApiFetch(`model/Units/${SelectedKey}`, "GET", undefined, (Response) => {
+        Response.data.UnitHistory.map((UnitSnapshot) => {
+          UnitSnapshot.New = false;
+          return UnitSnapshot;
+        });
         Profile.Profile = Response.data;
       })
     );
@@ -68,13 +72,10 @@ export default function UnitMoveComponent() {
 
   const UnitProfileHandler = (Action, Data, Key) => {
     let NewUnitProfile = { ...UnitProfile };
+    let PromiseArray = [];
     switch (Action) {
       case "ChangeUnitCaption":
-        NewUnitProfile.Profile.UnitHistory[
-          NewUnitProfile.Profile.UnitHistory.findIndex((Unit) => {
-            return Unit.TS == Key;
-          })
-        ].Caption = Data;
+        NewUnitProfile.Profile.UnitHistory[Key].Caption = Data;
         SetNewUnitProfile(NewUnitProfile);
         break;
       case "ChangeUnitType":
@@ -82,31 +83,20 @@ export default function UnitMoveComponent() {
         SetNewUnitProfile(NewUnitProfile);
         break;
       case "ChangeUnitState":
-        NewUnitProfile.Profile.UnitHistory[
-          NewUnitProfile.Profile.UnitHistory.findIndex((Unit) => {
-            return Unit.TS == Key;
-          })
-        ].UnitStateId = Data;
+        NewUnitProfile.Profile.UnitHistory[Key].UnitStateId = Data;
         SetNewUnitProfile(NewUnitProfile);
         break;
       case "ChangeUnitVehicle":
-        NewUnitProfile.Profile.UnitHistory[
-          NewUnitProfile.Profile.UnitHistory.findIndex((Unit) => {
-            return Unit.TS == Key;
-          })
-        ].VehicleId = Data;
+        NewUnitProfile.Profile.UnitHistory[Key].VehicleId = Data;
         SetNewUnitProfile(NewUnitProfile);
         break;
       case "ChangeUnitDate":
-        NewUnitProfile.Profile.UnitHistory[
-          NewUnitProfile.Profile.UnitHistory.findIndex((Unit) => {
-            return Unit.TS == Key;
-          })
-        ].TS = Data.format();
+        NewUnitProfile.Profile.UnitHistory[Key].TS = Data.format();
         SetNewUnitProfile(NewUnitProfile);
         break;
       case "AddUnitSnapshot":
         NewUnitProfile.Profile.UnitHistory.unshift({
+          New: true,
           Caption: "",
           TS: Data,
           UnitStateId: NewUnitProfile.AllStates.find((State) => {
@@ -116,6 +106,34 @@ export default function UnitMoveComponent() {
         });
         SetNewUnitProfile(NewUnitProfile);
 
+        break;
+      case "SaveUnit":
+        ApiFetch(
+          `model/Units${
+            "Id" in NewUnitProfile.Profile
+              ? ""
+              : `/${NewUnitProfile.Profile.Id}`
+          }`,
+          "Id" in NewUnitProfile.Profile ? "PATCH" : "POST",
+          NewUnitProfile.Profile,
+          (Response) => {}
+        ).then(() => {
+          NewUnitProfile.Profile.UnitHistory.forEach((UnitSnapshot) => {
+            PromiseArray.push(
+              ApiFetch(
+                "model/UnitHistory",
+                UnitSnapshot.New ? "POST" : "PATCH",
+                UnitSnapshot,
+                () => {}
+              )
+            );
+          });
+          Promise.all(PromiseArray).then(() => {
+            RequestUnitTable().then(() => {
+              SetNewShowUnit(false);
+            });
+          });
+        });
         break;
     }
   };
@@ -135,6 +153,7 @@ export default function UnitMoveComponent() {
         }}
         onOk={() => {
           {
+            UnitProfileHandler("SaveUnit");
             SetNewShowUnit(false);
           }
         }}

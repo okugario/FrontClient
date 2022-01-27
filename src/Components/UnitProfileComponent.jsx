@@ -106,6 +106,7 @@ export default function UnitProfile(props) {
         <div style={{ display: "flex", alignItems: "center" }}>
           <DatePicker
             value={Moment(props.Profile.Profile.UnitHistory[0].TS)}
+            disabled={"Id" in props.Profile.Profile}
             onChange={(Moment) => {
               props.UnitProfileHandler("ChangeUnitDate", Moment, SelectedKey);
             }}
