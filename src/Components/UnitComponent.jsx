@@ -204,21 +204,39 @@ export default function UnitMoveComponent() {
           },
           cancelButtonProps: { size: "small" },
           onOk: () => {
-            if ("UnitId" in NewUnitProfile.Profile.UnitHistory[Key]) {
+            if (NewUnitProfile.Profile.UnitHistory.length > 1) {
+              if ("UnitId" in NewUnitProfile.Profile.UnitHistory[Key]) {
+                ApiFetch(
+                  `model/UnitHistory/${NewUnitProfile.Profile.UnitHistory[Key].UnitId}/${NewUnitProfile.Profile.UnitHistory[Key].TS}`,
+                  "DELETE",
+                  undefined,
+                  (Response) => {}
+                ).then(() => {
+                  ApiFetch(
+                    `model/UnitHistory/${NewUnitProfile.Profile.UnitHistory[Key].UnitId}`,
+                    "GET",
+                    undefined,
+                    (Response) => {
+                      NewUnitProfile.Profile.UnitHistory = Response.data;
+                      SetNewUnitProfile(NewUnitProfile);
+                    }
+                  );
+                });
+              } else {
+                NewUnitProfile.Profile.UnitHistory.splice(Key, 1);
+                SetNewUnitProfile(NewUnitProfile);
+              }
+            } else {
               ApiFetch(
-                `model/UnitHistory/${NewUnitProfile.Profile.UnitHistory[Key].TS}`,
+                `model/Units/${SelectedKey}`,
                 "DELETE",
                 undefined,
-                (Response) => {}
-              ).then(() => {
-                ApiFetch("modal/UnitHistory", "GET", undefined, (Response) => {
-                  NewUnitProfile.Profile.UnitHistory = Response.data;
-                  SetNewUnitProfile(NewUnitProfile);
-                });
-              });
-            } else {
-              NewUnitProfile.Profile.UnitHistory.splice(Key, 1);
-              SetNewUnitProfile(NewUnitProfile);
+                () => {
+                  RequestUnitTable().then(() => {
+                    SetNewShowUnit(false);
+                  });
+                }
+              );
             }
           },
         });
