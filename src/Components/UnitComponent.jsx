@@ -59,7 +59,9 @@ export default function UnitMoveComponent() {
       Modal.confirm({
         okText: "Удалить",
         onOk: () => {
-          console.log("Отработало");
+          ApiFetch(`model/Units/${SelectedKey}`, "DELETE", undefined, () => {
+            RequestUnitTable();
+          });
         },
         cancelText: "Отмена",
         title: "Подтвердите действие",
@@ -171,28 +173,6 @@ export default function UnitMoveComponent() {
             SetNewShowUnit(false);
           });
         });
-        break;
-      case "DeleteUnit":
-        if (SelectedKey != null) {
-          Modal.confirm({
-            okText: "Удалить",
-            onOk: () => {
-              ApiFetch(
-                `model/Units/${NewUnitProfile.Profile.Id}`,
-                "DELETE",
-                undefined,
-                () => {
-                  RequestUnitTable();
-                }
-              );
-            },
-            cancelText: "Отмена",
-            title: "Подтвердите действие",
-            content: "Вы действительно хотите удалить объект?",
-            okButtonProps: { size: "small", danger: true, type: "primary" },
-            cancelButtonProps: { size: "small" },
-          });
-        }
         break;
     }
   };
