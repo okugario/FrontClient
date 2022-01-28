@@ -82,6 +82,12 @@ export default function UnitMoveComponent() {
     PromiseArray.push(
       ApiFetch(`model/Units/${SelectedKey}`, "GET", undefined, (Response) => {
         Profile.Profile = Response.data;
+        Profile.Profile.UnitHistory = Response.data.UnitHistory.map(
+          (UnitSnapshot) => {
+            UnitSnapshot.Edited = false;
+            return UnitSnapshot;
+          }
+        );
       })
     );
     PromiseArray.push(
@@ -115,6 +121,7 @@ export default function UnitMoveComponent() {
     let PromiseArray = [];
     switch (Action) {
       case "ChangeUnitCaption":
+        NewUnitProfile.Profile.UnitHistory[Key].Edited = true;
         NewUnitProfile.Profile.UnitHistory[Key].Caption = Data;
         SetNewUnitProfile(NewUnitProfile);
         break;
@@ -123,10 +130,12 @@ export default function UnitMoveComponent() {
         SetNewUnitProfile(NewUnitProfile);
         break;
       case "ChangeUnitState":
+        NewUnitProfile.Profile.UnitHistory[Key].Edited = true;
         NewUnitProfile.Profile.UnitHistory[Key].UnitStateId = Data;
         SetNewUnitProfile(NewUnitProfile);
         break;
       case "ChangeUnitVehicle":
+        NewUnitProfile.Profile.UnitHistory[Key].Edited = true;
         NewUnitProfile.Profile.UnitHistory[Key].VehicleId = Data;
         SetNewUnitProfile(NewUnitProfile);
         break;
@@ -144,30 +153,34 @@ export default function UnitMoveComponent() {
         SetNewUnitProfile(NewUnitProfile);
         break;
       case "SaveUnit":
-        let UnitId = null;
+        let NewUnitId = null;
         if (!("Id" in NewUnitProfile.Profile)) {
           await ApiFetch(
             "model/Units",
             "POST",
             NewUnitProfile.Profile,
             (Response) => {
-              UnitId = Response.data.Id;
+              NewUnitId = Response.data.Id;
             }
           );
         }
         NewUnitProfile.Profile.UnitHistory.forEach((UnitSnapshot) => {
-          PromiseArray.push(
-            ApiFetch(
-              `model/UnitHistory${
-                "Id" in NewUnitProfile.Profile ? `/${UnitId}` : ""
-              } `,
-              "UnitId" in UnitSnapshot ? "PATCH" : "POST",
-              Object.assign({ UnitId: UnitId }, UnitSnapshot),
-
-              () => {}
-            )
-          );
+          if (UnitSnapshot.Edited || !("UnitId" in UnitSnapshot)) {
+            PromiseArray.push(
+              ApiFetch(
+                `model/UnitHistory/${
+                  NewUnitId != null ? `${NewUnitId}` : NewUnitProfile.Profile.Id
+                }`,
+                "UnitId" in UnitSnapshot ? "PATCH" : "POST",
+                NewUnitId != null
+                  ? Object.assign(UnitSnapshot, { UnitId: NewUnitId })
+                  : UnitSnapshot,
+                (Response) => {}
+              )
+            );
+          }
         });
+
         Promise.all(PromiseArray).then(() => {
           RequestUnitTable().then(() => {
             SetNewShowUnit(false);
@@ -191,11 +204,7 @@ export default function UnitMoveComponent() {
           SetNewUnitProfile(null);
         }}
         onOk={() => {
-          {
-            UnitProfileHandler("SaveUnit");
-            SetNewShowUnit(false);
-            SetNewUnitProfile(null);
-          }
+          UnitProfileHandler("SaveUnit");
         }}
         okText="Сохранить"
       >
