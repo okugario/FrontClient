@@ -184,6 +184,13 @@ export default function UnitProfile(props) {
                     {Moment(Value).format("DD.MM.YYYY HH:mm:ss")}
                     <CloseOutlined
                       style={{ cursor: "pointer", color: "red" }}
+                      onClick={() => {
+                        props.UnitProfileHandler(
+                          "DeleteUnitSnapshot",
+                          undefined,
+                          Index
+                        );
+                      }}
                     />
                   </div>
                 );

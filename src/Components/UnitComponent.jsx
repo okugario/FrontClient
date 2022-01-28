@@ -187,6 +187,43 @@ export default function UnitMoveComponent() {
           });
         });
         break;
+
+      case "DeleteUnitSnapshot":
+        Modal.confirm({
+          title: "Подтвердите действие",
+          content:
+            NewUnitProfile.Profile.UnitHistory.length > 1
+              ? "Вы действительно хотите удалить запись из истории?"
+              : "Удалене последней записи в истории повлечет удаление всего профиля. Вы уверены?",
+          cancelText: "Отмена",
+          okText: "Удалить",
+          okButtonProps: {
+            size: "small",
+            type: "primary",
+            danger: true,
+          },
+          cancelButtonProps: { size: "small" },
+          onOk: () => {
+            if ("UnitId" in NewUnitProfile.Profile.UnitHistory[Key]) {
+              ApiFetch(
+                `model/UnitHistory/${NewUnitProfile.Profile.UnitHistory[Key].TS}`,
+                "DELETE",
+                undefined,
+                (Response) => {}
+              ).then(() => {
+                ApiFetch("modal/UnitHistory", "GET", undefined, (Response) => {
+                  NewUnitProfile.Profile.UnitHistory = Response.data;
+                  SetNewUnitProfile(NewUnitProfile);
+                });
+              });
+            } else {
+              NewUnitProfile.Profile.UnitHistory.splice(Key, 1);
+              SetNewUnitProfile(NewUnitProfile);
+            }
+          },
+        });
+
+        break;
     }
   };
   useEffect(RequestUnitTable, []);
