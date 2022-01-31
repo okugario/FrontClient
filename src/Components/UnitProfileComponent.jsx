@@ -46,7 +46,7 @@ export default function UnitProfile(props) {
         <div style={{ display: "flex", alignItems: "center" }}>Тип:</div>
         <div style={{ display: "flex", alignItems: "center" }}>
           <Select
-            disabled={props.Profile.Profile.UnitHistory != null}
+            disabled={"Id" in props.Profile.Profile}
             options={props.Profile.AllUnitType}
             value={props.Profile.Profile.UnitTypeId}
             onChange={(Value) => {
@@ -67,6 +67,7 @@ export default function UnitProfile(props) {
         <div style={{ display: "flex", alignItems: "center" }}>Состояние</div>
         <div style={{ display: "flex", alignItems: "center" }}>
           <Select
+            style={{ width: "100px" }}
             options={props.Profile.AllStates}
             value={UniversalGetter("UnitStateId")}
             onChange={(Value) => {
@@ -86,6 +87,7 @@ export default function UnitProfile(props) {
         <div style={{ display: "flex", alignItems: "center" }}>Транспорт</div>
         <div style={{ display: "flex", alignItems: "center" }}>
           <Select
+            style={{ width: "100px" }}
             options={props.Profile.AllVehicles}
             value={UniversalGetter("VehicleId")}
             onChange={(Value) => {
@@ -105,8 +107,11 @@ export default function UnitProfile(props) {
         <div style={{ display: "flex", alignItems: "center" }}>Дата</div>
         <div style={{ display: "flex", alignItems: "center" }}>
           <DatePicker
+            style={{ width: "200px" }}
             value={Moment(props.Profile.Profile.UnitHistory[0].TS)}
-            disabled={"Id" in props.Profile.Profile}
+            disabled={
+              "UnitId" in props.Profile.Profile.UnitHistory[SelectedKey]
+            }
             onChange={(Moment) => {
               props.UnitProfileHandler("ChangeUnitDate", Moment, SelectedKey);
             }}
@@ -179,6 +184,13 @@ export default function UnitProfile(props) {
                     {Moment(Value).format("DD.MM.YYYY HH:mm:ss")}
                     <CloseOutlined
                       style={{ cursor: "pointer", color: "red" }}
+                      onClick={() => {
+                        props.UnitProfileHandler(
+                          "DeleteUnitSnapshot",
+                          undefined,
+                          Index
+                        );
+                      }}
                     />
                   </div>
                 );
