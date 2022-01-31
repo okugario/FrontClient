@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
-import { Modal, Table } from "antd";
+import { message, Modal, Table } from "antd";
 import TableButtonComponent from "./TableButtonComponent";
 import UnitProfileComponent from "./UnitProfileComponent";
 import { ApiFetch } from "../Helpers/Helpers";
@@ -38,19 +38,29 @@ export default function UnitMoveComponent() {
       })
     );
     return Promise.all(PromiseArray).then(() => {
-      NewProfile.Profile = {
-        UnitTypeId: NewProfile.AllUnitType[0].value,
-        UnitHistory: [
-          {
-            Caption: "",
-            TS: Moment().format(),
-            UnitStateId: NewProfile.AllStates[0].value,
-            VehicleId: NewProfile.AllVehicles[0].value,
-          },
-        ],
-      };
-      SetNewUnitProfile(NewProfile);
-      SetNewShowProfile(true);
+      if (
+        NewProfile.AllUnitType.length > 0 &&
+        NewProfile.AllVehicles.length > 0 &&
+        NewProfile.AllStates.length > 0
+      ) {
+        NewProfile.Profile = {
+          UnitTypeId: NewProfile.AllUnitType[0].value,
+          UnitHistory: [
+            {
+              Caption: "",
+              TS: Moment().format(),
+              UnitStateId: NewProfile.AllStates[0].value,
+              VehicleId: NewProfile.AllVehicles[0].value,
+            },
+          ],
+        };
+        SetNewUnitProfile(NewProfile);
+        SetNewShowProfile(true);
+      } else {
+        message.error(
+          "Недостаточно данных для создания агрегатов. Проверьте справочники."
+        );
+      }
     });
   };
 

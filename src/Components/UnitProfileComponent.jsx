@@ -67,7 +67,7 @@ export default function UnitProfile(props) {
         <div style={{ display: "flex", alignItems: "center" }}>Состояние</div>
         <div style={{ display: "flex", alignItems: "center" }}>
           <Select
-            style={{ width: "100px" }}
+            style={{ width: "120px" }}
             options={props.Profile.AllStates}
             value={UniversalGetter("UnitStateId")}
             onChange={(Value) => {
@@ -87,7 +87,7 @@ export default function UnitProfile(props) {
         <div style={{ display: "flex", alignItems: "center" }}>Транспорт</div>
         <div style={{ display: "flex", alignItems: "center" }}>
           <Select
-            style={{ width: "100px" }}
+            style={{ width: "120px" }}
             options={props.Profile.AllVehicles}
             value={UniversalGetter("VehicleId")}
             onChange={(Value) => {
