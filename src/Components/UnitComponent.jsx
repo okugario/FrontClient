@@ -10,7 +10,7 @@ export default function UnitMoveComponent() {
   const [UnitsTable, SetNewUnitsTable] = useState();
   const [UnitProfile, SetNewUnitProfile] = useState(null);
   const [SelectedKey, SetNewSelectedKey] = useState();
-  const [ShowUnit, SetNewShowUnit] = useState(false);
+  const [ShowProfile, SetNewShowProfile] = useState(false);
 
   const AddUnit = () => {
     let PromiseArray = [];
@@ -50,7 +50,7 @@ export default function UnitMoveComponent() {
         ],
       };
       SetNewUnitProfile(NewProfile);
-      SetNewShowUnit(true);
+      SetNewShowProfile(true);
     });
   };
 
@@ -183,7 +183,7 @@ export default function UnitMoveComponent() {
 
         Promise.all(PromiseArray).then(() => {
           RequestUnitTable().then(() => {
-            SetNewShowUnit(false);
+            SetNewShowProfile(false);
           });
         });
         break;
@@ -233,7 +233,7 @@ export default function UnitMoveComponent() {
                 undefined,
                 () => {
                   RequestUnitTable().then(() => {
-                    SetNewShowUnit(false);
+                    SetNewShowProfile(false);
                   });
                 }
               );
@@ -253,9 +253,9 @@ export default function UnitMoveComponent() {
         okButtonProps={{ size: "small", type: "primary" }}
         cancelButtonProps={{ size: "small" }}
         title="Профиль агрегата"
-        visible={ShowUnit}
+        visible={ShowProfile}
         onCancel={() => {
-          SetNewShowUnit(false);
+          SetNewShowProfile(false);
           SetNewUnitProfile(null);
         }}
         onOk={() => {
@@ -297,7 +297,7 @@ export default function UnitMoveComponent() {
             },
             onDoubleClick: () => {
               RequestUnitProfile().then(() => {
-                SetNewShowUnit(true);
+                SetNewShowProfile(true);
               });
             },
           };
