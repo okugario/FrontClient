@@ -1,54 +1,55 @@
-import * as React from 'react';
-import { useState } from 'react';
-import { Input, Select, Button, Table, DatePicker, Modal, message } from 'antd';
+import * as React from "react";
+import { useState } from "react";
+import { Input, Select, Button, Table, DatePicker, Modal, message } from "antd";
 import {
   CaretDownOutlined,
   CaretUpOutlined,
   DashOutlined,
-} from '@ant-design/icons';
-import Moment from 'moment';
+} from "@ant-design/icons";
+import Moment from "moment";
 
 export default function TransportPrfoile(props) {
   const [ShowFirmHistory, SetShowFirmHistory] = useState(false);
   const [ShowLocationHistory, SetShowLocationHistory] = useState(false);
   const [ShowEquipmentHistory, SetShowShowEquipmentHistory] = useState(false);
+  const [ShowCurrentUnits, SetNewShowUnitsHistory] = useState(false);
   const [SelectedFirmKey, SetNewSelectedFirmKey] = useState(null);
   const [SelectedLocationKey, SetNewSelectedLocationKey] = useState(null);
   const [SelectedEquipmentKey, SetNewSelectedEquipmentKey] = useState(null);
 
   return (
     <>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
           Наименование:
         </div>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
           <Input
             onChange={(Event) => {
-              props.ProfileHandler('ChangeCaption', Event.target.value);
+              props.ProfileHandler("ChangeCaption", Event.target.value);
             }}
             size="small"
-            style={{ width: '160px' }}
+            style={{ width: "160px" }}
             value={props.Profile.Profile.Caption}
           />
         </div>
       </div>
       <div
         style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          marginTop: '10px',
+          display: "flex",
+          justifyContent: "space-between",
+          marginTop: "10px",
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center' }}>Тип ТС:</div>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ display: "flex", alignItems: "center" }}>Тип ТС:</div>
+        <div style={{ display: "flex", alignItems: "center" }}>
           <Select
             onChange={(TypeId) => {
-              props.ProfileHandler('ChangeTransportType', TypeId);
+              props.ProfileHandler("ChangeTransportType", TypeId);
             }}
             size="small"
             value={props.Profile.Profile.Model.TypeId}
-            style={{ width: '160px' }}
+            style={{ width: "160px" }}
             options={props.Profile.AllTypes.map((Type) => {
               return { value: Type.Id, label: Type.Caption };
             })}
@@ -57,20 +58,20 @@ export default function TransportPrfoile(props) {
       </div>
       <div
         style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          marginTop: '10px',
+          display: "flex",
+          justifyContent: "space-between",
+          marginTop: "10px",
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center' }}>Модель:</div>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ display: "flex", alignItems: "center" }}>Модель:</div>
+        <div style={{ display: "flex", alignItems: "center" }}>
           <Select
             onChange={(ModelId) => {
-              props.ProfileHandler('ChangeModel', ModelId);
+              props.ProfileHandler("ChangeModel", ModelId);
             }}
             size="small"
             value={props.Profile.Profile.ModelId}
-            style={{ width: '160px' }}
+            style={{ width: "160px" }}
             options={props.Profile.AllModels.map((Model) => {
               return {
                 value: Model.Id,
@@ -85,25 +86,25 @@ export default function TransportPrfoile(props) {
       </div>
       <div
         style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          marginTop: '10px',
+          display: "flex",
+          justifyContent: "space-between",
+          marginTop: "10px",
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
           Организация:
         </div>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
           <Input
             value={
               props.Profile.Profile.Owners.length > 0
                 ? props.Profile.AllFirms.find((Firm) => {
                     return Firm.Id == props.Profile.Profile.Owners[0].FirmId;
                   }).Caption
-                : 'Не указано'
+                : "Не указано"
             }
             size="small"
-            style={{ width: '135px' }}
+            style={{ width: "135px" }}
           />
           <Button
             icon={ShowFirmHistory ? <CaretUpOutlined /> : <CaretDownOutlined />}
@@ -120,9 +121,9 @@ export default function TransportPrfoile(props) {
           <Button
             size="small"
             type="primary"
-            style={{ margin: '5px' }}
+            style={{ margin: "5px" }}
             onClick={() => {
-              props.ProfileHandler('AddFirm');
+              props.ProfileHandler("AddFirm");
             }}
           >
             Добавить
@@ -131,28 +132,28 @@ export default function TransportPrfoile(props) {
             size="small"
             danger
             type="primary"
-            style={{ margin: '5px' }}
+            style={{ margin: "5px" }}
             onClick={() => {
               if (SelectedFirmKey != null) {
                 Modal.confirm({
                   onOk: () => {
                     props.ProfileHandler(
-                      'DeleteFirm',
+                      "DeleteFirm",
                       undefined,
                       SelectedFirmKey
                     );
                     SetNewSelectedFirmKey(null);
                   },
-                  title: 'Подтвердите действие',
-                  content: 'Вы действительно хотите удалить данную запись?',
-                  okText: 'Удалить',
-                  cancelText: 'Отмена',
+                  title: "Подтвердите действие",
+                  content: "Вы действительно хотите удалить данную запись?",
+                  okText: "Удалить",
+                  cancelText: "Отмена",
                   okButtonProps: {
-                    type: 'primary',
+                    type: "primary",
                     danger: true,
-                    size: 'small',
+                    size: "small",
                   },
-                  cancelButtonProps: { size: 'small' },
+                  cancelButtonProps: { size: "small" },
                 });
               }
             }}
@@ -185,9 +186,9 @@ export default function TransportPrfoile(props) {
             columns={[
               {
                 width: 180,
-                title: 'Дата',
-                dataIndex: 'TS',
-                key: 'TS',
+                title: "Дата",
+                dataIndex: "TS",
+                key: "TS",
                 render: (Text, Record, Index) => {
                   return (
                     <DatePicker
@@ -196,17 +197,17 @@ export default function TransportPrfoile(props) {
                         Modal.confirm({
                           onOk: () => {
                             props.ProfileHandler(
-                              'EditFirmDate',
+                              "EditFirmDate",
                               NewDate.format(),
                               Index
                             );
                           },
-                          title: 'Подтвердите изменение',
-                          content: 'Вы действительно хотите изменить дату?',
-                          okText: 'Да',
-                          okButtonProps: { size: 'small' },
-                          cancelButtonProps: { size: 'small' },
-                          cancelText: 'Нет',
+                          title: "Подтвердите изменение",
+                          content: "Вы действительно хотите изменить дату?",
+                          okText: "Да",
+                          okButtonProps: { size: "small" },
+                          cancelButtonProps: { size: "small" },
+                          cancelText: "Нет",
                         });
                       }}
                       size="small"
@@ -217,9 +218,9 @@ export default function TransportPrfoile(props) {
                 },
               },
               {
-                title: 'Наименование',
-                dataIndex: 'FirmId',
-                key: 'FirmId',
+                title: "Наименование",
+                dataIndex: "FirmId",
+                key: "FirmId",
                 render: (Text, Record, Index) => {
                   return (
                     <Select
@@ -227,21 +228,21 @@ export default function TransportPrfoile(props) {
                         Modal.confirm({
                           onOk: () => {
                             props.ProfileHandler(
-                              'EditFirmCaption',
+                              "EditFirmCaption",
                               FirmId,
                               Index
                             );
                           },
-                          title: 'Подтвердите изменение',
+                          title: "Подтвердите изменение",
                           content:
-                            'Вы действительно хотите изменить организацию?',
-                          okText: 'Да',
-                          okButtonProps: { size: 'small' },
-                          cancelButtonProps: { size: 'small' },
-                          cancelText: 'Нет',
+                            "Вы действительно хотите изменить организацию?",
+                          okText: "Да",
+                          okButtonProps: { size: "small" },
+                          cancelButtonProps: { size: "small" },
+                          cancelText: "Нет",
                         });
                       }}
-                      style={{ width: '160px' }}
+                      style={{ width: "160px" }}
                       value={Text}
                       size="small"
                       options={props.Profile.AllFirms.map((Type) => {
@@ -257,18 +258,18 @@ export default function TransportPrfoile(props) {
       ) : null}
       <div
         style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          marginTop: '10px',
+          display: "flex",
+          justifyContent: "space-between",
+          marginTop: "10px",
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
           Местоположение:
         </div>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
           <Input
             size="small"
-            style={{ width: '135px' }}
+            style={{ width: "135px" }}
             value={
               props.Profile.Profile.Locations.length != 0
                 ? props.Profile.AllWorkConditions.find((Condition) => {
@@ -277,7 +278,7 @@ export default function TransportPrfoile(props) {
                       props.Profile.Profile.Locations[0].ConditionsId
                     );
                   }).Caption
-                : 'Не указано'
+                : "Не указано"
             }
           />
           <Button
@@ -297,9 +298,9 @@ export default function TransportPrfoile(props) {
           <Button
             size="small"
             type="primary"
-            style={{ margin: '5px' }}
+            style={{ margin: "5px" }}
             onClick={() => {
-              props.ProfileHandler('AddLocation');
+              props.ProfileHandler("AddLocation");
             }}
           >
             Добавить
@@ -308,28 +309,28 @@ export default function TransportPrfoile(props) {
             size="small"
             danger
             type="primary"
-            style={{ margin: '5px' }}
+            style={{ margin: "5px" }}
             onClick={() => {
               if (SelectedLocationKey != null) {
                 Modal.confirm({
-                  okText: 'Удалить',
+                  okText: "Удалить",
                   onOk: () => {
                     props.ProfileHandler(
-                      'DeleteLocation',
+                      "DeleteLocation",
                       undefined,
                       SelectedLocationKey
                     );
                     SetNewSelectedLocationKey(null);
                   },
                   okButtonProps: {
-                    type: 'primary',
+                    type: "primary",
                     danger: true,
-                    size: 'small',
+                    size: "small",
                   },
-                  cancelText: 'Отмена',
-                  cancelButtonProps: { size: 'small' },
-                  title: 'Подтвердите действие',
-                  content: 'Вы действительно хотите удалить данную запись?',
+                  cancelText: "Отмена",
+                  cancelButtonProps: { size: "small" },
+                  title: "Подтвердите действие",
+                  content: "Вы действительно хотите удалить данную запись?",
                 });
               }
             }}
@@ -374,17 +375,17 @@ export default function TransportPrfoile(props) {
                         Modal.confirm({
                           onOk: () => {
                             props.ProfileHandler(
-                              'EditLocationDate',
+                              "EditLocationDate",
                               Time.format(),
                               Index
                             );
                           },
-                          okButtonProps: { type: 'primary', size: 'small' },
-                          okText: 'Да',
-                          cancelText: 'Нет',
-                          cancelButtonProps: { size: 'small' },
-                          title: 'Подтвердите действие',
-                          content: 'Вы действительно хотите изменить дату?',
+                          okButtonProps: { type: "primary", size: "small" },
+                          okText: "Да",
+                          cancelText: "Нет",
+                          cancelButtonProps: { size: "small" },
+                          title: "Подтвердите действие",
+                          content: "Вы действительно хотите изменить дату?",
                         });
                       }}
                       showTime={true}
@@ -394,31 +395,31 @@ export default function TransportPrfoile(props) {
                     />
                   );
                 },
-                title: 'Дата',
-                key: 'TS',
-                dataIndex: 'TS',
+                title: "Дата",
+                key: "TS",
+                dataIndex: "TS",
               },
               {
                 render: (Value, Record, Index) => {
                   return (
                     <Select
-                      style={{ width: '160px' }}
+                      style={{ width: "160px" }}
                       onChange={(Value) => {
                         Modal.confirm({
                           onOk: () => {
                             props.ProfileHandler(
-                              'EditLocationCaption',
+                              "EditLocationCaption",
                               Value,
                               Index
                             );
                           },
-                          okButtonProps: { type: 'primary', size: 'small' },
-                          okText: 'Да',
-                          cancelText: 'Нет',
-                          cancelButtonProps: { size: 'small' },
-                          title: 'Подтвердите действие',
+                          okButtonProps: { type: "primary", size: "small" },
+                          okText: "Да",
+                          cancelText: "Нет",
+                          cancelButtonProps: { size: "small" },
+                          title: "Подтвердите действие",
                           content:
-                            'Вы действительно хотите изменить условия местоположение?',
+                            "Вы действительно хотите изменить условия местоположение?",
                         });
                       }}
                       value={Value}
@@ -434,9 +435,9 @@ export default function TransportPrfoile(props) {
                     />
                   );
                 },
-                title: 'Наименование',
-                key: 'ConditionsId',
-                dataIndex: 'ConditionsId',
+                title: "Наименование",
+                key: "ConditionsId",
+                dataIndex: "ConditionsId",
               },
             ]}
           />
@@ -444,22 +445,20 @@ export default function TransportPrfoile(props) {
       ) : null}
       <div
         style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          marginTop: '10px',
+          display: "flex",
+          justifyContent: "space-between",
+          marginTop: "10px",
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          Оборудование:
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ display: "flex", alignItems: "center" }}>Терминал:</div>
+        <div style={{ display: "flex", alignItems: "center" }}>
           <Input
             size="small"
-            style={{ width: '135px' }}
+            style={{ width: "135px" }}
             value={
               props.Profile.Profile.Equipments.length > 0
                 ? props.Profile.Profile.Equipments[0].ObjectId
-                : 'Не указано'
+                : "Не указано"
             }
           />
           <Button
@@ -479,16 +478,16 @@ export default function TransportPrfoile(props) {
           <Button
             size="small"
             type="primary"
-            style={{ margin: '5px' }}
+            style={{ margin: "5px" }}
             onClick={() => {
               if (props.Profile.Profile.Caption.length != 0) {
                 props.ProfileHandler(
-                  'AddEquipment',
+                  "AddEquipment",
                   undefined,
                   props.Profile.Profile.Equipments.length
                 );
               } else {
-                message.warning('Укажите наименование транспорта');
+                message.warning("Укажите наименование транспорта");
               }
             }}
           >
@@ -498,19 +497,19 @@ export default function TransportPrfoile(props) {
             size="small"
             danger
             type="primary"
-            style={{ margin: '5px' }}
+            style={{ margin: "5px" }}
             onClick={() => {
               if (SelectedEquipmentKey != null) {
                 Modal.confirm({
-                  okText: 'Удалить',
-                  cancelText: 'Отмена',
-                  okButtonProps: { size: 'small', danger: true },
-                  cancelButtonProps: { size: 'small' },
-                  title: 'Подтвердите действие',
-                  content: 'Вы действительно хотите удалить данную запись?',
+                  okText: "Удалить",
+                  cancelText: "Отмена",
+                  okButtonProps: { size: "small", danger: true },
+                  cancelButtonProps: { size: "small" },
+                  title: "Подтвердите действие",
+                  content: "Вы действительно хотите удалить данную запись?",
                   onOk: () => {
                     props.ProfileHandler(
-                      'DeleteEquipment',
+                      "DeleteEquipment",
                       undefined,
                       SelectedEquipmentKey
                     );
@@ -553,38 +552,38 @@ export default function TransportPrfoile(props) {
             )}
             columns={[
               {
-                title: 'Дата',
-                key: 'TS',
-                dataIndex: 'TS',
+                title: "Дата",
+                key: "TS",
+                dataIndex: "TS",
                 render: (Text, Record, Index) => {
                   return (
-                    <div style={{ cursor: 'pointer' }}>
-                      {Moment(Text).format('DD.MM.YYYY hh:mm:ss')}
+                    <div style={{ cursor: "pointer" }}>
+                      {Moment(Text).format("DD.MM.YYYY hh:mm:ss")}
                     </div>
                   );
                 },
               },
               {
-                title: 'ID терминала',
-                key: 'ObjectId',
-                dataIndex: 'ObjectId',
+                title: "ID терминала",
+                key: "ObjectId",
+                dataIndex: "ObjectId",
                 render: (Text, Record, Index) => {
                   return (
                     <div
                       style={{
-                        cursor: 'pointer',
-                        display: 'flex',
-                        justifyContent: 'space-between',
+                        cursor: "pointer",
+                        display: "flex",
+                        justifyContent: "space-between",
                       }}
                     >
                       {Text}
                       <Button
                         onClick={() => {
                           props.ProfileHandler(
-                            'ChangeProfileMode',
+                            "ChangeProfileMode",
                             {
-                              Mode: 'TerminalProfile',
-                              Title: 'Профиль терминала',
+                              Mode: "TerminalProfile",
+                              Title: "Профиль терминала",
                             },
                             Index
                           );
@@ -600,6 +599,38 @@ export default function TransportPrfoile(props) {
             ]}
           />
         </>
+      ) : null}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginTop: "10px",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center" }}>
+          Текущие агрегаты:
+        </div>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <Button
+            onClick={() => {
+              SetNewShowUnitsHistory(!ShowCurrentUnits);
+            }}
+            size="small"
+            type="primary"
+            icon={
+              ShowCurrentUnits ? <CaretUpOutlined /> : <CaretDownOutlined />
+            }
+          />
+        </div>
+      </div>
+      {ShowCurrentUnits ? (
+        <Table
+          style={{ marginTop: "10px" }}
+          columns={[
+            { title: "Наименование", dataIndex: "Caption", key: "Caption" },
+            { title: "Дата", dataIndex: "Date", key: "Date" },
+          ]}
+        />
       ) : null}
     </>
   );
