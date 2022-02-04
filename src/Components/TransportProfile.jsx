@@ -16,7 +16,6 @@ export default function TransportPrfoile(props) {
   const [SelectedFirmKey, SetNewSelectedFirmKey] = useState(null);
   const [SelectedLocationKey, SetNewSelectedLocationKey] = useState(null);
   const [SelectedEquipmentKey, SetNewSelectedEquipmentKey] = useState(null);
-
   return (
     <>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -624,13 +623,54 @@ export default function TransportPrfoile(props) {
         </div>
       </div>
       {ShowCurrentUnits ? (
-        <Table
-          style={{ marginTop: "10px" }}
-          columns={[
-            { title: "Наименование", dataIndex: "Caption", key: "Caption" },
-            { title: "Дата", dataIndex: "Date", key: "Date" },
-          ]}
-        />
+        <>
+          <Table
+            scroll={{ y: 700 }}
+            style={{ marginTop: "10px" }}
+            rowKey="Key"
+            rowSelection={{
+              hideSelectAll: true,
+              columnWidth: 0,
+              renderCell: () => {
+                return null;
+              },
+            }}
+            size="small"
+            pagination={false}
+            dataSource={props.Profile.Profile.CurrentUnits.map(
+              (Unit, Index) => {
+                return {
+                  Key: Index,
+                  Caption: Unit.Caption,
+                  Date: Unit.TS,
+                  TypeUnit: Unit.UnitType.UnitType.Caption,
+                };
+              }
+            )}
+            columns={[
+              { title: "Наименование", dataIndex: "Caption", key: "Caption" },
+              { title: "Тип", dataIndex: "TypeUnit", key: "TypeUnit" },
+              {
+                title: "Время установки",
+                dataIndex: "Date",
+                key: "Date",
+                render: (Text, Record, Index) => {
+                  return (
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      {Moment(Text).format("DD.MM.YYYY HH:mm:ss")}
+                    </div>
+                  );
+                },
+              },
+            ]}
+          />
+        </>
       ) : null}
     </>
   );

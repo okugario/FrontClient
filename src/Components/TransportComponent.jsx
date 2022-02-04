@@ -1,21 +1,21 @@
-import * as React from 'react';
-import { useState, useEffect } from 'react';
-import TransportProfile from './TransportProfile';
-import { Table, Modal, Button, message, Input } from 'antd';
-import { ApiFetch } from '../Helpers/Helpers';
-import Moment from 'moment';
-import ProfilePageHandler from './ProfilePageHandler';
-import TerminalProfileComponent from './TerminalProfileComponent';
-import { inject, observer } from 'mobx-react';
-import { SearchOutlined } from '@ant-design/icons';
+import * as React from "react";
+import { useState, useEffect } from "react";
+import TransportProfile from "./TransportProfile";
+import { Table, Modal, Button, message, Input } from "antd";
+import { ApiFetch } from "../Helpers/Helpers";
+import Moment from "moment";
+import ProfilePageHandler from "./ProfilePageHandler";
+import TerminalProfileComponent from "./TerminalProfileComponent";
+import { inject, observer } from "mobx-react";
+import { SearchOutlined } from "@ant-design/icons";
 
-const TransportComponent = inject('ProviderStore')(
+const TransportComponent = inject("ProviderStore")(
   observer((props) => {
     const [SearchString, SetNewSearchString] = useState(null);
     const [TransportTable, SetNewTransportTable] = useState(null);
     const [ProfileMode, SetNewProfileMode] = useState({
-      Mode: 'TransportProfile',
-      Title: 'Профиль транспорта',
+      Mode: "TransportProfile",
+      Title: "Профиль транспорта",
     });
     const [ShowProfile, SetNewShowProfile] = useState(false);
     const [SelectedKey, SetNewSelectedKey] = useState(null);
@@ -26,23 +26,23 @@ const TransportComponent = inject('ProviderStore')(
       let NewProfile = { ...Profile };
 
       switch (Action) {
-        case 'DeleteTransport':
+        case "DeleteTransport":
           ApiFetch(
             `model/Vehicles/${SelectedKey}`,
-            'DELETE',
+            "DELETE",
             undefined,
             (Response) => {
               RequestTransportTable();
             }
           );
           break;
-        case 'AddTransport':
+        case "AddTransport":
           NewProfile = {
             AllTypes: [],
             AllModels: [],
             Profile: {
-              Caption: '',
-              ModelId: '',
+              Caption: "",
+              ModelId: "",
               Model: {},
               Owners: [],
               Equipments: [],
@@ -51,28 +51,28 @@ const TransportComponent = inject('ProviderStore')(
           };
           let PromiseArray = [];
           PromiseArray.push(
-            ApiFetch('model/VehicleModels', 'GET', undefined, (Response) => {
+            ApiFetch("model/VehicleModels", "GET", undefined, (Response) => {
               NewProfile.AllModels = Response.data;
               NewProfile.Profile.ModelId = Response.data.find((Model) => {
-                return Model.Caption == '-';
+                return Model.Caption == "-";
               }).Id;
             })
           );
           PromiseArray.push(
-            ApiFetch('model/VehicleTypes', 'GET', undefined, (Response) => {
+            ApiFetch("model/VehicleTypes", "GET", undefined, (Response) => {
               NewProfile.AllTypes = Response.data;
               NewProfile.Profile.Model.TypeId = Response.data.find((Type) => {
-                return Type.Caption == '-';
+                return Type.Caption == "-";
               }).Id;
             })
           );
           PromiseArray.push(
-            ApiFetch('model/Firms', 'GET', undefined, (Response) => {
+            ApiFetch("model/Firms", "GET", undefined, (Response) => {
               NewProfile.AllFirms = Response.data;
             })
           );
           PromiseArray.push(
-            ApiFetch('model/WorkConditions', 'GET', undefined, (Response) => {
+            ApiFetch("model/WorkConditions", "GET", undefined, (Response) => {
               NewProfile.AllWorkConditions = Response.data;
             })
           );
@@ -82,13 +82,13 @@ const TransportComponent = inject('ProviderStore')(
           });
 
           break;
-        case 'ChangeProfileMode':
-          if (Data.Mode == 'TransportProfile') {
+        case "ChangeProfileMode":
+          if (Data.Mode == "TransportProfile") {
             const NewProfile = { ...Profile };
             if (SelectedKey != null) {
               ApiFetch(
                 `model/Vehicles/${SelectedKey}`,
-                'GET',
+                "GET",
                 undefined,
                 (Response) => {
                   NewProfile.Profile.Equipments = Response.data.Equipments;
@@ -106,7 +106,7 @@ const TransportComponent = inject('ProviderStore')(
           }
 
           break;
-        case 'AddFirm':
+        case "AddFirm":
           NewProfile.Profile.Owners.push({
             TS: Moment().format(),
             VehicleId: Profile.Profile.Id,
@@ -114,46 +114,46 @@ const TransportComponent = inject('ProviderStore')(
           });
           SetNewProfile(NewProfile);
           break;
-        case 'DeleteFirm':
+        case "DeleteFirm":
           NewProfile.Profile.Owners.splice(Index, 1);
           SetNewProfile(NewProfile);
           break;
-        case 'ChangeCaption':
+        case "ChangeCaption":
           NewProfile.Profile.Caption = Data;
           SetNewProfile(NewProfile);
           break;
-        case 'ChangeTransportType':
+        case "ChangeTransportType":
           NewProfile.Profile.Model.TypeId = Data;
           NewProfile.Profile.ModelId = NewProfile.AllModels.find((Model) => {
             return Model.TypeId == Data;
           }).Id;
           SetNewProfile(NewProfile);
           break;
-        case 'ChangeModel':
+        case "ChangeModel":
           NewProfile.Profile.ModelId = Data;
           SetNewProfile(NewProfile);
           break;
-        case 'EditFirmDate':
+        case "EditFirmDate":
           NewProfile.Profile.Owners[Index].TS = Data;
           SetNewProfile(NewProfile);
           break;
-        case 'EditFirmCaption':
+        case "EditFirmCaption":
           NewProfile.Profile.Owners[Index].FirmId = Data;
           SetNewProfile(NewProfile);
           break;
-        case 'EditLocationCaption':
+        case "EditLocationCaption":
           NewProfile.Profile.Locations[Index].ConditionsId = Data;
           SetNewProfile(NewProfile);
           break;
-        case 'EditLocationDate':
+        case "EditLocationDate":
           NewProfile.Profile.Locations[Index].TS = Data;
           SetNewProfile(NewProfile);
           break;
-        case 'DeleteLocation':
+        case "DeleteLocation":
           NewProfile.Profile.Locations.splice(Index, 1);
           SetNewProfile(NewProfile);
           break;
-        case 'AddLocation':
+        case "AddLocation":
           NewProfile.Profile.Locations.push({
             TS: Moment().format(),
             VehicleId: NewProfile.Profile.Id,
@@ -162,37 +162,37 @@ const TransportComponent = inject('ProviderStore')(
           SetNewProfile(NewProfile);
           break;
 
-        case 'ChangeCanData':
+        case "ChangeCanData":
           NewProfile.Profile.Equipments[
             TerminalIndex
           ].UnitProfile.Options.truck.canweight = Data;
           SetNewProfile(NewProfile);
           break;
-        case 'ChangeMaxWeight':
+        case "ChangeMaxWeight":
           NewProfile.Profile.Equipments[
             TerminalIndex
           ].UnitProfile.Options.truck.maxweight = Data;
           SetNewProfile(NewProfile);
           break;
-        case 'ChangeTyreSystem':
+        case "ChangeTyreSystem":
           NewProfile.Profile.Equipments[
             TerminalIndex
           ].UnitProfile.Options.truck.tyresystem = Data;
           SetNewProfile(NewProfile);
           break;
-        case 'ChangeTerminalID':
+        case "ChangeTerminalID":
           NewProfile.Profile.Equipments[TerminalIndex].ObjectId = Data;
           SetNewProfile(NewProfile);
           break;
-        case 'ChangeEquipmentDate':
+        case "ChangeEquipmentDate":
           NewProfile.Profile.Equipments[TerminalIndex].TS = Data;
           SetNewProfile(NewProfile);
           break;
-        case 'DeleteEquipment':
+        case "DeleteEquipment":
           Profile.Profile.Equipments.splice(Index, 1);
           SetNewProfile(NewProfile);
           break;
-        case 'AddEquipment':
+        case "AddEquipment":
           NewProfile.Profile.Equipments.push({
             TS: Moment().format(),
             VehicleId: NewProfile.Profile.Id,
@@ -203,23 +203,23 @@ const TransportComponent = inject('ProviderStore')(
                   canweight: false,
                   inputs: [],
                   maxweight: 50,
-                  tyresystem: 'skt',
+                  tyresystem: "skt",
                 },
               },
             },
           });
           SetNewProfile(NewProfile);
           TransportProfileHandler(
-            'ChangeProfileMode',
+            "ChangeProfileMode",
             {
-              Mode: 'TerminalProfile',
-              Title: 'Профиль терминала',
+              Mode: "TerminalProfile",
+              Title: "Профиль терминала",
             },
             NewProfile.Profile.Equipments.length - 1
           );
 
           break;
-        case 'AddSensor':
+        case "AddSensor":
           NewProfile.Profile.Equipments[
             TerminalIndex
           ].UnitProfile.Options.truck.inputs.push({
@@ -229,32 +229,32 @@ const TransportComponent = inject('ProviderStore')(
           SetNewProfile(NewProfile);
           break;
 
-        case 'ChangeSensorEnterNumber':
+        case "ChangeSensorEnterNumber":
           NewProfile.Profile.Equipments[
             TerminalIndex
           ].UnitProfile.Options.truck.inputs[Index].id = Data;
           SetNewProfile(NewProfile);
           break;
-        case 'ChangeSensorMultiplier':
+        case "ChangeSensorMultiplier":
           NewProfile.Profile.Equipments[
             TerminalIndex
           ].UnitProfile.Options.truck.inputs[Index].k = Data;
           SetNewProfile(NewProfile);
           break;
-        case 'DeleteSensor':
+        case "DeleteSensor":
           NewProfile.Profile.Equipments[
             TerminalIndex
           ].UnitProfile.Options.truck.inputs.splice(Index, 1);
           SetNewProfile(NewProfile);
           break;
-        case 'SaveProfile':
-          if (ProfileMode.Mode == 'TransportProfile') {
-            if (Profile.Profile.Caption != '') {
+        case "SaveProfile":
+          if (ProfileMode.Mode == "TransportProfile") {
+            if (Profile.Profile.Caption != "") {
               ApiFetch(
                 `model/Vehicles${
-                  'Id' in NewProfile.Profile ? `/${NewProfile.Profile.Id}` : ''
+                  "Id" in NewProfile.Profile ? `/${NewProfile.Profile.Id}` : ""
                 }`,
-                'Id' in NewProfile.Profile ? 'PATCH' : 'POST',
+                "Id" in NewProfile.Profile ? "PATCH" : "POST",
                 NewProfile.Profile,
                 (Response) => {
                   RequestTransportTable().then(() => {
@@ -262,30 +262,30 @@ const TransportComponent = inject('ProviderStore')(
                   });
                 }
               ).catch(() => {
-                message.warning('Укажите другое наименование транспорта');
+                message.warning("Укажите другое наименование транспорта");
               });
             } else {
-              message.warning('Укажите корректное наименование');
+              message.warning("Укажите корректное наименование");
             }
           } else {
             ApiFetch(
               `model/VehicleEquipments${
-                'UnitProfileID' in NewProfile.Profile.Equipments[TerminalIndex]
+                "UnitProfileID" in NewProfile.Profile.Equipments[TerminalIndex]
                   ? `/${NewProfile.Profile.Equipments[TerminalIndex].VehicleId}`
-                  : ''
+                  : ""
               }${
-                'UnitProfileID' in NewProfile.Profile.Equipments[TerminalIndex]
+                "UnitProfileID" in NewProfile.Profile.Equipments[TerminalIndex]
                   ? `/${NewProfile.Profile.Equipments[TerminalIndex].TS}`
-                  : ''
+                  : ""
               }`,
-              'UnitProfileID' in NewProfile.Profile.Equipments[TerminalIndex]
-                ? 'PATCH'
-                : 'POST',
+              "UnitProfileID" in NewProfile.Profile.Equipments[TerminalIndex]
+                ? "PATCH"
+                : "POST",
               NewProfile.Profile.Equipments[TerminalIndex],
               (Response) => {
-                TransportProfileHandler('ChangeProfileMode', {
-                  Mode: 'TransportProfile',
-                  Title: 'Профиль транспорта',
+                TransportProfileHandler("ChangeProfileMode", {
+                  Mode: "TransportProfile",
+                  Title: "Профиль транспорта",
                 });
               }
             );
@@ -296,14 +296,14 @@ const TransportComponent = inject('ProviderStore')(
     };
     const GetProfile = (ModalMode) => {
       switch (ModalMode) {
-        case 'TransportProfile':
+        case "TransportProfile":
           return (
             <TransportProfile
               Profile={Profile}
               ProfileHandler={TransportProfileHandler}
             />
           );
-        case 'TerminalProfile':
+        case "TerminalProfile":
           return (
             <TerminalProfileComponent
               TransportCaption={Profile.Profile.Caption}
@@ -314,15 +314,15 @@ const TransportComponent = inject('ProviderStore')(
       }
     };
     const ClearSearch = (Event) => {
-      if (Event.key === 'Escape') {
+      if (Event.key === "Escape") {
         SetNewSearchString(null);
       }
     };
     const RequestTransportTable = () => {
       if (
-        props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id == 'Vehicles'
+        props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id == "Vehicles"
       ) {
-        return ApiFetch('model/Vehicles', 'GET', undefined, (Response) => {
+        return ApiFetch("model/Vehicles", "GET", undefined, (Response) => {
           SetNewTransportTable(Response.data);
         });
       }
@@ -331,45 +331,56 @@ const TransportComponent = inject('ProviderStore')(
       let NewProfile = {};
       let PromiseArray = [];
       PromiseArray.push(
-        ApiFetch('model/VehicleModels', 'GET', undefined, (Response) => {
+        ApiFetch("model/VehicleModels", "GET", undefined, (Response) => {
           NewProfile.AllModels = Response.data;
         })
       );
       PromiseArray.push(
-        ApiFetch('model/VehicleTypes', 'GET', undefined, (Response) => {
+        ApiFetch("model/VehicleTypes", "GET", undefined, (Response) => {
           NewProfile.AllTypes = Response.data;
         })
       );
       PromiseArray.push(
-        ApiFetch('model/Firms', 'GET', undefined, (Response) => {
+        ApiFetch("model/Firms", "GET", undefined, (Response) => {
           NewProfile.AllFirms = Response.data;
         })
       );
       PromiseArray.push(
-        ApiFetch('model/WorkConditions', 'GET', undefined, (Response) => {
+        ApiFetch("model/WorkConditions", "GET", undefined, (Response) => {
           NewProfile.AllWorkConditions = Response.data;
         })
       );
       PromiseArray.push(
         ApiFetch(
           `model/Vehicles/${SelectedKey}`,
-          'GET',
+          "GET",
           undefined,
           (Response) => {
             NewProfile.Profile = Response.data;
+            Response.data.CurrentUnits.forEach((UnitSnapshot) => {
+              PromiseArray.push(
+                ApiFetch(
+                  `model/Units/${UnitSnapshot.UnitId}`,
+                  "GET",
+                  undefined,
+                  (Response) => {
+                    UnitSnapshot.UnitType = Response.data;
+                  }
+                )
+              );
+            });
           }
         )
       );
-
       return Promise.all(PromiseArray).then(() => {
         SetNewProfile(NewProfile);
       });
     };
     useEffect(() => {
       RequestTransportTable();
-      document.addEventListener('keydown', ClearSearch, false);
+      document.addEventListener("keydown", ClearSearch, false);
       return () => {
-        document.removeEventListener('keydown', ClearSearch, false);
+        document.removeEventListener("keydown", ClearSearch, false);
       };
     }, [props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id]);
     return (
@@ -377,30 +388,30 @@ const TransportComponent = inject('ProviderStore')(
         <Modal
           maskClosable={false}
           onOk={() => {
-            TransportProfileHandler('SaveProfile');
+            TransportProfileHandler("SaveProfile");
           }}
           destroyOnClose={true}
           title={
             <ProfilePageHandler
               OnBack={() => {
-                TransportProfileHandler('ChangeProfileMode', {
-                  Mode: 'TransportProfile',
-                  Title: 'Профиль транспорта',
+                TransportProfileHandler("ChangeProfileMode", {
+                  Mode: "TransportProfile",
+                  Title: "Профиль транспорта",
                 });
               }}
               Title={ProfileMode.Title}
-              ShowBackIcon={ProfileMode.Mode == 'TerminalProfile'}
+              ShowBackIcon={ProfileMode.Mode == "TerminalProfile"}
             />
           }
           width="450px"
           okText="Сохранить"
-          okButtonProps={{ size: 'small' }}
-          cancelButtonProps={{ size: 'small' }}
+          okButtonProps={{ size: "small" }}
+          cancelButtonProps={{ size: "small" }}
           visible={ShowProfile}
           onCancel={() => {
-            TransportProfileHandler('ChangeProfileMode', {
-              Mode: 'TransportProfile',
-              Title: 'Профиль транспорта',
+            TransportProfileHandler("ChangeProfileMode", {
+              Mode: "TransportProfile",
+              Title: "Профиль транспорта",
             });
             SetNewShowProfile(false);
           }}
@@ -409,17 +420,17 @@ const TransportComponent = inject('ProviderStore')(
         </Modal>
         <div
           style={{
-            width: '200px',
-            display: 'flex',
-            justifyContent: 'space-evenly',
-            marginBottom: '5px',
+            width: "200px",
+            display: "flex",
+            justifyContent: "space-evenly",
+            marginBottom: "5px",
           }}
         >
           <Button
             size="small"
             type="primary"
             onClick={() => {
-              TransportProfileHandler('AddTransport');
+              TransportProfileHandler("AddTransport");
             }}
           >
             Добавить
@@ -432,19 +443,19 @@ const TransportComponent = inject('ProviderStore')(
               if (SelectedKey != null) {
                 Modal.confirm({
                   okButtonProps: {
-                    size: 'small',
+                    size: "small",
                     danger: true,
-                    type: 'primary',
+                    type: "primary",
                   },
-                  okText: 'Удалить',
-                  cancelText: 'Отмена',
-                  cancelButtonProps: { size: 'small' },
+                  okText: "Удалить",
+                  cancelText: "Отмена",
+                  cancelButtonProps: { size: "small" },
                   onOk: () => {
-                    TransportProfileHandler('DeleteTransport');
+                    TransportProfileHandler("DeleteTransport");
                   },
-                  title: 'Подтвердите действие',
+                  title: "Подтвердите действие",
                   content:
-                    'Вы действительно хотите удалить транспортное средство?',
+                    "Вы действительно хотите удалить транспортное средство?",
                 });
               }
             }}
@@ -489,7 +500,7 @@ const TransportComponent = inject('ProviderStore')(
                   return true;
                 }
               },
-              filteredValue: ['Caption'],
+              filteredValue: ["Caption"],
               filterIcon: <SearchOutlined />,
               filterDropdown: (
                 <Input
@@ -501,11 +512,11 @@ const TransportComponent = inject('ProviderStore')(
                   }}
                 />
               ),
-              title: 'Наименование',
-              key: 'Caption',
-              dataIndex: 'Caption',
+              title: "Наименование",
+              key: "Caption",
+              dataIndex: "Caption",
               render: (Record) => {
-                return <div style={{ cursor: 'pointer' }}>{Record}</div>;
+                return <div style={{ cursor: "pointer" }}>{Record}</div>;
               },
             },
           ]}
