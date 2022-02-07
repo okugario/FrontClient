@@ -1,10 +1,10 @@
-import * as React from "react";
-import { useState, useEffect } from "react";
-import { message, Modal, Table } from "antd";
-import TableButtonComponent from "./TableButtonComponent";
-import UnitProfileComponent from "./UnitProfileComponent";
-import { ApiFetch } from "../Helpers/Helpers";
-import Moment from "moment";
+import * as React from 'react';
+import { useState, useEffect } from 'react';
+import { message, Modal, Table } from 'antd';
+import TableButtonComponent from './TableButtonComponent';
+import UnitProfileComponent from './UnitProfileComponent';
+import { ApiFetch } from '../Helpers/Helpers';
+import Moment from 'moment';
 
 export default function UnitMoveComponent() {
   const [UnitsTable, SetNewUnitsTable] = useState();
@@ -17,21 +17,21 @@ export default function UnitMoveComponent() {
     let NewProfile = {};
 
     PromiseArray.push(
-      ApiFetch("model/Vehicles", "GET", undefined, (Response) => {
+      ApiFetch('model/Vehicles', 'GET', undefined, (Response) => {
         NewProfile.AllVehicles = Response.data.map((Vehicle) => {
           return { value: Vehicle.Id, label: Vehicle.Caption };
         });
       })
     );
     PromiseArray.push(
-      ApiFetch("model/UnitTypes", "GET", undefined, (Response) => {
+      ApiFetch('model/UnitTypes', 'GET', undefined, (Response) => {
         NewProfile.AllUnitType = Response.data.map((Type) => {
           return { value: Type.Id, label: Type.Caption };
         });
       })
     );
     PromiseArray.push(
-      ApiFetch("model/UnitStates", "GET", undefined, (Response) => {
+      ApiFetch('model/UnitStates', 'GET', undefined, (Response) => {
         NewProfile.AllStates = Response.data.map((State) => {
           return { value: State.Id, label: State.Caption };
         });
@@ -47,7 +47,7 @@ export default function UnitMoveComponent() {
           UnitTypeId: NewProfile.AllUnitType[0].value,
           UnitHistory: [
             {
-              Caption: "",
+              Caption: '',
               TS: Moment().format(),
               UnitStateId: NewProfile.AllStates[0].value,
               VehicleId: NewProfile.AllVehicles[0].value,
@@ -58,7 +58,7 @@ export default function UnitMoveComponent() {
         SetNewShowProfile(true);
       } else {
         message.error(
-          "Недостаточно данных для создания агрегатов. Проверьте справочники."
+          'Недостаточно данных для создания агрегатов. Проверьте справочники.'
         );
       }
     });
@@ -67,22 +67,22 @@ export default function UnitMoveComponent() {
   const DeleteUnit = () => {
     if (SelectedKey != null) {
       Modal.confirm({
-        okText: "Удалить",
+        okText: 'Удалить',
         onOk: () => {
-          ApiFetch(`model/Units/${SelectedKey}`, "DELETE", undefined, () => {
+          ApiFetch(`model/Units/${SelectedKey}`, 'DELETE', undefined, () => {
             RequestUnitTable();
           });
         },
-        cancelText: "Отмена",
-        title: "Подтвердите действие",
-        content: "Вы действительно хотите удалить объект?",
-        okButtonProps: { size: "small", danger: true, type: "primary" },
-        cancelButtonProps: { size: "small" },
+        cancelText: 'Отмена',
+        title: 'Подтвердите действие',
+        content: 'Вы действительно хотите удалить объект?',
+        okButtonProps: { size: 'small', danger: true, type: 'primary' },
+        cancelButtonProps: { size: 'small' },
       });
     }
   };
   const RequestUnitTable = () => {
-    return ApiFetch("model/Units", "GET", undefined, (Response) => {
+    return ApiFetch('model/Units', 'GET', undefined, (Response) => {
       SetNewUnitsTable(Response.data);
     });
   };
@@ -90,7 +90,7 @@ export default function UnitMoveComponent() {
     let Profile = {};
     let PromiseArray = [];
     PromiseArray.push(
-      ApiFetch(`model/Units/${SelectedKey}`, "GET", undefined, (Response) => {
+      ApiFetch(`model/Units/${SelectedKey}`, 'GET', undefined, (Response) => {
         Profile.Profile = Response.data;
         Profile.Profile.UnitHistory = Response.data.UnitHistory.map(
           (UnitSnapshot) => {
@@ -101,21 +101,21 @@ export default function UnitMoveComponent() {
       })
     );
     PromiseArray.push(
-      ApiFetch("model/UnitTypes", "GET", undefined, (Response) => {
+      ApiFetch('model/UnitTypes', 'GET', undefined, (Response) => {
         Profile.AllUnitType = Response.data.map((Type) => {
           return { value: Type.Id, label: Type.Caption };
         });
       })
     );
     PromiseArray.push(
-      ApiFetch("model/UnitStates", "GET", undefined, (Response) => {
+      ApiFetch('model/UnitStates', 'GET', undefined, (Response) => {
         Profile.AllStates = Response.data.map((State) => {
           return { value: State.Id, label: State.Caption };
         });
       })
     );
     PromiseArray.push(
-      ApiFetch("model/Vehicles", "GET", undefined, (Response) => {
+      ApiFetch('model/Vehicles', 'GET', undefined, (Response) => {
         Profile.AllVehicles = Response.data.map((Vehicle) => {
           return { value: Vehicle.Id, label: Vehicle.Caption };
         });
@@ -130,126 +130,121 @@ export default function UnitMoveComponent() {
     let NewUnitProfile = { ...UnitProfile };
     let PromiseArray = [];
     switch (Action) {
-      case "ChangeUnitCaption":
+      case 'ChangeUnitCaption':
         NewUnitProfile.Profile.UnitHistory[Key].Edited = true;
         NewUnitProfile.Profile.UnitHistory[Key].Caption = Data;
         SetNewUnitProfile(NewUnitProfile);
         break;
-      case "ChangeUnitType":
+      case 'ChangeUnitType':
         NewUnitProfile.Profile.UnitTypeId = Data;
         SetNewUnitProfile(NewUnitProfile);
         break;
-      case "ChangeUnitState":
+      case 'ChangeUnitState':
         NewUnitProfile.Profile.UnitHistory[Key].Edited = true;
         NewUnitProfile.Profile.UnitHistory[Key].UnitStateId = Data;
         SetNewUnitProfile(NewUnitProfile);
         break;
-      case "ChangeUnitVehicle":
+      case 'ChangeUnitVehicle':
         NewUnitProfile.Profile.UnitHistory[Key].Edited = true;
         NewUnitProfile.Profile.UnitHistory[Key].VehicleId = Data;
         SetNewUnitProfile(NewUnitProfile);
         break;
-      case "ChangeUnitDate":
+      case 'ChangeUnitDate':
         NewUnitProfile.Profile.UnitHistory[Key].TS = Data.format();
         SetNewUnitProfile(NewUnitProfile);
         break;
-      case "AddUnitSnapshot":
+      case 'AddUnitSnapshot':
         NewUnitProfile.Profile.UnitHistory.unshift({
-          Caption: "",
+          Caption: '',
           TS: Moment().format(),
           UnitStateId: NewUnitProfile.AllStates[0].value,
           VehicleId: NewUnitProfile.AllVehicles[0].value,
         });
         SetNewUnitProfile(NewUnitProfile);
         break;
-      case "SaveUnit":
-        let NewUnitId = null;
-        if (!("Id" in NewUnitProfile.Profile)) {
-          await ApiFetch(
-            "model/Units",
-            "POST",
-            NewUnitProfile.Profile,
-            (Response) => {
-              NewUnitId = Response.data.Id;
-            }
-          );
-        }
-        NewUnitProfile.Profile.UnitHistory.forEach((UnitSnapshot) => {
-          if (UnitSnapshot.Edited || !("UnitId" in UnitSnapshot)) {
-            PromiseArray.push(
-              ApiFetch(
-                `model/UnitHistory/${
-                  NewUnitId != null ? `${NewUnitId}` : NewUnitProfile.Profile.Id
-                }`,
-                "UnitId" in UnitSnapshot ? "PATCH" : "POST",
-                NewUnitId != null
-                  ? Object.assign(UnitSnapshot, { UnitId: NewUnitId })
-                  : UnitSnapshot,
-                (Response) => {}
-              )
+      case 'SaveUnit':
+        if (
+          NewUnitProfile.Profile.UnitHistory.every((Snapshot) => {
+            return Snapshot.Caption.length > 0;
+          })
+        ) {
+          let NewUnitId = null;
+          if (!('Id' in NewUnitProfile.Profile)) {
+            await ApiFetch(
+              'model/Units',
+              'POST',
+              NewUnitProfile.Profile,
+              (Response) => {
+                NewUnitId = Response.data.Id;
+              }
             );
           }
-        });
-
-        Promise.all(PromiseArray).then(() => {
-          RequestUnitTable().then(() => {
-            SetNewShowProfile(false);
-          });
-        });
-        break;
-
-      case "DeleteUnitSnapshot":
-        Modal.confirm({
-          title: "Подтвердите действие",
-          content:
-            NewUnitProfile.Profile.UnitHistory.length > 1
-              ? "Вы действительно хотите удалить запись из истории?"
-              : "Удалене последней записи в истории повлечет удаление всего профиля. Вы уверены?",
-          cancelText: "Отмена",
-          okText: "Удалить",
-          okButtonProps: {
-            size: "small",
-            type: "primary",
-            danger: true,
-          },
-          cancelButtonProps: { size: "small" },
-          onOk: () => {
-            if (NewUnitProfile.Profile.UnitHistory.length > 1) {
-              if ("UnitId" in NewUnitProfile.Profile.UnitHistory[Key]) {
+          NewUnitProfile.Profile.UnitHistory.forEach((UnitSnapshot) => {
+            if (UnitSnapshot.Edited || !('UnitId' in UnitSnapshot)) {
+              PromiseArray.push(
                 ApiFetch(
-                  `model/UnitHistory/${NewUnitProfile.Profile.UnitHistory[Key].UnitId}/${NewUnitProfile.Profile.UnitHistory[Key].TS}`,
-                  "DELETE",
-                  undefined,
+                  `model/UnitHistory/${
+                    NewUnitId != null
+                      ? `${NewUnitId}`
+                      : NewUnitProfile.Profile.Id
+                  }`,
+                  'UnitId' in UnitSnapshot ? 'PATCH' : 'POST',
+                  NewUnitId != null
+                    ? Object.assign(UnitSnapshot, { UnitId: NewUnitId })
+                    : UnitSnapshot,
                   (Response) => {}
-                ).then(() => {
-                  ApiFetch(
-                    `model/UnitHistory/${NewUnitProfile.Profile.UnitHistory[Key].UnitId}`,
-                    "GET",
-                    undefined,
-                    (Response) => {
-                      NewUnitProfile.Profile.UnitHistory = Response.data;
-                      SetNewUnitProfile(NewUnitProfile);
-                    }
-                  );
-                });
-              } else {
-                NewUnitProfile.Profile.UnitHistory.splice(Key, 1);
-                SetNewUnitProfile(NewUnitProfile);
-              }
-            } else {
-              ApiFetch(
-                `model/Units/${SelectedKey}`,
-                "DELETE",
-                undefined,
-                () => {
-                  RequestUnitTable().then(() => {
-                    SetNewShowProfile(false);
-                  });
-                }
+                )
               );
             }
-          },
-        });
+          });
+
+          Promise.all(PromiseArray).then(() => {
+            RequestUnitTable().then(() => {
+              SetNewShowProfile(false);
+            });
+          });
+        } else {
+          message.warning('Заполните наименование у всех снимков агрегата');
+        }
+
+        break;
+
+      case 'DeleteUnitSnapshot':
+        if (NewUnitProfile.Profile.UnitHistory.length != 1) {
+          if ('UnitId' in NewUnitProfile.Profile.UnitHistory[Key]) {
+            ApiFetch(
+              `model/UnitHistory/${NewUnitProfile.Profile.UnitHistory[Key].UnitId}/${NewUnitProfile.Profile.UnitHistory[Key].TS}`,
+              'DELETE',
+              undefined,
+              (Response) => {}
+            ).then(() => {
+              ApiFetch(
+                `model/UnitHistory/${NewUnitProfile.Profile.UnitHistory[Key].UnitId}`,
+                'GET',
+                undefined,
+                (Response) => {
+                  NewUnitProfile.Profile.UnitHistory = Response.data;
+                  SetNewUnitProfile(NewUnitProfile);
+                }
+              );
+            });
+          } else {
+            NewUnitProfile.Profile.UnitHistory.splice(Key, 1);
+            SetNewUnitProfile(NewUnitProfile);
+          }
+        } else {
+          if ('UnitId' in NewUnitProfile.Profile.UnitHistory[Key]) {
+            ApiFetch(`model/Units/${SelectedKey}`, 'DELETE', undefined, () => {
+              RequestUnitTable().then(() => {
+                SetNewShowProfile(false);
+              });
+            });
+          } else {
+            message.warning(
+              'Должен остаться хотябы один снимок состояния агрегата'
+            );
+          }
+        }
 
         break;
     }
@@ -260,8 +255,8 @@ export default function UnitMoveComponent() {
       <Modal
         destroyOnClose={true}
         maskClosable={false}
-        okButtonProps={{ size: "small", type: "primary" }}
-        cancelButtonProps={{ size: "small" }}
+        okButtonProps={{ size: 'small', type: 'primary' }}
+        cancelButtonProps={{ size: 'small' }}
         title="Профиль агрегата"
         visible={ShowProfile}
         onCancel={() => {
@@ -269,7 +264,7 @@ export default function UnitMoveComponent() {
           SetNewUnitProfile(null);
         }}
         onOk={() => {
-          UnitProfileHandler("SaveUnit");
+          UnitProfileHandler('SaveUnit');
         }}
         okText="Сохранить"
       >
@@ -303,7 +298,7 @@ export default function UnitMoveComponent() {
         onRow={(Record) => {
           return {
             onClick: () => {
-              SetNewSelectedKey(Record["Id"]);
+              SetNewSelectedKey(Record['Id']);
             },
             onDoubleClick: () => {
               RequestUnitProfile().then(() => {
@@ -314,20 +309,20 @@ export default function UnitMoveComponent() {
         }}
         columns={[
           {
-            title: "Наименование",
-            dataIndex: "Caption",
-            key: "Caption",
+            title: 'Наименование',
+            dataIndex: 'Caption',
+            key: 'Caption',
             render: (Value, Record, Index) => {
-              return <div style={{ cursor: "pointer" }}>{Value}</div>;
+              return <div style={{ cursor: 'pointer' }}>{Value}</div>;
             },
           },
           {
-            title: "Тип агрегата",
-            dataIndex: "UnitType",
-            key: "UnitType",
+            title: 'Тип агрегата',
+            dataIndex: 'UnitType',
+            key: 'UnitType',
             render: (Value, Record, Index) => {
               return (
-                <div style={{ cursor: "pointer" }}>
+                <div style={{ cursor: 'pointer' }}>
                   {Record.UnitType.Caption}
                 </div>
               );
