@@ -71,6 +71,7 @@ export default function UnitMoveComponent() {
         onOk: () => {
           ApiFetch(`model/Units/${SelectedKey}`, 'DELETE', undefined, () => {
             RequestUnitTable();
+            SetNewSelectedKey(null);
           });
         },
         cancelText: 'Отмена',
@@ -125,7 +126,18 @@ export default function UnitMoveComponent() {
       SetNewUnitProfile(Profile);
     });
   };
-
+  const OnClose = () => {
+    if (
+      UnitProfile.Profile.UnitHistory.some((UnitSnapshot) => {
+        return 'UnitId' in UnitProfile;
+      })
+    ) {
+      SetNewShowProfile(false);
+      SetNewUnitProfile(null);
+    } else {
+      message.warn('Сохраните хотябы один снимок агрегата');
+    }
+  };
   const UnitProfileHandler = async (Action, Data, Key) => {
     let NewUnitProfile = { ...UnitProfile };
     let PromiseArray = [];
@@ -260,8 +272,7 @@ export default function UnitMoveComponent() {
         title="Профиль агрегата"
         visible={ShowProfile}
         onCancel={() => {
-          SetNewShowProfile(false);
-          SetNewUnitProfile(null);
+          OnClose();
         }}
         onOk={() => {
           UnitProfileHandler('SaveUnit');
