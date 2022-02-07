@@ -223,7 +223,7 @@ export default function UnitMoveComponent() {
                 'GET',
                 undefined,
                 (Response) => {
-                  NewUnitProfile.Profile.UnitHistory = Response.data;
+                  NewUnitProfile.Profile.UnitHistory.splice(Key, 1);
                   SetNewUnitProfile(NewUnitProfile);
                 }
               );
