@@ -1,8 +1,8 @@
-import * as React from "react";
-import { useState, useEffect } from "react";
-import { Select, DatePicker, Table, Input, Button } from "antd";
-import Moment from "moment";
-import { CloseOutlined } from "@ant-design/icons";
+import * as React from 'react';
+import { useState } from 'react';
+import { Select, DatePicker, Table, Input, Button, Modal } from 'antd';
+import Moment from 'moment';
+import { CloseOutlined } from '@ant-design/icons';
 
 export default function UnitProfile(props) {
   const [SelectedKey, SetNewSelectedKey] = useState(0);
@@ -13,65 +13,65 @@ export default function UnitProfile(props) {
     <>
       <div
         style={{
-          display: "flex",
-          justifyContent: "space-between",
-          paddingBottom: "10px",
+          display: 'flex',
+          justifyContent: 'space-between',
+          paddingBottom: '10px',
         }}
       >
-        <div style={{ display: "flex", alignItems: "center" }}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
           Наименование:
         </div>
-        <div style={{ display: "flex", alignItems: "center" }}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
           <Input
-            value={UniversalGetter("Caption")}
+            value={UniversalGetter('Caption')}
             onChange={(Event) => {
               props.UnitProfileHandler(
-                "ChangeUnitCaption",
+                'ChangeUnitCaption',
                 Event.target.value,
                 SelectedKey
               );
             }}
-            style={{ width: "200px" }}
+            style={{ width: '200px' }}
             size="small"
           />
         </div>
       </div>
       <div
         style={{
-          display: "flex",
-          justifyContent: "space-between",
-          paddingBottom: "10px",
+          display: 'flex',
+          justifyContent: 'space-between',
+          paddingBottom: '10px',
         }}
       >
-        <div style={{ display: "flex", alignItems: "center" }}>Тип:</div>
-        <div style={{ display: "flex", alignItems: "center" }}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>Тип:</div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
           <Select
-            disabled={"Id" in props.Profile.Profile}
+            disabled={'Id' in props.Profile.Profile}
             options={props.Profile.AllUnitType}
             value={props.Profile.Profile.UnitTypeId}
             onChange={(Value) => {
-              props.UnitProfileHandler("ChangeUnitType", Value);
+              props.UnitProfileHandler('ChangeUnitType', Value);
             }}
             size="small"
-            style={{ width: "200px" }}
+            style={{ width: '200px' }}
           />
         </div>
       </div>
       <div
         style={{
-          display: "flex",
-          justifyContent: "space-between",
-          paddingBottom: "10px",
+          display: 'flex',
+          justifyContent: 'space-between',
+          paddingBottom: '10px',
         }}
       >
-        <div style={{ display: "flex", alignItems: "center" }}>Состояние</div>
-        <div style={{ display: "flex", alignItems: "center" }}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>Состояние</div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
           <Select
-            style={{ width: "120px" }}
+            style={{ width: '120px' }}
             options={props.Profile.AllStates}
-            value={UniversalGetter("UnitStateId")}
+            value={UniversalGetter('UnitStateId')}
             onChange={(Value) => {
-              props.UnitProfileHandler("ChangeUnitState", Value, SelectedKey);
+              props.UnitProfileHandler('ChangeUnitState', Value, SelectedKey);
             }}
             size="small"
           />
@@ -79,19 +79,19 @@ export default function UnitProfile(props) {
       </div>
       <div
         style={{
-          display: "flex",
-          justifyContent: "space-between",
-          paddingBottom: "10px",
+          display: 'flex',
+          justifyContent: 'space-between',
+          paddingBottom: '10px',
         }}
       >
-        <div style={{ display: "flex", alignItems: "center" }}>Транспорт</div>
-        <div style={{ display: "flex", alignItems: "center" }}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>Транспорт</div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
           <Select
-            style={{ width: "120px" }}
+            style={{ width: '120px' }}
             options={props.Profile.AllVehicles}
-            value={UniversalGetter("VehicleId")}
+            value={UniversalGetter('VehicleId')}
             onChange={(Value) => {
-              props.UnitProfileHandler("ChangeUnitVehicle", Value, SelectedKey);
+              props.UnitProfileHandler('ChangeUnitVehicle', Value, SelectedKey);
             }}
             size="small"
           />
@@ -99,21 +99,21 @@ export default function UnitProfile(props) {
       </div>
       <div
         style={{
-          display: "flex",
-          justifyContent: "space-between",
-          paddingBottom: "10px",
+          display: 'flex',
+          justifyContent: 'space-between',
+          paddingBottom: '10px',
         }}
       >
-        <div style={{ display: "flex", alignItems: "center" }}>Дата</div>
-        <div style={{ display: "flex", alignItems: "center" }}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>Дата</div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
           <DatePicker
-            style={{ width: "200px" }}
+            style={{ width: '200px' }}
             value={Moment(props.Profile.Profile.UnitHistory[0].TS)}
             disabled={
-              "UnitId" in props.Profile.Profile.UnitHistory[SelectedKey]
+              'UnitId' in props.Profile.Profile.UnitHistory[SelectedKey]
             }
             onChange={(Moment) => {
-              props.UnitProfileHandler("ChangeUnitDate", Moment, SelectedKey);
+              props.UnitProfileHandler('ChangeUnitDate', Moment, SelectedKey);
             }}
             format="DD.MM.YYYY HH:mm:ss"
             size="small"
@@ -122,19 +122,19 @@ export default function UnitProfile(props) {
       </div>
       <div
         style={{
-          paddingBottom: "10px",
+          paddingBottom: '10px',
         }}
       >
         <Table
           title={() => (
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <div>История перемещений</div>
               <Button
                 size="small"
                 type="primary"
                 onClick={() => {
                   SetNewSelectedKey(0);
-                  props.UnitProfileHandler("AddUnitSnapshot");
+                  props.UnitProfileHandler('AddUnitSnapshot');
                 }}
               >
                 Добавить
@@ -169,27 +169,47 @@ export default function UnitProfile(props) {
           )}
           columns={[
             {
-              title: "Дата",
-              dataIndex: "TS",
-              key: "TS",
+              title: 'Дата',
+              dataIndex: 'TS',
+              key: 'TS',
               render: (Value, Record, Index) => {
                 return (
                   <div
                     style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
                     }}
                   >
-                    {Moment(Value).format("DD.MM.YYYY HH:mm:ss")}
+                    {Moment(Value).format('DD.MM.YYYY HH:mm:ss')}
                     <CloseOutlined
-                      style={{ cursor: "pointer", color: "red" }}
+                      style={{ cursor: 'pointer', color: 'red' }}
                       onClick={() => {
-                        props.UnitProfileHandler(
-                          "DeleteUnitSnapshot",
-                          undefined,
-                          Index
-                        );
+                        Modal.confirm({
+                          title: 'Подтвердите действие',
+                          content:
+                            props.Profile.Profile.UnitHistory.length > 1
+                              ? 'Вы действительно хотите удалить запись из истории?'
+                              : 'Удалене последней записи в истории повлечет удаление всего профиля. Вы уверены?',
+                          cancelText: 'Отмена',
+                          okText: 'Удалить',
+                          okButtonProps: {
+                            size: 'small',
+                            type: 'primary',
+                            danger: true,
+                          },
+                          cancelButtonProps: { size: 'small' },
+
+                          onOk: () => {
+                            SetNewSelectedKey(0);
+
+                            props.UnitProfileHandler(
+                              'DeleteUnitSnapshot',
+                              undefined,
+                              Index
+                            );
+                          },
+                        });
                       }}
                     />
                   </div>
