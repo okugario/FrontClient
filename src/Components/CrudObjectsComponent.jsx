@@ -1,10 +1,10 @@
-import * as React from 'react';
-import { useEffect, useState } from 'react';
-import { Table, Button, message, Input, Modal } from 'antd';
-import { ApiFetch } from '../Helpers/Helpers';
-import { inject, observer } from 'mobx-react';
+import * as React from "react";
+import { useEffect, useState } from "react";
+import { Table, Button, message, Input, Modal } from "antd";
+import { ApiFetch } from "../Helpers/Helpers";
+import { inject, observer } from "mobx-react";
 
-const ObjectsComponent = inject('ProviderStore')(
+const ObjectsComponent = inject("ProviderStore")(
   observer((props) => {
     const InputRef = React.createRef();
     const [SelectedKey, SetNewSelectedKey] = useState(null);
@@ -13,7 +13,7 @@ const ObjectsComponent = inject('ProviderStore')(
     const RequestTable = () => {
       return ApiFetch(
         `model/${props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id}`,
-        'GET',
+        "GET",
         undefined,
         (Response) => {
           SetNewObjectsTable(
@@ -29,29 +29,29 @@ const ObjectsComponent = inject('ProviderStore')(
     const ObjectsHandler = (Action, Index) => {
       let NewObjectsTable = [...ObjectsTable];
       switch (Action) {
-        case 'EditObject':
+        case "EditObject":
           if (
             ObjectsTable.some((Object) => {
               return Object.Edit;
             })
           ) {
-            message.warn('Сохраните объект');
+            message.warn("Сохраните объект");
           } else {
             NewObjectsTable[Index].Edit = true;
             SetNewObjectsTable(NewObjectsTable);
           }
 
           break;
-        case 'AddObject':
+        case "AddObject":
           if (
             NewObjectsTable.some((Object) => {
               return Object.Edit;
             })
           ) {
-            message.warn('Сохраните объект');
+            message.warn("Сохраните объект");
           } else {
             NewObjectsTable.unshift({
-              Caption: '',
+              Caption: "",
               Edit: true,
               Index: NewObjectsTable.length,
             });
@@ -59,14 +59,14 @@ const ObjectsComponent = inject('ProviderStore')(
           }
 
           break;
-        case 'SaveObject':
+        case "SaveObject":
           if (InputRef.current.input.value.length != 0) {
             if (
               NewObjectsTable.some((Object) => {
                 return Object.Caption == InputRef.current.input.value;
               })
             ) {
-              message.warn('Укажите другое наименование');
+              message.warn("Укажите другое наименование");
             } else {
               NewObjectsTable[Index].Caption = InputRef.current.input.value;
 
@@ -74,11 +74,11 @@ const ObjectsComponent = inject('ProviderStore')(
                 `model/${
                   props.ProviderStore.CurrentTab.Options.CurrentMenuItem.id
                 }${
-                  'Id' in NewObjectsTable[Index]
+                  "Id" in NewObjectsTable[Index]
                     ? `/${NewObjectsTable[Index].Id}`
-                    : ''
+                    : ""
                 }`,
-                'Id' in NewObjectsTable[Index] ? 'PATCH' : 'POST',
+                "Id" in NewObjectsTable[Index] ? "PATCH" : "POST",
                 NewObjectsTable[Index],
                 (Response) => {
                   RequestTable();
@@ -86,12 +86,12 @@ const ObjectsComponent = inject('ProviderStore')(
               );
             }
           } else {
-            message.warn('Заполните наименование объекта');
+            message.warn("Заполните наименование объекта");
           }
 
           break;
-        case 'EditCancel':
-          if ('Id' in NewObjectsTable[Index]) {
+        case "EditCancel":
+          if ("Id" in NewObjectsTable[Index]) {
             NewObjectsTable[Index].Edit = false;
           } else {
             NewObjectsTable.splice(Index, 1);
@@ -99,9 +99,9 @@ const ObjectsComponent = inject('ProviderStore')(
 
           SetNewObjectsTable(NewObjectsTable);
           break;
-        case 'DeleteObject':
+        case "DeleteObject":
           if (
-            'Id' in
+            "Id" in
             NewObjectsTable.find((Object) => {
               return Object.Index == Index;
             })
@@ -114,12 +114,14 @@ const ObjectsComponent = inject('ProviderStore')(
                   return Object.Index == Index;
                 }).Id
               }`,
-              'DELETE',
+              "DELETE",
               undefined,
               (Response) => {
                 RequestTable();
               }
-            );
+            ).catch(() => {
+              message.warn("Сначала удалите связанные объекты");
+            });
           } else {
             NewObjectsTable.splice(
               NewObjectsTable.findIndex((Object) => {
@@ -140,17 +142,17 @@ const ObjectsComponent = inject('ProviderStore')(
       <div className="FullExtend">
         <div
           style={{
-            width: '200px',
-            display: 'flex',
-            justifyContent: 'space-evenly',
-            marginBottom: '5px',
+            width: "200px",
+            display: "flex",
+            justifyContent: "space-evenly",
+            marginBottom: "5px",
           }}
         >
           <Button
             size="small"
             type="primary"
             onClick={() => {
-              ObjectsHandler('AddObject');
+              ObjectsHandler("AddObject");
             }}
           >
             Добавить
@@ -162,19 +164,19 @@ const ObjectsComponent = inject('ProviderStore')(
             onClick={() => {
               if (SelectedKey != null) {
                 Modal.confirm({
-                  okText: 'Удалить',
-                  cancelText: 'Отмена',
+                  okText: "Удалить",
+                  cancelText: "Отмена",
                   okButtonProps: {
-                    size: 'small',
-                    type: 'primary',
+                    size: "small",
+                    type: "primary",
                     danger: true,
                   },
-                  cancelButtonProps: { size: 'small' },
-                  title: 'Подтвердите действие',
-                  content: 'Вы действительно хотите удалить объект?',
+                  cancelButtonProps: { size: "small" },
+                  title: "Подтвердите действие",
+                  content: "Вы действительно хотите удалить объект?",
 
                   onOk: () => {
-                    ObjectsHandler('DeleteObject', SelectedKey);
+                    ObjectsHandler("DeleteObject", SelectedKey);
                   },
                 });
               }
@@ -197,10 +199,10 @@ const ObjectsComponent = inject('ProviderStore')(
           onRow={(Record) => {
             return {
               onClick: () => {
-                SetNewSelectedKey(Record['Index']);
+                SetNewSelectedKey(Record["Index"]);
               },
               onDoubleClick: () => {
-                ObjectsHandler('EditObject', Record['Index']);
+                ObjectsHandler("EditObject", Record["Index"]);
               },
             };
           }}
@@ -209,42 +211,42 @@ const ObjectsComponent = inject('ProviderStore')(
           size="small"
           columns={[
             {
-              title: 'Наименование',
-              key: 'Caption',
-              dataIndex: 'Caption',
+              title: "Наименование",
+              key: "Caption",
+              dataIndex: "Caption",
               render: (Text, Record, Index) => {
                 if (Record.Edit) {
                   return (
                     <>
                       <Input
-                        defaultValue={Record['Caption']}
+                        defaultValue={Record["Caption"]}
                         size="small"
-                        style={{ width: '150px' }}
+                        style={{ width: "150px" }}
                         ref={InputRef}
                       />
                       <Button
                         onClick={() => {
-                          ObjectsHandler('SaveObject', Index);
+                          ObjectsHandler("SaveObject", Index);
                         }}
                         size="small"
                         type="primary"
-                        style={{ marginLeft: '10px' }}
+                        style={{ marginLeft: "10px" }}
                       >
                         Сохранить
                       </Button>
                       <Button
                         onClick={() => {
-                          ObjectsHandler('EditCancel', Index);
+                          ObjectsHandler("EditCancel", Index);
                         }}
                         size="small"
-                        style={{ marginLeft: '10px' }}
+                        style={{ marginLeft: "10px" }}
                       >
                         Отмена
                       </Button>
                     </>
                   );
                 } else {
-                  return <div style={{ cursor: 'pointer' }}>{Text}</div>;
+                  return <div style={{ cursor: "pointer" }}>{Text}</div>;
                 }
               },
             },
