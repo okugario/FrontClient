@@ -1,37 +1,72 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { Button, Checkbox, message, Table, Input, Modal } from "antd";
-import { ApiFetch } from "../Helpers/Helpers";
+import { ApiFetch, TableSorter } from "../Helpers/Helpers";
 export default function FirmsComponent() {
   const [FirmsTable, SetNewFirmsTable] = useState();
   const [SelectedKey, SetNewSelectedKey] = useState(null);
   const InputRef = React.createRef();
   const RequestTable = () => {
     return ApiFetch("model/Firms", "GET", undefined, (Response) => {
-      console.log(Response.data);
       SetNewFirmsTable(
         Response.data.map((Firm, Index) => {
+          if (Firm.Options == null) {
+            Firm.Options = {};
+          }
           Firm.Index = Index;
           Firm.Edit = false;
+
           return Firm;
         })
       );
     });
   };
+  const SaveFirm = (Index) => {
+    ApiFetch(
+      `model/Firms${
+        "Id" in FirmsTable[Index] ? `/${FirmsTable[Index].Id}` : ""
+      }`,
+      "Id" in FirmsTable[Index] ? "PATCH" : "POST",
+      FirmsTable[Index],
+      (Response) => {
+        RequestTable();
+      }
+    );
+  };
   const FirmsHandler = (Action, Data, Index) => {
     let NewFirmsTable = [...FirmsTable];
     switch (Action) {
       case "Edit":
-        NewFirmsTable[Index].Edit = true;
-        SetNewFirmsTable(NewFirmsTable);
+        if (
+          NewFirmsTable.some((Firm) => {
+            return Firm.Edit;
+          })
+        ) {
+          message.warn("Сохраните объект");
+        } else {
+          NewFirmsTable[Index].Edit = true;
+          SetNewFirmsTable(NewFirmsTable);
+        }
         break;
       case "EditCancel":
         if ("Id" in NewFirmsTable[Index]) {
-          NewFirmsTable[Index].Edit = false;
+          ApiFetch(
+            `model/Firms/${NewFirmsTable[Index].Id}`,
+            "GET",
+            undefined,
+            (Response) => {
+              Response.data.Edit = false;
+              Response.data.Index = Index;
+              NewFirmsTable[Index] = Response.data;
+            }
+          ).then(() => {
+            SetNewFirmsTable(NewFirmsTable);
+          });
         } else {
           NewFirmsTable.splice(Index, 1);
+          SetNewFirmsTable(NewFirmsTable);
         }
-        SetNewFirmsTable(NewFirmsTable);
+
         break;
 
       case "AddFirms":
@@ -45,17 +80,21 @@ export default function FirmsComponent() {
         SetNewFirmsTable(NewFirmsTable);
         break;
       case "SaveFirm":
-        NewFirmsTable[Index].Caption = InputRef.current.input.value;
-        ApiFetch(
-          `model/Firms${
-            "Id" in NewFirmsTable[Index] ? `/${NewFirmsTable[Index].Id}` : ""
-          }`,
-          "Id" in NewFirmsTable[Index] ? "PATCH" : "POST",
-          NewFirmsTable[Index],
-          (Response) => {
-            RequestTable();
+        if ("Id" in NewFirmsTable[Index]) {
+          SaveFirm(Index);
+        } else {
+          if (
+            !NewFirmsTable.some((Object) => {
+              return Object.Caption == InputRef.current.input.value;
+            }) &&
+            InputRef.current.input.value.length > 0
+          ) {
+            NewFirmsTable[Index].Caption = InputRef.current.input.value;
+            SaveFirm(Index);
+          } else {
+            message.warning("Укажите другое наименование");
           }
-        );
+        }
 
         break;
       case "DeleteFirm":
@@ -74,6 +113,7 @@ export default function FirmsComponent() {
             "DELETE",
             undefined,
             (Response) => {
+              SetNewSelectedKey(null);
               RequestTable();
             }
           ).catch(() => {
@@ -124,7 +164,7 @@ export default function FirmsComponent() {
                 },
                 cancelButtonProps: { size: "small" },
                 title: "Подтвердите действие",
-                content: "Вы действительно хотите удалить объект?",
+                content: "Вы действительно хотите удалить организацию?",
 
                 onOk: () => {
                   FirmsHandler("DeleteFirm", undefined, SelectedKey);
