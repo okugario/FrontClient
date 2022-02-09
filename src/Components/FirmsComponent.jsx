@@ -70,17 +70,27 @@ export default function FirmsComponent() {
         break;
 
       case "AddFirms":
-        NewFirmsTable.unshift({
-          Caption: "",
-          Own: false,
-          Options: {},
-          Edit: true,
-          Index: NewFirmsTable.length,
-        });
+        if (
+          NewFirmsTable.some((Firm) => {
+            return Firm.Edit;
+          })
+        ) {
+          message.warn("Сохраните объект");
+        } else {
+          NewFirmsTable.unshift({
+            Caption: "",
+            Own: false,
+            Options: {},
+            Edit: true,
+            Index: NewFirmsTable.length,
+          });
+        }
         SetNewFirmsTable(NewFirmsTable);
         break;
       case "SaveFirm":
         if ("Id" in NewFirmsTable[Index]) {
+          NewFirmsTable[Index].Caption = InputRef.current.input.value;
+          SetNewFirmsTable(NewFirmsTable);
           SaveFirm(Index);
         } else {
           if (
