@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { Button, Checkbox, message, Table, Input, Modal } from "antd";
-import { ApiFetch, TableSorter } from "../Helpers/Helpers";
+import { ApiFetch } from "../Helpers/Helpers";
 export default function FirmsComponent() {
   const [FirmsTable, SetNewFirmsTable] = useState();
   const [SelectedKey, SetNewSelectedKey] = useState(null);
