@@ -42,7 +42,7 @@ export default function FirmsComponent() {
             return Firm.Edit;
           })
         ) {
-          message.warn("Сохраните объект");
+          message.warn("Сохраните организацию");
         } else {
           NewFirmsTable[Index].Edit = true;
           SetNewFirmsTable(NewFirmsTable);
@@ -75,7 +75,7 @@ export default function FirmsComponent() {
             return Firm.Edit;
           })
         ) {
-          message.warn("Сохраните объект");
+          message.warn("Сохраните организацию");
         } else {
           NewFirmsTable.unshift({
             Caption: "",
@@ -132,9 +132,17 @@ export default function FirmsComponent() {
         }
         break;
       case "ChangeCheckbox":
-        NewFirmsTable[Index].Edit = true;
-        NewFirmsTable[Index].Own = Data;
-        SetNewFirmsTable(NewFirmsTable);
+        if (
+          NewFirmsTable.some((Firm) => {
+            return Firm.Edit;
+          })
+        ) {
+          message.warn("Сохраните организацию");
+        } else {
+          NewFirmsTable[Index].Edit = true;
+          NewFirmsTable[Index].Own = Data;
+          SetNewFirmsTable(NewFirmsTable);
+        }
         break;
     }
   };

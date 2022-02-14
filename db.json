@@ -1,0 +1,70 @@
+{
+    "Report": [
+      {
+        "Terminal": "432274",
+        "Vehicle": "KOMATSU 181",
+        "TypeCompany": "extern",
+        "January": "0",
+        "February": "0",
+        "March": "0",
+        "April": "1",
+        "May": "1",
+        "June": "1",
+        "July": "1",
+        "August": "1",
+        "September": "1",
+        "October": "1",
+        "November": "1",
+        "December": "0"
+      },  {
+        "Terminal": "55104179",
+        "Vehicle": "880 (75302)",
+        "TypeCompany": "extern",
+        "January": "0",
+        "February": "1",
+        "March": "1",
+        "April": "1",
+        "May": "1",
+        "June": "1",
+        "July": "1",
+        "August": "1",
+        "September": "1",
+        "October": "1",
+        "November": "1",
+        "December": "1"
+      }, {
+        "Terminal": "202000066",
+        "Vehicle": "2133",
+        "TypeCompany": "tk",
+        "January": "1",
+        "February": "1",
+        "March": "1",
+        "April": "0",
+        "May": "0",
+        "June": "0",
+        "July": "0",
+        "August": "0",
+        "September": "1",
+        "October": "1",
+        "November": "0",
+        "December": "0"
+      },
+      {
+        "Terminal": "203024848",
+        "Vehicle": "HITACHI 1046",
+        "TypeCompany": "notdef",
+        "January": "1",
+        "February": "1",
+        "March": "1",
+        "April": "1",
+        "May": "1",
+        "June": "1",
+        "July": "1",
+        "August": "1",
+        "September": "1",
+        "October": "1",
+        "November": "1",
+        "December": "1"
+      }
+    ]
+  }
