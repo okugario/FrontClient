@@ -26,6 +26,7 @@ const LoadsReportComponent = inject('ProviderStore')(
     const [LoadsTableRows, SetNewLoadsTableRows] = useState([]);
     const [LoadsTableColumns, SetNewLoadsTableColumns] = useState([]);
     const [LoadsTableSummary, SetNewLoadsTableSummary] = useState([]);
+    const [ShouldersTable, SetNewShouldersTable] = useState([]);
     const [Chart, SetNewChart] = useState(null);
     const [ChartRef, SetNewChartRef] = useState(createRef());
 
@@ -136,6 +137,16 @@ const LoadsReportComponent = inject('ProviderStore')(
             'GET',
             undefined,
             (Response) => {
+              SetNewShouldersTable(
+                Response.SouldersVehicle.map((Element, Index) => {
+                  return {
+                    Key: Index,
+                    Vehicle: Element.Vehicle,
+                    Shoulders: Element.Soulders,
+                    Summ: Element.Summ,
+                  };
+                })
+              );
               SetNewLoadsTableSummary(Response.loadsTable.summary);
               SetNewSummaryTables(Response.summaryTables);
               SetNewLoadsTableRows(
@@ -159,10 +170,12 @@ const LoadsReportComponent = inject('ProviderStore')(
             SetNewLoadsTableRows([]);
             SetNewLoadsTableColumns([]);
             SetNewLoadsTableSummary([]);
+            SetNewShouldersTable([]);
           });
         } else {
           if (Chart != null) {
             UpdateChart([], []);
+            SetNewShouldersTable([]);
             SetNewSummaryTables([]);
             SetNewLoadsTableRows([]);
             SetNewLoadsTableColumns([]);
@@ -187,7 +200,8 @@ const LoadsReportComponent = inject('ProviderStore')(
           <div style={{ height: '100%', width: '100%' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <strong>{GetReportTitle()}</strong>
-              {LoadsTableRows.length != 0 ? (
+              {LoadsTableRows.length != 0 &&
+              props.ProviderStore.CurrentTab.Id == 'reports' ? (
                 <Button
                   size="small"
                   type="primary"
@@ -238,23 +252,81 @@ const LoadsReportComponent = inject('ProviderStore')(
             />
           </div>
         </div>
-        <div style={{ overflowY: 'auto', height: '500px' }}>
-          {SummaryTables.map((ObjectTable, Index) => {
-            ObjectTable.table.rows.push(ObjectTable.table.summary[0]);
-            return (
-              <Table
-                pagination={false}
-                key={Index}
-                size="small"
-                title={() => <strong>{ObjectTable.caption}</strong>}
-                columns={GenerateTableData(
-                  'Columns',
-                  ObjectTable.table.columns
-                )}
-                dataSource={GenerateTableData('Rows', ObjectTable.table.rows)}
-              />
-            );
-          })}
+        <div style={{ display: 'grid', gridTemplateRows: '1fr 1fr' }}>
+          <div style={{ overflowY: 'auto', height: '500px' }}>
+            {SummaryTables.map((ObjectTable, Index) => {
+              ObjectTable.table.rows.push(ObjectTable.table.summary[0]);
+              return (
+                <Table
+                  pagination={false}
+                  key={Index}
+                  size="small"
+                  title={() => <strong>{ObjectTable.caption}</strong>}
+                  columns={GenerateTableData(
+                    'Columns',
+                    ObjectTable.table.columns
+                  )}
+                  dataSource={GenerateTableData('Rows', ObjectTable.table.rows)}
+                />
+              );
+            })}
+          </div>
+          <div>
+            <Table
+              expandable={{
+                expandedRowRender: (Record) => {
+                  return (
+                    <Table
+                      summary={() => {
+                        return (
+                          <Table.Summary fixed={true}>
+                            <Table.Summary.Row>
+                              <Table.Summary.Cell index={0}>
+                                Сумма
+                              </Table.Summary.Cell>
+                              <Table.Summary.Cell index={1}>
+                                {Record.Summ}
+                              </Table.Summary.Cell>
+                            </Table.Summary.Row>
+                          </Table.Summary>
+                        );
+                      }}
+                      pagination={false}
+                      rowKey="TripsNamber"
+                      dataSource={Record.Shoulders}
+                      columns={[
+                        {
+                          title: 'Номер рейса',
+                          dataIndex: 'TripsNamber',
+                          key: 'TripsNamber',
+                        },
+                        {
+                          title: 'Плечо в км',
+                          dataIndex: 'Shoulder',
+                          key: 'Shoulder',
+                        },
+                      ]}
+                    />
+                  );
+                },
+              }}
+              rowKey="Key"
+              dataSource={ShouldersTable}
+              pagination={false}
+              size="small"
+              scroll={{ y: 190 }}
+              columns={[
+                {
+                  title: 'Машина',
+                  dataIndex: 'Vehicle',
+                  key: 'Vehicle',
+                  render: (Value, Record) => {
+                    return `${Value} Рейсов ${Record.Shoulders.length}`;
+                  },
+                },
+              ]}
+            />
+          </div>
         </div>
       </div>
     );
