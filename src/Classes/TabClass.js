@@ -117,6 +117,11 @@ export class Tab {
               import("../Components/ConfigSchemesComponent")
             );
             break;
+          case "ReportComponent":
+            Item.Component = React.lazy(() =>
+              import("../Components/ReportComponent")
+            );
+            break;
         }
         return Item;
       });
