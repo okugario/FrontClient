@@ -43,6 +43,7 @@ const TransportComponent = inject('ProviderStore')(
             Profile: {
               Caption: '',
               ModelId: '',
+              Model: {},
               Owners: [],
               Equipments: [],
               Locations: [],
