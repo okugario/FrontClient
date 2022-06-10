@@ -195,7 +195,7 @@ export default function RetranslationProfile(props) {
               onChange={(Event) => {
                 props.RetranslationHandler(
                   'ChangeProtocolLimit',
-                  Event.target.value
+                  Event.target.valueAsNumber
                 );
               }}
               size="small"
@@ -217,7 +217,7 @@ export default function RetranslationProfile(props) {
               onChange={(Event) => {
                 props.RetranslationHandler(
                   'ChangeProtocolPause',
-                  Event.target.value
+                  Event.target.valueAsNumber
                 );
               }}
               size="small"
