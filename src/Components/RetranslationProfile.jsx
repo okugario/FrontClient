@@ -192,6 +192,7 @@ export default function RetranslationProfile(props) {
           </div>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <Input
+              type="number"
               onChange={(Event) => {
                 props.RetranslationHandler(
                   'ChangeProtocolLimit',
@@ -214,6 +215,7 @@ export default function RetranslationProfile(props) {
           <div style={{ display: 'flex', alignItems: 'center' }}>Пауза:</div>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <Input
+              type="number"
               onChange={(Event) => {
                 props.RetranslationHandler(
                   'ChangeProtocolPause',
