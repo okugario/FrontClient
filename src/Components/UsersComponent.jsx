@@ -1,11 +1,11 @@
-import * as React from "react";
-import { Table, Modal, message } from "antd";
-import { useState, useEffect } from "react";
-import { ApiFetch } from "../Helpers/Helpers";
-import UserProfileComponent from "../Components/UserProfileComponent";
-import TableButtonComponent from "../Components/TableButtonComponent";
-import Bcrypt from "bcryptjs";
-import Moment from "moment";
+import * as React from 'react';
+import { Table, Modal, message } from 'antd';
+import { useState, useEffect } from 'react';
+import { ApiFetch } from '../Helpers/Helpers';
+import UserProfileComponent from '../Components/UserProfileComponent';
+import TableButtonComponent from '../Components/TableButtonComponent';
+import Bcrypt from 'bcryptjs';
+import Moment from 'moment';
 
 export default function UsersComponent(props) {
   const [UsersTable, SetNewUsersTable] = useState();
@@ -14,7 +14,7 @@ export default function UsersComponent(props) {
   const [UserProfile, SetNewUserProfile] = useState(null);
 
   const RequestTable = () => {
-    return ApiFetch("model/Users", "GET", undefined, (Response) => {
+    return ApiFetch('model/Users', 'GET', undefined, (Response) => {
       SetNewUsersTable(Response.data);
     });
   };
@@ -22,12 +22,12 @@ export default function UsersComponent(props) {
     let Profile = {};
     let PromiseArray = [];
     PromiseArray.push(
-      ApiFetch(`model/Users/${SelectedKey}`, "GET", undefined, (Response) => {
+      ApiFetch(`model/Users/${SelectedKey}`, 'GET', undefined, (Response) => {
         Profile.Profile = Response.data;
       })
     );
     PromiseArray.push(
-      ApiFetch("model/AccessRoles", "GET", undefined, (Response) => {
+      ApiFetch('model/AccessRoles', 'GET', undefined, (Response) => {
         Profile.AllRoles = Response.data.map((Role) => {
           return {
             value: Role.rolename,
@@ -43,31 +43,31 @@ export default function UsersComponent(props) {
   const UserProfileHandler = (Action, Data) => {
     let NewUserProfile = { ...UserProfile };
     switch (Action) {
-      case "ChangeUsername":
+      case 'ChangeUsername':
         NewUserProfile.Profile.Username = Data;
         SetNewUserProfile(NewUserProfile);
         break;
-      case "ChangeRolename":
+      case 'ChangeRolename':
         NewUserProfile.Profile.Rolename = Data;
         SetNewUserProfile(NewUserProfile);
         break;
-      case "ChangeEnabled":
+      case 'ChangeEnabled':
         NewUserProfile.Profile.Enabled = Data;
         SetNewUserProfile(NewUserProfile);
         break;
-      case "ChangePassword":
+      case 'ChangePassword':
         NewUserProfile.Profile.Password = Data;
         SetNewUserProfile(NewUserProfile);
         break;
-      case "SaveUserProfile":
+      case 'SaveUserProfile':
         if (NewUserProfile.Profile.Hash.length > 0) {
           ApiFetch(
-            `model/Users${
+            `model/Users/${
               NewUserProfile.Profile.New
                 ? ``
                 : `${NewUserProfile.Profile.Username}`
             }`,
-            NewUserProfile.Profile.New ? "POST" : "PATCH",
+            NewUserProfile.Profile.New ? 'POST' : 'PATCH',
             NewUserProfile.Profile,
             (Response) => {
               RequestTable().then(() => {
@@ -76,17 +76,17 @@ export default function UsersComponent(props) {
             }
           );
         } else {
-          message.warn("Установите пароль!");
+          message.warn('Установите пароль!');
         }
         break;
-      case "HashPassword":
+      case 'HashPassword':
         NewUserProfile.Profile.Hash = Bcrypt.hashSync(
           NewUserProfile.Profile.Password,
           12
         );
         SetNewUserProfile(NewUserProfile);
         break;
-      case "EnableStartDate":
+      case 'EnableStartDate':
         if (Data) {
           NewUserProfile.Profile.options.StartDate = Moment().format();
         } else {
@@ -94,7 +94,7 @@ export default function UsersComponent(props) {
         }
         SetNewUserProfile(NewUserProfile);
         break;
-      case "EnableEndDate":
+      case 'EnableEndDate':
         if (Data) {
           NewUserProfile.Profile.options.EndDate = Moment().format();
         } else {
@@ -102,11 +102,11 @@ export default function UsersComponent(props) {
         }
         SetNewUserProfile(NewUserProfile);
         break;
-      case "ChangeStartDate":
+      case 'ChangeStartDate':
         NewUserProfile.Profile.options.StartDate = Data.format();
         SetNewUserProfile(NewUserProfile);
         break;
-      case "ChangeEndDate":
+      case 'ChangeEndDate':
         NewUserProfile.Profile.options.EndDate = Data.format();
         SetNewUserProfile(NewUserProfile);
         break;
@@ -114,7 +114,7 @@ export default function UsersComponent(props) {
   };
 
   const AddUserProfile = () => {
-    ApiFetch("model/AccessRoles", "GET", undefined, (Response) => {
+    ApiFetch('model/AccessRoles', 'GET', undefined, (Response) => {
       SetNewUserProfile({
         AllRoles: Response.data.map((Role) => {
           return {
@@ -124,11 +124,11 @@ export default function UsersComponent(props) {
         }),
         Profile: {
           New: true,
-          Rolename: "USER",
-          Username: "",
-          Password: "",
+          Rolename: 'USER',
+          Username: '',
+          Password: '',
           Enabled: true,
-          Hash: "",
+          Hash: '',
           options: {},
         },
       });
@@ -136,7 +136,7 @@ export default function UsersComponent(props) {
     });
   };
   const DeleteUserProfile = () => {
-    ApiFetch(`model/Users/${SelectedKey}`, "DELETE", undefined, (Response) => {
+    ApiFetch(`model/Users/${SelectedKey}`, 'DELETE', undefined, (Response) => {
       SetNewSelectedKey(null);
       RequestTable();
     });
@@ -153,15 +153,15 @@ export default function UsersComponent(props) {
         onDelete={() => {
           if (SelectedKey != null) {
             Modal.confirm({
-              okText: "Удалить",
+              okText: 'Удалить',
               onOk: () => {
                 DeleteUserProfile();
               },
-              cancelText: "Отмена",
-              title: "Подвердите действие",
-              content: "Вы действительно хотите удалить пользователя?",
-              okButtonProps: { size: "small", danger: true, type: "primary" },
-              cancelButtonProps: { size: "small" },
+              cancelText: 'Отмена',
+              title: 'Подвердите действие',
+              content: 'Вы действительно хотите удалить пользователя?',
+              okButtonProps: { size: 'small', danger: true, type: 'primary' },
+              cancelButtonProps: { size: 'small' },
             });
           }
         }}
@@ -169,8 +169,8 @@ export default function UsersComponent(props) {
       <Modal
         destroyOnClose={true}
         maskClosable={false}
-        okButtonProps={{ size: "small", type: "primary" }}
-        cancelButtonProps={{ size: "small" }}
+        okButtonProps={{ size: 'small', type: 'primary' }}
+        cancelButtonProps={{ size: 'small' }}
         title="Профиль пользователя"
         visible={ShowProfile}
         onCancel={() => {
@@ -179,7 +179,7 @@ export default function UsersComponent(props) {
         }}
         onOk={() => {
           {
-            UserProfileHandler("SaveUserProfile");
+            UserProfileHandler('SaveUserProfile');
           }
         }}
         okText="Сохранить"
@@ -206,7 +206,7 @@ export default function UsersComponent(props) {
         onRow={(Record) => {
           return {
             onClick: () => {
-              SetNewSelectedKey(Record["Username"]);
+              SetNewSelectedKey(Record['Username']);
             },
             onDoubleClick: () => {
               RequestProfile().then(() => {
@@ -217,19 +217,19 @@ export default function UsersComponent(props) {
         }}
         columns={[
           {
-            title: "Имя пользователя",
-            dataIndex: "Username",
-            key: "Username",
+            title: 'Имя пользователя',
+            dataIndex: 'Username',
+            key: 'Username',
             render: (Value, Record, Index) => {
-              return <div style={{ cursor: "pointer" }}>{Value}</div>;
+              return <div style={{ cursor: 'pointer' }}>{Value}</div>;
             },
           },
           {
-            title: "Имя роли",
-            dataIndex: "Rolename",
-            key: "Rolename",
+            title: 'Имя роли',
+            dataIndex: 'Rolename',
+            key: 'Rolename',
             render: (Value, Record, Index) => {
-              return <div style={{ cursor: "pointer" }}>{Value}</div>;
+              return <div style={{ cursor: 'pointer' }}>{Value}</div>;
             },
           },
         ]}
