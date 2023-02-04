@@ -176,6 +176,12 @@ export default function RetranslationProfile(props) {
                   title:
                     "Вес отправляется параметром 'sensor1','sensor2 (могут быть меньше нуля)",
                 },
+                {
+                  label: '5',
+                  value: 5,
+                  title:
+                    "Без LLS",
+                }
               ]}
             />
           </div>
